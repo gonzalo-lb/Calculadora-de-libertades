@@ -1,6 +1,9 @@
 import datetime
 from dateutil.relativedelta import relativedelta
 
+def es_multiplo(numero, multiplo):
+    return numero % multiplo == 0
+
 # Ingresar fecha de detención   
 fechaDeDetencionInput = input('Ingresar fecha de detención en formato año-mes-día (XXXX/XX/XX): ')
 fechaDeDetencionInput_año = fechaDeDetencionInput[0:4]
@@ -12,9 +15,18 @@ fechaDeDetencionInput_dia = fechaDeDetencionInput[8:10]
 fechaDeDetencion = datetime.date(int(fechaDeDetencionInput_año), int(fechaDeDetencionInput_mes), int(fechaDeDetencionInput_dia))
 
 # Ingresar monto de pena
-montoDePena_años = int(input('Ingresar monto de pena (años): '))
-montoDePena_meses = int(input('Ingresar monto de pena (meses): '))
-montoDePena_dias = int(input('Ingresar monto de pena (días): '))
+try:
+    montoDePena_años = int(input('Ingresar monto de pena (años): '))
+except:
+    montoDePena_años = 0
+try:
+    montoDePena_meses = int(input('Ingresar monto de pena (meses): '))
+except:
+    montoDePena_meses = 0
+try:
+    montoDePena_dias = int(input('Ingresar monto de pena (días): '))
+except:
+    montoDePena_dias = 0
 
 # Implementar código para revisar que las fechas estén bien ingresadas
 
@@ -73,15 +85,80 @@ if LC_meses >= 12:
 
 libertadCondicional += relativedelta(days=-1)
 
+# SALIDAS TRANSITORIAS
+# --------------------
+salidasTransitorias = fechaDeDetencion
+
+# Calcula la mitad de los días lo redondea para abajo si da con coma, y los suma
+ST_dias = int(montoDePena_dias / 2) # Hace la mitad y lo redondea para abajo
+salidasTransitorias +=relativedelta(days=ST_dias)
+
+# Calcula la mitad de los meses
+ST_meses = montoDePena_meses
+ST_dias_resto = 0
+if ST_meses == 1:
+    ST_meses = 0
+    ST_dias_resto = int(15)
+elif ST_meses > 1:
+    if es_multiplo(ST_meses, 2):
+        ST_meses /= 2
+    else:
+        ST_meses = montoDePena_meses/2
+        ST_meses = int(ST_meses)        
+        ST_dias_resto = int(15)
+
+salidasTransitorias += relativedelta(months=ST_meses)
+salidasTransitorias += relativedelta(days=ST_dias_resto)
+
+# Calcula la mitad de los años
+ST_años = montoDePena_años
+ST_meses_resto = 0
+if ST_años == 1:
+    ST_años = 0
+    ST_meses_resto = int(6)
+elif ST_años > 1:
+    if es_multiplo(ST_años, 2):
+        ST_años /= 2
+    else:
+        ST_años /= 2
+        ST_años = int(ST_años)
+        ST_meses_resto = int(6)
+
+salidasTransitorias += relativedelta(years=ST_años)
+salidasTransitorias += relativedelta(months=ST_meses_resto)
+
+salidasTransitorias += relativedelta(days=-1)
+
+# LIBERTAD ASISTIDA
+# -----------------
+
+libertadAsistida3meses = vencimientoDePena
+libertadAsistida6meses = vencimientoDePena
+
+libertadAsistida3meses += relativedelta(months=-3)
+libertadAsistida6meses += relativedelta(months=-6)
+
 # Se ajustan los resultados para que no tengan decimales
-if LC_años.is_integer():    
+if type(LC_años) is not int and LC_años.is_integer():
     LC_años = int(LC_años)
-if LC_meses.is_integer():
+if type(LC_meses) is not int and LC_meses.is_integer():
     LC_meses = int(LC_meses)
-if LC_dias.is_integer():
+if type(LC_dias) is not int and LC_dias.is_integer():
     LC_dias = int(LC_dias)
+
+# Se ajustan los resultados para que no tengan decimales
+if type(ST_años) is not int and ST_años.is_integer():
+    ST_años = int(ST_años)
+if type(ST_meses) is not int and ST_meses.is_integer():
+    ST_meses = int(ST_meses)
+if type(ST_dias) is not int and ST_dias.is_integer():
+    ST_dias = int(ST_dias)
 
 # Imprimir resultados
 print('Vencimiento de pena: {}'.format(vencimientoDePena))
 print('La libertad condicional se obtiene a los {} año(s), {} mes(es) y {} día(s) de detención'.format(LC_años, LC_meses, LC_dias))
 print('Libertad condicional: {}'.format(libertadCondicional))
+print('Las salidas transitorias se obtienen a los {} año(s), {} mes(es) y {} día(s) de detención'.format(ST_años, ST_meses + ST_meses_resto, ST_dias + ST_dias_resto))
+print('Salidas transitorias: {}'.format(salidasTransitorias))
+print('Libertad asistida -3 meses-: {}'.format(libertadAsistida3meses))
+print('Libertad asistida -6 meses-: {}'.format(libertadAsistida6meses))
