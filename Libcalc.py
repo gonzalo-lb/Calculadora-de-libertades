@@ -4,6 +4,11 @@ from dateutil.relativedelta import relativedelta
 def es_multiplo(numero, multiplo):
     return numero % multiplo == 0
 
+# Dummy dates
+detencion1 = {"detencion":datetime.date(2010, 3, 4), "libertad":datetime.date(2010, 3, 27)}
+detencion2 = {"detencion":datetime.date(2011, 5, 7), "libertad":datetime.date(2011, 7, 2)}
+detencion3 = {"detencion":datetime.date(2012, 8, 25), "libertad":datetime.date(2013, 9, 19)}
+
 # Ingresar fecha de detención   
 fechaDeDetencionInput = input('Ingresar fecha de detención en formato año-mes-día (XXXX/XX/XX): ')
 fechaDeDetencionInput_año = fechaDeDetencionInput[0:4]
