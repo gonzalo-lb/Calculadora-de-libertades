@@ -9,7 +9,7 @@ detencion1 = {"detencion":datetime.date(2010, 3, 4), "libertad":datetime.date(20
 detencion2 = {"detencion":datetime.date(2011, 5, 7), "libertad":datetime.date(2011, 7, 2)}
 detencion3 = {"detencion":datetime.date(2012, 8, 25), "libertad":datetime.date(2013, 9, 19)}
 
-# Ingresar fecha de detención   
+# Ingresar fecha de detención
 fechaDeDetencionInput = input('Ingresar fecha de detención en formato año-mes-día (XXXX/XX/XX): ')
 fechaDeDetencionInput_año = fechaDeDetencionInput[0:4]
 fechaDeDetencionInput_mes = fechaDeDetencionInput[5:7]
@@ -20,17 +20,24 @@ fechaDeDetencionInput_dia = fechaDeDetencionInput[8:10]
 fechaDeDetencion = datetime.date(int(fechaDeDetencionInput_año), int(fechaDeDetencionInput_mes), int(fechaDeDetencionInput_dia))
 
 # Ingresar monto de pena
+montoDePena={"Años":0, "Meses":0, "Días":0}
 try:
+    montoDePena['Años'] = int(input('Ingresar monto de pena (años): '))
     montoDePena_años = int(input('Ingresar monto de pena (años): '))
 except:
+    montoDePena['Años'] = 0
     montoDePena_años = 0
 try:
+    montoDePena['Meses'] = int(input('Ingresar monto de pena (meses): '))
     montoDePena_meses = int(input('Ingresar monto de pena (meses): '))
 except:
-    montoDePena_meses = 0
+    montoDePena['Meses'] = 0
+    montoDePena_meses = 0    
 try:
+    montoDePena['Días'] = int(input('Ingresar monto de pena (días): '))
     montoDePena_dias = int(input('Ingresar monto de pena (días): '))
 except:
+    montoDePena['Días'] = 0
     montoDePena_dias = 0
 
 # Implementar código para revisar que las fechas estén bien ingresadas
