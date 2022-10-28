@@ -1,124 +1,6 @@
 import datetime
 from dateutil.relativedelta import relativedelta
-# from libcalc_methods import es_multiplo, TiempoEnAños_Meses_Dias, GetConsoleInput_Fecha, GetConsoleInput_MontoDePena, GetConsole_OtrosTiemposDeDetencion
-
-def FechaAesMayorQueFechaB(fecha_a:datetime.date, fecha_b:datetime.date):
-    temp = fecha_a - fecha_b    
-    if temp.days > 0:
-        return True
-    else:
-        return False
-
-def FechaAesIgualQueFechaB(fecha_a:datetime.date, fecha_b:datetime.date):
-    temp = fecha_a - fecha_b    
-    if temp.days == 0:
-        return True
-    else:
-        return False
-
-def es_multiplo(numero, multiplo):
-    return numero % multiplo == 0
-
-class TiempoEnAños_Meses_Dias():
-    def __init__(self):
-        self.años = 0
-        self.meses = 0
-        self.dias = 0
-    
-    def __str__(self):
-        return '...{} año(s), {} mes(es) y {} día(s)...'.format(self.años, self.meses, self.dias)
-
-def GetConsoleInput_Fecha(mensaje_para_el_usuario="Ingrese fecha en formato año-mes-día (XXXX/XX/XX): "):
-    '''Hace ingresar por consola una fecha de detención y la devuelve como un datetime.date'''
-    fechaDeDetencionInput = input(mensaje_para_el_usuario)
-    fechaDeDetencionInput_año = fechaDeDetencionInput[0:4]
-    fechaDeDetencionInput_mes = fechaDeDetencionInput[5:7]
-    fechaDeDetencionInput_dia = fechaDeDetencionInput[8:10]
-    fechaDeDetencionInput = datetime.date(int(fechaDeDetencionInput_año), int(fechaDeDetencionInput_mes), int(fechaDeDetencionInput_dia))
-    return fechaDeDetencionInput
-
-def GetConsoleInput_MontoDePena():
-    '''Hace ingresar por consola un monto de pena temporal y la devuelve como un TiempoEnAños_Meses_Dias()'''
-    montoDePena = TiempoEnAños_Meses_Dias()
-    # Ingresar monto de pena    
-    try:
-        montoDePena.años = int(input('Ingresar monto de pena (años): '))
-    except:
-        montoDePena.años = 0        
-    try:
-        montoDePena.meses = int(input('Ingresar monto de pena (meses): '))        
-    except:
-        montoDePena.meses = 0        
-    try:
-        montoDePena.dias = int(input('Ingresar monto de pena (días): '))        
-    except:
-        montoDePena.dias = 0
-    return montoDePena
-
-def GetConsole_OtrosTiemposDeDetencion():
-    OTDD = []
-    seguir_preguntando = True
-    init_query = input('Ingresar tiempos de detención? (Y/N): ')
-    if init_query == "N" or init_query == "n":
-        return "NULL"
-    else:
-        while seguir_preguntando:
-            f_det = GetConsoleInput_Fecha('Ingresar fecha de detención (XXXX/XX/XX): ')
-            f_lib = GetConsoleInput_Fecha('Ingresar fecha de libertad (XXXX/XX/XX): ')
-            este = OtrasDetenciones(f_det, f_lib)
-            OTDD.append(este)
-            seguir = input('Necesita ingresar otro tiempo de detención? (Y/N): ')
-            if seguir == "Y" or seguir == "y":
-                seguir_preguntando = True
-            else:
-                seguir_preguntando = False
-        return OTDD
-
-class OtrasDetenciones():
-    def __init__(self, fecha_de_detencion:datetime.datetime, fecha_de_libertad:datetime.datetime, nombre:str="Sin nombre"):
-        self._nombre = nombre
-        self._detencion = fecha_de_detencion
-        self._libertad = fecha_de_libertad
-        self._tiempoDeDetencion = TiempoEnAños_Meses_Dias()
-        self._CalcularTiempoDeDetencion()
-    
-    def _CalcularTiempoDeDetencion(self):
-        if FechaAesMayorQueFechaB(self._detencion, self._libertad):            
-            raise Exception('ERROR: Se ingresó una fecha de detención posterior a la fecha de libertad.')
-        
-        fecha_temp = self._detencion
-        _meses = 0
-        _años = 0
-        _dias = 1
-
-        if self._detencion.day > self._libertad.day:
-            _meses -= 1
-        
-        while fecha_temp.month != self._libertad.month:
-            _meses += 1
-            fecha_temp += relativedelta(months=1)
-        
-        while fecha_temp.year != self._libertad.year:
-            _años += 1
-            fecha_temp += relativedelta(years=1)
-        
-        while fecha_temp.day != self._libertad.day:
-            _dias += 1
-            fecha_temp += relativedelta(days=1)
-        
-        self._tiempoDeDetencion.años = _años
-        self._tiempoDeDetencion.meses = _meses
-        self._tiempoDeDetencion.dias = _dias
-
-        print('Este tiempo de detención es de: {}'.format(self._tiempoDeDetencion))
-
-def RestarOtrasDetenciones(fecha_de_requisito_temporal:datetime.date, otras_detenciones:list[OtrasDetenciones]):
-        toreturn = fecha_de_requisito_temporal
-        for otra_det in otras_detenciones:
-            toreturn += relativedelta(days=-otra_det._tiempoDeDetencion.dias)
-            toreturn += relativedelta(days=-otra_det._tiempoDeDetencion.meses)
-            toreturn += relativedelta(days=-otra_det._tiempoDeDetencion.años)
-        return toreturn 
+from libcalc_methods import *
 
 class ComputoDePena():
     
@@ -146,9 +28,7 @@ class ComputoDePena():
         self.__CalcularLibertadCondicional()
         self.__CalcularSalidasTransitorias()
         self.__CalcularLibertadAsistida_3meses()
-        self.__CalcularLibertadAsistida_6meses()
-        print(otrosTiemposDeDetencion)
-        print(type(otrosTiemposDeDetencion))
+        self.__CalcularLibertadAsistida_6meses()                
 
     def __CalcularVencimientoDePena(self):
 
@@ -303,6 +183,7 @@ class ComputoDePena():
         resultadosFinales = '''
 Cómputo de pena
 ---------------
+Fecha de detención: {}
 Vencimiento de pena: {}
 La libertad condicional se obtiene a los {} año(s), {} mes(es) y {} día(s) de detención.
 Libertad condicional: {}
@@ -310,7 +191,8 @@ Las salidas transitorias se obtienen a los {} año(s), {} mes(es) y {} día(s) d
 Salidas transitorias: {}
 Libertad asistida -3 meses-: {}
 Libertad asistida -6 meses-: {}
-'''.format(self._vencimiento_de_pena,
+'''.format(self._fecha_de_detencion,
+        self._vencimiento_de_pena,
         self._requisito_libertad_condicional.años, self._requisito_libertad_condicional.meses, self._requisito_libertad_condicional.dias,
         self._computo_libertad_condicional,
         self._requisito_salidas_transitorias.años, self._requisito_salidas_transitorias.meses, self._requisito_salidas_transitorias.dias,
@@ -321,12 +203,14 @@ Libertad asistida -6 meses-: {}
         resultadosSinRestarOtrasDetenciones = '''
 Resultados sin restar otras detenciones
 ---------------------------------------
+Fecha de detención: {}
 Vencimiento de pena: {}
 Libertad condicional: {}
 Salidas transitorias: {}
 Libertad asistida -3 meses-: {}
 Libertad asistida -6 meses-: {}
-'''.format(self._vencimiento_de_pena_sinRestarOtrasDetenciones,        
+'''.format(self._fecha_de_detencion, 
+        self._vencimiento_de_pena_sinRestarOtrasDetenciones,        
         self._computo_libertad_condicional_sinRestarOtrasDetenciones,        
         self._computo_salidas_transitorias_sinRestarOtrasDetenciones,
         self._computo_libertad_asistida_3meses_sinRestarOtrasDetenciones,
@@ -339,7 +223,7 @@ def _DEBUG():
     
     fechaDeDetencionInput = GetConsoleInput_Fecha('Ingresar fecha de detención en formato año-mes-día (XXXX/XX/XX): ')
     montoDePena = GetConsoleInput_MontoDePena()
-    otrasDetenciones = GetConsole_OtrosTiemposDeDetencion()
+    otrasDetenciones = GetConsoleInput_OtrosTiemposDeDetencion()
     
     computo = ComputoDePena(fechaDeDetencionInput, montoDePena, otrasDetenciones)    
     computo._ImprimirResultados()    
