@@ -1,0 +1,9 @@
+ - Penas perpetuas.
+ - Nuevo cómputo para libertad condicional revocada (no se contabiliza el tiempo que se estuvo en libertad)
+ - Fecha del hecho, para evaluar leyes penal más benignas en reincidencia, ejecución penal, multas, etc.
+ - Penas de ejecución condicional y plazos para las reglas de conducta.
+ - Alertas por reincidencia, delitos excluidos del régimen de libertades (por ley 27.375), libertades revocadas, etc. con indicación de la normativa específica.
+ - Requisito temporal extra para la ST, de permanencia en periodo de prueba (art. 17, ley 24.660)
+ - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)
+ - Prelibertad
+ - Régimen de salida anticipada para los casos del 56 bis (1 año antes)
