@@ -9,6 +9,8 @@ class ComputoDePena():
         self._monto_de_pena = montoDePena
         self._vencimiento_de_pena = datetime.date
         self._vencimiento_de_pena_sinRestarOtrasDetenciones = datetime.date
+        self._caducidad_de_la_pena = datetime.date
+        self._caducidad_de_la_pena_sinRestarOtrasDetenciones = datetime.date
         self._otros_tiempos_de_detencion = otrosTiemposDeDetencion
         self._computo_libertad_condicional = datetime.date
         self._computo_libertad_condicional_sinRestarOtrasDetenciones = datetime.date
@@ -25,6 +27,7 @@ class ComputoDePena():
 
         # Luego tiene que hacer todos los cálculos
         self.__CalcularVencimientoDePena()
+        self.__CalcularCaducidadDeLaPena()
         self.__CalcularLibertadCondicional()
         self.__CalcularSalidasTransitorias()
         self.__CalcularLibertadAsistida_3meses()
@@ -41,6 +44,14 @@ class ComputoDePena():
         self._vencimiento_de_pena_sinRestarOtrasDetenciones = self._vencimiento_de_pena
         if self._otros_tiempos_de_detencion != "NULL":
             self._vencimiento_de_pena = RestarOtrasDetenciones(self._vencimiento_de_pena, self._otros_tiempos_de_detencion)
+    
+    def __CalcularCaducidadDeLaPena(self):
+
+        self._caducidad_de_la_pena = datetime.date
+        self._caducidad_de_la_pena = self._vencimiento_de_pena
+        self._caducidad_de_la_pena += relativedelta(years=10)        
+        self._caducidad_de_la_pena_sinRestarOtrasDetenciones = self._vencimiento_de_pena_sinRestarOtrasDetenciones
+        self._caducidad_de_la_pena_sinRestarOtrasDetenciones += relativedelta(years=10)
     
     def __CalcularLibertadCondicional(self):
 
@@ -59,25 +70,25 @@ class ComputoDePena():
             # Calcula los 2/3 de los meses
             self._requisito_libertad_condicional.meses = self._monto_de_pena.meses
             self._requisito_libertad_condicional.meses = (self._requisito_libertad_condicional.meses * 2) / 3
-            dias_resto = 0
+            LC_dias_resto = 0
             if self._requisito_libertad_condicional.meses.is_integer() is False:
-                dias_resto = self._requisito_libertad_condicional.meses - int(self._requisito_libertad_condicional.meses)
+                LC_dias_resto = self._requisito_libertad_condicional.meses - int(self._requisito_libertad_condicional.meses)
                 self._requisito_libertad_condicional.meses = int(self._requisito_libertad_condicional.meses)
-                if dias_resto > 0.3 and dias_resto < 0.4:
-                    dias_resto = int(10)
-                elif dias_resto > 0.6 and dias_resto < 0.7:
-                    dias_resto = int(20)
+                if LC_dias_resto > 0.3 and LC_dias_resto < 0.4:
+                    LC_dias_resto = int(10)
+                elif LC_dias_resto > 0.6 and LC_dias_resto < 0.7:
+                    LC_dias_resto = int(20)
                 else:
                     print('ERROR: Al calcular los 2/3 de los meses, los decimales no son ni 0.3333 ni 0.6666!')
-                self._computo_libertad_condicional +=relativedelta(days=dias_resto)
+                self._computo_libertad_condicional +=relativedelta(days=LC_dias_resto)
                 self._computo_libertad_condicional +=relativedelta(months=self._requisito_libertad_condicional.meses)
             else:
                 self._computo_libertad_condicional +=relativedelta(months=self._requisito_libertad_condicional.meses)
 
-            while dias_resto >= 30:
+            while LC_dias_resto >= 30:
                 self._requisito_libertad_condicional.meses += 1
-                dias_resto -= 30
-            self._requisito_libertad_condicional.dias += dias_resto
+                LC_dias_resto -= 30
+            self._requisito_libertad_condicional.dias += LC_dias_resto
 
             # 2/3 de los años
             LC_años_en_meses = self._monto_de_pena.años * 12
@@ -130,6 +141,11 @@ class ComputoDePena():
         self._computo_salidas_transitorias += relativedelta(months=self._requisito_salidas_transitorias.meses)
         self._computo_salidas_transitorias += relativedelta(days=ST_dias_resto)
 
+        while ST_dias_resto >= 30:
+            self._requisito_salidas_transitorias.meses += 1
+            ST_dias_resto -= 30
+        self._requisito_salidas_transitorias.dias += ST_dias_resto
+
         # Calcula la mitad de los años
         self._requisito_salidas_transitorias.años = self._monto_de_pena.años
         ST_meses_resto = 0
@@ -146,6 +162,11 @@ class ComputoDePena():
 
         self._computo_salidas_transitorias += relativedelta(years=self._requisito_salidas_transitorias.años)
         self._computo_salidas_transitorias += relativedelta(months=ST_meses_resto)
+
+        while ST_meses_resto >= 12:
+            self._requisito_salidas_transitorias.años += 1
+            ST_meses_resto -= 12
+        self._requisito_salidas_transitorias.meses += ST_meses_resto
 
         self._computo_salidas_transitorias += relativedelta(days=-1)
 
@@ -185,6 +206,7 @@ Cómputo de pena
 ---------------
 Fecha de detención: {}
 Vencimiento de pena: {}
+Caducidad de la pena: {}
 La libertad condicional se obtiene a los {} año(s), {} mes(es) y {} día(s) de detención.
 Libertad condicional: {}
 Las salidas transitorias se obtienen a los {} año(s), {} mes(es) y {} día(s) de detención.
@@ -193,6 +215,7 @@ Libertad asistida -3 meses-: {}
 Libertad asistida -6 meses-: {}
 '''.format(self._fecha_de_detencion,
         self._vencimiento_de_pena,
+        self._caducidad_de_la_pena, 
         self._requisito_libertad_condicional.años, self._requisito_libertad_condicional.meses, self._requisito_libertad_condicional.dias,
         self._computo_libertad_condicional,
         self._requisito_salidas_transitorias.años, self._requisito_salidas_transitorias.meses, self._requisito_salidas_transitorias.dias,
@@ -205,12 +228,14 @@ Resultados sin restar otras detenciones
 ---------------------------------------
 Fecha de detención: {}
 Vencimiento de pena: {}
+Caducidad de la pena: {}
 Libertad condicional: {}
 Salidas transitorias: {}
 Libertad asistida -3 meses-: {}
 Libertad asistida -6 meses-: {}
 '''.format(self._fecha_de_detencion, 
-        self._vencimiento_de_pena_sinRestarOtrasDetenciones,        
+        self._vencimiento_de_pena_sinRestarOtrasDetenciones, 
+        self._caducidad_de_la_pena_sinRestarOtrasDetenciones, 
         self._computo_libertad_condicional_sinRestarOtrasDetenciones,        
         self._computo_salidas_transitorias_sinRestarOtrasDetenciones,
         self._computo_libertad_asistida_3meses_sinRestarOtrasDetenciones,
@@ -221,7 +246,7 @@ Libertad asistida -6 meses-: {}
 
 def _DEBUG():    
     
-    fechaDeDetencionInput = GetConsoleInput_Fecha('Ingresar fecha de detención en formato año-mes-día (XXXX/XX/XX): ')
+    fechaDeDetencionInput = GetConsoleInput_Fecha('Ingresar fecha de detención en formato día/mes/año (XX/XX/XXXX): ')
     montoDePena = GetConsoleInput_MontoDePena()
     otrasDetenciones = GetConsoleInput_OtrosTiemposDeDetencion()
     

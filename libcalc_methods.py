@@ -65,12 +65,15 @@ def FechaAesIgualQueFechaB(fecha_a:datetime.date, fecha_b:datetime.date):
 def es_multiplo(numero, multiplo):
     return numero % multiplo == 0
 
-def GetConsoleInput_Fecha(mensaje_para_el_usuario="Ingrese fecha en formato año-mes-día (XXXX/XX/XX): "):
-    '''Hace ingresar por consola una fecha de detención y la devuelve como un datetime.date'''
+def GetConsoleInput_Fecha(mensaje_para_el_usuario="Ingrese fecha en formato año-mes-día (XX/XX/XXXX): "):
+    '''Hace ingresar por consola una fecha de detención en formato XX/XX/XXXX y la devuelve como un datetime.date'''
     fechaDeDetencionInput = input(mensaje_para_el_usuario)
-    fechaDeDetencionInput_año = fechaDeDetencionInput[0:4]
-    fechaDeDetencionInput_mes = fechaDeDetencionInput[5:7]
-    fechaDeDetencionInput_dia = fechaDeDetencionInput[8:10]
+    # fechaDeDetencionInput_año = fechaDeDetencionInput[0:4]
+    # fechaDeDetencionInput_mes = fechaDeDetencionInput[5:7]
+    # fechaDeDetencionInput_dia = fechaDeDetencionInput[8:10]
+    fechaDeDetencionInput_dia = fechaDeDetencionInput[0:2]
+    fechaDeDetencionInput_mes = fechaDeDetencionInput[3:5]
+    fechaDeDetencionInput_año = fechaDeDetencionInput[6:10]
     fechaDeDetencionInput = datetime.date(int(fechaDeDetencionInput_año), int(fechaDeDetencionInput_mes), int(fechaDeDetencionInput_dia))
     return fechaDeDetencionInput
 
