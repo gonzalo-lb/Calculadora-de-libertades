@@ -4,7 +4,8 @@ from libcalc_methods import *
 
 class ComputoDePena():
     
-    def __init__(self, fechaDeDetencion:datetime.date, montoDePena:TiempoEnAños_Meses_Dias, otrosTiemposDeDetencion='NULL'):
+    def __init__(self, fechaDelHecho:datetime.date, fechaDeDetencion:datetime.date, montoDePena:TiempoEnAños_Meses_Dias, otrosTiemposDeDetencion='NULL'):
+        self._fecha_del_hecho = fechaDelHecho
         self._fecha_de_detencion = fechaDeDetencion
         self._monto_de_pena = montoDePena
         self._vencimiento_de_pena = datetime.date
@@ -24,6 +25,10 @@ class ComputoDePena():
         self._computo_libertad_asistida_6meses = datetime.date
         self._computo_libertad_asistida_6meses_sinRestarOtrasDetenciones = datetime.date
         self._requisito_libertad_asistida_6meses = TiempoEnAños_Meses_Dias()        
+
+        # Determina qué régimen normativo va a utilizar
+        regimenNormativoAplicable = RegimenNormativoAplicable(self._fecha_del_hecho)
+        print(regimenNormativoAplicable)
 
         # Luego tiene que hacer todos los cálculos
         self.__CalcularVencimientoDePena()
@@ -246,11 +251,12 @@ Libertad asistida -6 meses-: {}
 
 def _DEBUG():    
     
+    fechaDelHecho = GetConsoleInput_Fecha('Ingresar fecha del hecho en formato día/mes/año (XX/XX/XXXX): ')
     fechaDeDetencionInput = GetConsoleInput_Fecha('Ingresar fecha de detención en formato día/mes/año (XX/XX/XXXX): ')
     montoDePena = GetConsoleInput_MontoDePena()
     otrasDetenciones = GetConsoleInput_OtrosTiemposDeDetencion()
     
-    computo = ComputoDePena(fechaDeDetencionInput, montoDePena, otrasDetenciones)    
+    computo = ComputoDePena(fechaDelHecho, fechaDeDetencionInput, montoDePena, otrasDetenciones)    
     computo._ImprimirResultados()    
 
 if __name__ == '__main__':

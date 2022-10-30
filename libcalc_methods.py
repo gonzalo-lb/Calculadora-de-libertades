@@ -19,7 +19,7 @@ class OtraDetencion():
         self._CalcularTiempoDeDetencion()
     
     def _CalcularTiempoDeDetencion(self):
-        if FechaAesMayorQueFechaB(self._detencion, self._libertad):            
+        if FechaA_es_Mayor_Que_FechaB(self._detencion, self._libertad):            
             raise Exception('ERROR: Se ingresó una fecha de detención posterior a la fecha de libertad.')
         
         fecha_temp = self._detencion
@@ -48,14 +48,81 @@ class OtraDetencion():
 
         print('Este tiempo de detención es de: {}'.format(self._tiempoDeDetencion))    
 
-def FechaAesMayorQueFechaB(fecha_a:datetime.date, fecha_b:datetime.date):
+class InformacionNormativa():
+    def __init__(self):
+        
+        self._libertadCondicional_ley_11179_requisito_temporal_LC = 20
+        self._libertadCondicional_ley_11179_texto_art_13_CP ='''Art. 13. - El condenado a reclusión o prisión perpetua que hubiere cumplido veinte años de condena, el condenado a reclusión temporal o a prisión por más de tres años que hubiere cumplido los dos tercios de su condena y el condenado a reclusión o prisión. por menos de tres años, que por los menos hubiere cumplido un año de reclusión u ocho meses de prisión, observando con regularidad los reglamentos carcelarios, podrán obtener la libertad por resolución judicial, previo informe de la dirección del establecimiento, bajo las siguientes condiciones:
+
+1º. Residir en el lugar que determine el auto de soltura;
+
+2º. Observar las reglas de inspección que fije el mismo auto, especialmente la obligación de abstenerse de consumir bebidas alcohólicas;
+
+3º. Adoptar en el plazo que el auto determine, oficio, arte, industria o profesión, si no tuviere medios propios de subsistencia;
+
+4º. No cometer nuevos delitos;
+
+5º. Someterse al cuidado de un patronato, indicado por las autoridades competentes;
+
+Estas condiciones regirán hasta el vencimiento de los términos de las penas temporales y e  las que el juez podrá añadir cualquiera de las reglas de conducta contempladas en el artículo 27 bis, regirán hasta el vencimiento de los términos de las penas temporales y en las perpetuas hasta cinco años más, a contar del día de la libertad condicional.'''
+        
+        # La ley 25.892 se publicó en el BO 24/05/2004. No tiene fecha expresa de implementación, por lo que rigen los 8 días del CC,
+        # que sería el 01/06/2004.
+        self._libertadCondicional_ley_25892_fecha_vigencia = datetime.date(2004, 6, 1)
+        self._libertadCondicional_ley_25892_requisito_temporal_LC = 35
+        self._libertadCondicional_ley_25892_texto_art_13_CP = '''Artículo 13. El condenado a reclusión o prisión perpetua que hubiere cumplido treinta y cinco (35) años de condena, el condenado a reclusión o a prisión por más de tres (3) años que hubiere cumplido los dos tercios, y el condenado a reclusión o prisión, por tres (3) años o menos, que hubiere cumplido un (1) año de reclusión u ocho (8) meses de prisión, observando con regularidad los reglamentos carcelarios, podrán obtener la libertad por resolución judicial, previo informe de la dirección del establecimiento e informe de peritos que pronostique en forma individualizada y favorable su reinserción social, bajo las siguientes condiciones:
+
+1º.- Residir en el lugar que determine el auto de soltura;
+
+2º.- Observar las reglas de inspección que fije el mismo auto, especialmente la obligación de abstenerse de consumir bebidas alcohólicas o utilizar sustancias estupefacientes;
+
+3º.- Adoptar en el plazo que el auto determine, oficio, arte, industria o profesión, si no tuviere medios propios de subsistencia;
+
+4º.- No cometer nuevos delitos;
+
+5º.- Someterse al cuidado de un patronato, indicado por las autoridades competentes;
+
+6º.- Someterse a tratamiento médico, psiquiátrico o psicológico, que acrediten su necesidad y eficacia de acuerdo al consejo de peritos.
+
+Estas condiciones, a las que el juez podrá añadir cualquiera de las reglas de conducta contempladas en el artículo 27 bis, regirán hasta el vencimiento de los términos de las penas temporales y hasta diez (10) años más en las perpetuas, a contar desde el día del otorgamiento de la libertad condicional.'''
+
+        # La ley 27.375 se publicó en el BO 28/07/2017. No tiene fecha expresa de implementación, por lo que rigen los 8 días del CC,
+        # que sería el 05/08/2017.
+        self._libertadCondicional_ley_27375_fecha_vigencia = datetime.date(2017, 8, 5)
+        self._libertadCondicional_ley_27375_requisito_temporal_LC = 35
+
+class RegimenNormativoAplicable():
+    def __init__(self, fechaDelHecho:int):
+        infNorm = InformacionNormativa()
+        
+        # REGIMEN DE LIBERTAD CONDICIONAL
+        self._libertadCondicional = "Ley 11.179"
+        if FechaA_es_Mayor_O_Igual_Que_FechaB(fechaDelHecho, infNorm._libertadCondicional_ley_25892_fecha_vigencia):
+            self._libertadCondicional = "Ley 25.892"
+        if FechaA_es_Mayor_O_Igual_Que_FechaB(fechaDelHecho, infNorm._libertadCondicional_ley_27375_fecha_vigencia):
+            self._libertadCondicional = "Ley 27.375"
+    
+    def __str__(self):
+        return '''
+        REGIMEN LEGAL APLICABLE AL CASO
+        -------------------------------
+        Régimen de libertad condicional: {}'''.format(self._libertadCondicional)
+
+def FechaA_es_Mayor_Que_FechaB(fecha_a:datetime.date, fecha_b:datetime.date):
     temp = fecha_a - fecha_b    
     if temp.days > 0:
         return True
     else:
         return False
 
-def FechaAesIgualQueFechaB(fecha_a:datetime.date, fecha_b:datetime.date):
+def FechaA_es_Mayor_O_Igual_Que_FechaB(fecha_a:datetime.date, fecha_b:datetime.date):
+    temp = fecha_a - fecha_b
+    if temp.days >= 0:
+        return True    
+    else:
+        return False
+
+def FechaA_es_Igual_Que_FechaB(fecha_a:datetime.date, fecha_b:datetime.date):
     temp = fecha_a - fecha_b    
     if temp.days == 0:
         return True
