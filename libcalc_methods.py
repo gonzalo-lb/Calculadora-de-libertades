@@ -2,12 +2,15 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 class TiempoEnAños_Meses_Dias():
-    def __init__(self):
+    def __init__(self, es_perpetua:bool=False):
+        self.perpetua = es_perpetua
         self.años = 0
         self.meses = 0
         self.dias = 0
     
     def __str__(self):
+        if self.perpetua:
+            return 'Es una pena perpetua'        
         return '...{} año(s), {} mes(es) y {} día(s)...'.format(self.años, self.meses, self.dias)
 
 class OtraDetencion():
