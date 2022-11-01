@@ -1,3 +1,4 @@
+import os
 import datetime
 from dateutil.relativedelta import relativedelta
 
@@ -149,20 +150,42 @@ def GetConsoleInput_Fecha(mensaje_para_el_usuario="Ingrese fecha en formato año
 
 def GetConsoleInput_MontoDePena():
     '''Hace ingresar por consola un monto de pena temporal y la devuelve como un TiempoEnAños_Meses_Dias()'''
+    clear = lambda: os.system('cls')
     montoDePena = TiempoEnAños_Meses_Dias()
-    # Ingresar monto de pena    
-    try:
-        montoDePena.años = int(input('Ingresar monto de pena (años): '))
-    except:
-        montoDePena.años = 0        
-    try:
-        montoDePena.meses = int(input('Ingresar monto de pena (meses): '))        
-    except:
-        montoDePena.meses = 0        
-    try:
-        montoDePena.dias = int(input('Ingresar monto de pena (días): '))        
-    except:
-        montoDePena.dias = 0
+
+    solicitar_tipo_de_pena_a_calcular = '''Indicar tipo de pena a calcular:
+1 --> Pena temporal
+2 --> Pena perpetua
+
+'''
+    print(solicitar_tipo_de_pena_a_calcular)
+    opciones_validas = ['1', '2']
+    opcion_elegida = input('Elegir opción: ')    
+
+    while opcion_elegida not in opciones_validas:
+        clear()
+        print('La opción elegida no es válida. Intentar de nuevo.')
+        print(solicitar_tipo_de_pena_a_calcular)
+        opcion_elegida = input('Elegir opción: ')
+    
+    if opcion_elegida == '1': # Pena temporal
+        # Ingresar monto de pena    
+        try:
+            montoDePena.años = int(input('Ingresar monto de pena (años): '))
+        except:
+            montoDePena.años = 0        
+        try:
+            montoDePena.meses = int(input('Ingresar monto de pena (meses): '))        
+        except:
+            montoDePena.meses = 0        
+        try:
+            montoDePena.dias = int(input('Ingresar monto de pena (días): '))        
+        except:
+            montoDePena.dias = 0
+    
+    elif opcion_elegida == '2': # Pena perpetua
+        montoDePena.perpetua = True
+
     return montoDePena
 
 def GetConsoleInput_OtrosTiemposDeDetencion():
