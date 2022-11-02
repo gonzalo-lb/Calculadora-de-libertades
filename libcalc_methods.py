@@ -10,8 +10,8 @@ class TiempoEnAños_Meses_Dias():
         self.dias = 0
     
     def __str__(self):
-        if self.perpetua:
-            return 'Es una pena perpetua'        
+        # if self.perpetua:
+        #     return 'Es una pena perpetua'        
         return '...{} año(s), {} mes(es) y {} día(s)...'.format(self.años, self.meses, self.dias)
 
 class OtraDetencion():
@@ -111,6 +111,10 @@ class RegimenNormativoAplicable():
         REGIMEN LEGAL APLICABLE AL CASO
         -------------------------------
         Régimen de libertad condicional: {}'''.format(self._libertadCondicional)
+
+def Datetime_date_enFormatoXX_XX_XXXX(_date:datetime.date):
+    toRT = str(_date)
+    return '{}/{}/{}'.format(toRT[8:10], toRT[5:7], toRT[0:4])
 
 def FechaA_es_Mayor_Que_FechaB(fecha_a:datetime.date, fecha_b:datetime.date):
     temp = fecha_a - fecha_b    

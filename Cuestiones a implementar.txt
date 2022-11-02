@@ -1,4 +1,9 @@
- - Penas perpetuas.
+Con qué seguir:
+ - JSON para los regímenes legales
+ - Armar la lógica de toda la calculadora antes de seguir
+
+A implementar:
+
  - Nuevo cómputo para libertad condicional revocada (no se contabiliza el tiempo que se estuvo en libertad)
  - Fecha del hecho, para evaluar leyes penal más benignas en reincidencia, ejecución penal, multas, etc.
  - Penas de ejecución condicional y plazos para las reglas de conducta.
@@ -7,3 +12,7 @@
  - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)
  - Prelibertad
  - Régimen de salida anticipada para los casos del 56 bis (1 año antes)
+
+A mejorar:
+ - Penas perpetuas.
+	Ser mas específico con los regímenes en la devolución cuando imprime los resultados
