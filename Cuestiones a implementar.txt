@@ -4,6 +4,7 @@ Con qué seguir:
 
 A implementar:
 
+ - Estímulo educativo
  - Nuevo cómputo para libertad condicional revocada (no se contabiliza el tiempo que se estuvo en libertad)
  - Fecha del hecho, para evaluar leyes penal más benignas en reincidencia, ejecución penal, multas, etc.
  - Penas de ejecución condicional y plazos para las reglas de conducta.
