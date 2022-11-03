@@ -1,0 +1,29 @@
+{
+    "Ley 11.179":{
+        "Fecha de implementación":"Desde siempre",
+        "Requisito temporal pena perpetua":20,
+        "Preguntar si es reincidente":true,
+        "Preguntar si es un cómputo por LC revocada":true,
+        "Preguntar por delitos excluidos ley 25.892":false,
+        "Preguntar por delitos excluidos ley 27.375":false,
+        "Preguntar por 2/3 con calificación BUENO":false
+    },
+    "Ley 25.892":{
+        "Fecha de implementación":{"Año":2004, "Mes":6, "Día":1},
+        "Requisito temporal pena perpetua":35,
+        "Preguntar si es reincidente":true,
+        "Preguntar si es un cómputo por LC revocada":true,
+        "Preguntar por delitos excluidos ley 25.892":true,
+        "Preguntar por delitos excluidos ley 27.375":false,
+        "Preguntar por 2/3 con calificación BUENO":false
+    },
+    "Ley 27.375":{
+        "Fecha de implementación":{"Año":2017, "Mes":8, "Día":5},
+        "Requisito temporal pena perpetua":35,
+        "Preguntar si es reincidente":true,
+        "Preguntar si es un cómputo por LC revocada":true,
+        "Preguntar por delitos excluidos ley 25.892":false,
+        "Preguntar por delitos excluidos ley 27.375":true,
+        "Preguntar por 2/3 con calificación BUENO":true
+    }
+}

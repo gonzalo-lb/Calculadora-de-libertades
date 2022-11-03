@@ -99,6 +99,12 @@ class RegimenNormativoAplicable():
     def __init__(self, fechaDelHecho:int):
         infNorm = InformacionNormativa()
         
+        self._preguntarSiEsReincidente = False
+        self._preguntarSiEsComputoPorLC_Revocada = False
+        self._preguntarSiSeCondenoPorDelitosExcluidos_14CP_Ley25892 = False
+        self._preguntarSiSeCondenoPorDelitosExcluidos_14CP_Ley27375 = False
+        self._preguntarPorCondYCocept_Bueno_paraLC_art28_Ley24660 = False
+
         # REGIMEN DE LIBERTAD CONDICIONAL
         self._libertadCondicional = "Ley 11.179"
         if FechaA_es_Mayor_O_Igual_Que_FechaB(fechaDelHecho, infNorm._libertadCondicional_ley_25892_fecha_vigencia):

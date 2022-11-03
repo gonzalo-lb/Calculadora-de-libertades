@@ -11,7 +11,6 @@ A implementar:
  - Alertas por reincidencia, delitos excluidos del régimen de libertades (por ley 27.375), libertades revocadas, etc. con indicación de la normativa específica.
  - Requisito temporal extra para la ST, de permanencia en periodo de prueba (art. 17, ley 24.660)
  - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)
- - Prelibertad
  - Régimen de salida anticipada para los casos del 56 bis (1 año antes)
 
 A mejorar:
