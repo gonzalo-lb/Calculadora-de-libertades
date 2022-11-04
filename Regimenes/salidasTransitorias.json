@@ -1,0 +1,34 @@
+{
+    "Decreto Ley 412/58":{
+        "Fecha de implementación":"Desde siempre",
+        "Preguntar si hay accesoria del 52 CP":true,
+        "Preguntar por delitos excluidos por 56 bis ley 25.948":false,
+        "Preguntar por delitos excluidos por 56 bis ley 27.375":false,
+        "Preguntar si se encuentra en período de prueba, y desde cuándo":false,
+        "Preguntar por requisito de calificación":false
+    },
+    "Ley 24.660":{
+        "Fecha de implementación":{"Año":1996, "Mes":7, "Día":16},
+        "Preguntar si hay accesoria del 52 CP":true,
+        "Preguntar por delitos excluidos por 56 bis ley 25.948":false,
+        "Preguntar por delitos excluidos por 56 bis ley 27.375":false,
+        "Preguntar si se encuentra en período de prueba, y desde cuándo":false,
+        "Preguntar por requisito de calificación":false
+    },
+    "Ley 25.948":{
+        "Fecha de implementación":{"Año":2004, "Mes":11, "Día":20},
+        "Preguntar si hay accesoria del 52 CP":true,
+        "Preguntar por delitos excluidos por 56 bis ley 25.948":true,
+        "Preguntar por delitos excluidos por 56 bis ley 27.375":false,
+        "Preguntar si se encuentra en período de prueba, y desde cuándo":false,
+        "Preguntar por requisito de calificación":false
+    },
+    "Ley 27.375":{
+        "Fecha de implementación":{"Año":2017, "Mes":8, "Día":5},
+        "Preguntar si hay accesoria del 52 CP":true,
+        "Preguntar por delitos excluidos por 56 bis ley 25.948":false,
+        "Preguntar por delitos excluidos por 56 bis ley 27.375":true,
+        "Preguntar si se encuentra en período de prueba, y desde cuándo":true,
+        "Preguntar por requisito de calificación":true
+    }
+}
