@@ -1,5 +1,6 @@
 import os
 import datetime
+import json
 from dateutil.relativedelta import relativedelta
 
 class TiempoEnAños_Meses_Dias():
@@ -52,7 +53,42 @@ class OtraDetencion():
 
         print('Este tiempo de detención es de: {}'.format(self._tiempoDeDetencion))    
 
-class InformacionNormativa():
+class RegimenNormativoAplicable():
+    def __init__(self, _fechaDelHecho:datetime.date):
+        
+        with open('Regimenes/libertadCondicional.json') as reg_LC:
+            self.__JSON_LC = json.load(reg_LC)
+
+        with open('Regimenes/salidasTransitorias.json') as reg_ST:
+            self.__JSON_ST = json.load(reg_ST)
+        
+        with open('Regimenes/libertadAsistida.json') as reg_LA:
+            self.__JSON_LA = json.load(reg_LA)
+        
+        with open('Regimenes/regimenPrepLib.json') as reg_PrepLib:
+            self.__JSON_PREPLIB = json.load(reg_PrepLib)
+
+        # DETERMINA RÉGIMEN DE LIBERTAD CONDICIONAL
+        self._regimen_LC = 'Sin determinar'
+        for key in self.__JSON_LC:
+            fecha_implementacion = self.__JSON_LC[key]
+            fecha_implementacion = fecha_implementacion["Fecha de implementacion"]
+            fecha_implementacion = datetime.date(fecha_implementacion['year'], fecha_implementacion['month'], fecha_implementacion['day'])            
+            if FechaA_es_Mayor_O_Igual_Que_FechaB(_fechaDelHecho, fecha_implementacion):
+                self._regimen_LC = key
+        
+        self._LC_fechaDeImplementacion = self.__JSON_LC[self._regimen_LC]
+        self._LC_fechaDeImplementacion = self._LC_fechaDeImplementacion["Fecha de implementacion"]
+        self._LC_fechaDeImplementacion = datetime.date(self._LC_fechaDeImplementacion['year'], self._LC_fechaDeImplementacion['month'], self._LC_fechaDeImplementacion['day'])            
+        self._LC_requisitoTemporalPenaPerpetua =  self.__JSON_LC[self._regimen_LC]["Requisito temporal pena perpetua"]
+        self._LC_preguntarSiEsReincidente =  self.__JSON_LC[self._regimen_LC]["Preguntar si es reincidente"]        
+        self._LC_preguntarSiEsComputoLCRevocada =  self.__JSON_LC[self._regimen_LC]["Preguntar si es un computo por LC revocada"]
+        self._LC_preguntarSiEsPorDelitosExcluidosLey25892 = self.__JSON_LC[self._regimen_LC]["Preguntar por delitos excluidos ley 25.892"]
+        self._LC_preguntarSiEsPorDelitosExcluidosLey27375 = self.__JSON_LC[self._regimen_LC]["Preguntar por delitos excluidos ley 27.375"]
+        self._LC_preguntarPor2_3ConCalificacionBUENO = self.__JSON_LC[self._regimen_LC]["Preguntar por 2/3 con calificacion BUENO"]
+        
+
+class InformacionNormativaVIEJO():
     def __init__(self):
         
         self._libertadCondicional_ley_11179_requisito_temporal_LC = 20
@@ -95,9 +131,9 @@ Estas condiciones, a las que el juez podrá añadir cualquiera de las reglas de 
         self._libertadCondicional_ley_27375_fecha_vigencia = datetime.date(2017, 8, 5)
         self._libertadCondicional_ley_27375_requisito_temporal_LC = 35
 
-class RegimenNormativoAplicable():
+class RegimenNormativoAplicableVIEJO():
     def __init__(self, fechaDelHecho:int):
-        infNorm = InformacionNormativa()
+        infNorm = InformacionNormativaVIEJO()
         
         self._preguntarSiEsReincidente = False
         self._preguntarSiEsComputoPorLC_Revocada = False

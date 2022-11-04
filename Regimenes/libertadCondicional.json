@@ -1,29 +1,29 @@
 {
     "Ley 11.179":{
-        "Fecha de implementación":"Desde siempre",
+        "Fecha de implementacion":{"year":1, "month":1, "day":1},
         "Requisito temporal pena perpetua":20,
         "Preguntar si es reincidente":true,
-        "Preguntar si es un cómputo por LC revocada":true,
+        "Preguntar si es un computo por LC revocada":true,
         "Preguntar por delitos excluidos ley 25.892":false,
         "Preguntar por delitos excluidos ley 27.375":false,
-        "Preguntar por 2/3 con calificación BUENO":false
+        "Preguntar por 2/3 con calificacion BUENO":false
     },
     "Ley 25.892":{
-        "Fecha de implementación":{"Año":2004, "Mes":6, "Día":1},
+        "Fecha de implementacion":{"year":2004, "month":6, "day":1},
         "Requisito temporal pena perpetua":35,
         "Preguntar si es reincidente":true,
-        "Preguntar si es un cómputo por LC revocada":true,
+        "Preguntar si es un computo por LC revocada":true,
         "Preguntar por delitos excluidos ley 25.892":true,
         "Preguntar por delitos excluidos ley 27.375":false,
-        "Preguntar por 2/3 con calificación BUENO":false
+        "Preguntar por 2/3 con calificacion BUENO":false
     },
     "Ley 27.375":{
-        "Fecha de implementación":{"Año":2017, "Mes":8, "Día":5},
+        "Fecha de implementacion":{"year":2017, "month":8, "day":5},
         "Requisito temporal pena perpetua":35,
         "Preguntar si es reincidente":true,
-        "Preguntar si es un cómputo por LC revocada":true,
+        "Preguntar si es un computo por LC revocada":true,
         "Preguntar por delitos excluidos ley 25.892":false,
         "Preguntar por delitos excluidos ley 27.375":true,
-        "Preguntar por 2/3 con calificación BUENO":true
+        "Preguntar por 2/3 con calificacion BUENO":true
     }
 }
