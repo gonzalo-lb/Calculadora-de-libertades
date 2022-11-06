@@ -1,34 +1,42 @@
 {
-    "Decreto Ley 412/58":{
-        "Fecha de implementación":"Desde siempre",
+    "Decreto Ley 412/58":{        
+        "Fecha de implementacion - year":1,
+        "Fecha de implementacion - month":1,
+        "Fecha de implementacion - day":1,
         "Preguntar si hay accesoria del 52 CP":true,
         "Preguntar por delitos excluidos por 56 bis ley 25.948":false,
         "Preguntar por delitos excluidos por 56 bis ley 27.375":false,
-        "Preguntar si se encuentra en período de prueba, y desde cuándo":false,
-        "Preguntar por requisito de calificación":false
+        "Preguntar si se encuentra en periodo de prueba, y desde cuando":false,
+        "Preguntar por requisito de calificacion":false
     },
-    "Ley 24.660":{
-        "Fecha de implementación":{"Año":1996, "Mes":7, "Día":16},
+    "Ley 24.660":{        
+        "Fecha de implementacion - year":1996,
+        "Fecha de implementacion - month":7,
+        "Fecha de implementacion - day":16,  
         "Preguntar si hay accesoria del 52 CP":true,
         "Preguntar por delitos excluidos por 56 bis ley 25.948":false,
         "Preguntar por delitos excluidos por 56 bis ley 27.375":false,
-        "Preguntar si se encuentra en período de prueba, y desde cuándo":false,
-        "Preguntar por requisito de calificación":false
+        "Preguntar si se encuentra en periodo de prueba, y desde cuando":false,
+        "Preguntar por requisito de calificacion":false
     },
-    "Ley 25.948":{
-        "Fecha de implementación":{"Año":2004, "Mes":11, "Día":20},
+    "Ley 25.948":{        
+        "Fecha de implementacion - year":2004,
+        "Fecha de implementacion - month":11,
+        "Fecha de implementacion - day":20,  
         "Preguntar si hay accesoria del 52 CP":true,
         "Preguntar por delitos excluidos por 56 bis ley 25.948":true,
         "Preguntar por delitos excluidos por 56 bis ley 27.375":false,
-        "Preguntar si se encuentra en período de prueba, y desde cuándo":false,
-        "Preguntar por requisito de calificación":false
+        "Preguntar si se encuentra en periodo de prueba, y desde cuando":false,
+        "Preguntar por requisito de calificacion":false
     },
-    "Ley 27.375":{
-        "Fecha de implementación":{"Año":2017, "Mes":8, "Día":5},
+    "Ley 27.375":{        
+        "Fecha de implementacion - year":2017,
+        "Fecha de implementacion - month":8,
+        "Fecha de implementacion - day":5,  
         "Preguntar si hay accesoria del 52 CP":true,
         "Preguntar por delitos excluidos por 56 bis ley 25.948":false,
         "Preguntar por delitos excluidos por 56 bis ley 27.375":true,
-        "Preguntar si se encuentra en período de prueba, y desde cuándo":true,
-        "Preguntar por requisito de calificación":true
+        "Preguntar si se encuentra en periodo de prueba, y desde cuando":true,
+        "Preguntar por requisito de calificacion":true
     }
 }

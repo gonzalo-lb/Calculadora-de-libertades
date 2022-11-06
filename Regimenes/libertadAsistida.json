@@ -1,22 +1,28 @@
 {
     "Ley 24.660":{
-        "Fecha de implementación":{"Año":1996, "Mes":7, "Día":16},
+        "Fecha de implementacion - year":1996,
+        "Fecha de implementacion - month":7,
+        "Fecha de implementacion - day":16,
         "Requisito temporal":6,
-        "Preguntar si es nuevo cómputo por libertad revocada":true,
+        "Preguntar si es nuevo computo por libertad revocada":true,
         "Preguntar por delitos excluidos por 56 bis ley 25.948":false,
         "Preguntar por delitos excluidos por 56 bis ley 27.375":false
     },
     "Ley 25.948":{
-        "Fecha de implementación":{"Año":2004, "Mes":11, "Día":20},
+        "Fecha de implementacion - year":2004,
+        "Fecha de implementacion - month":11,
+        "Fecha de implementacion - day":20,        
         "Requisito temporal":6,
-        "Preguntar si es nuevo cómputo por libertad revocada":true,
+        "Preguntar si es nuevo computo por libertad revocada":true,
         "Preguntar por delitos excluidos por 56 bis ley 25.948":true,
         "Preguntar por delitos excluidos por 56 bis ley 27.375":false
     },
     "Ley 27.375":{
-        "Fecha de implementación":{"Año":2017, "Mes":8, "Día":5},
+        "Fecha de implementacion - year":2017,
+        "Fecha de implementacion - month":8,
+        "Fecha de implementacion - day":5,        
         "Requisito temporal":3,
-        "Preguntar si es nuevo cómputo por libertad revocada":true,
+        "Preguntar si es nuevo computo por libertad revocada":true,
         "Preguntar por delitos excluidos por 56 bis ley 25.948":false,
         "Preguntar por delitos excluidos por 56 bis ley 27.375":true
     }

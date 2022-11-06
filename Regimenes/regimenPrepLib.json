@@ -1,6 +1,8 @@
 {
-    "Ley 27.375":{
-        "Fecha de implementación":{"Año":2017, "Mes":8, "Día":5},        
+    "Ley 27.375":{        
+        "Fecha de implementacion - year":2017,
+        "Fecha de implementacion - month":8,
+        "Fecha de implementacion - day":5,     
         "Preguntar por delitos excluidos por 56 bis ley 27.375":true
     }
 }

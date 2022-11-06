@@ -24,6 +24,62 @@ class ComputoDePena():
         self._computo_salidas_transitorias, self._computo_salidas_transitorias_sinRestarOtrasDetenciones, self._requisito_salidas_transitorias = self.__CalcularSalidasTransitorias(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)
         self._computo_libertad_asistida_3meses, self._computo_libertad_asistida_3meses_sinRestarOtrasDetenciones = self.__CalcularLibertadAsistida_3meses(self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones)
         self._computo_libertad_asistida_6meses, self._computo_libertad_asistida_6meses_sinRestarOtrasDetenciones = self.__CalcularLibertadAsistida_6meses(self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones)
+
+    def __Calcular_dos_tercios(self, _fechaDeDetencion:datetime.date, _montoDePena:TiempoEnAños_Meses_Dias):
+        TR_2_3 = _fechaDeDetencion
+        TR_requisito_libertad_condicional = TiempoEnAños_Meses_Dias()
+
+        # Calcula los 2/3 de los días, lo redondea para abajo si da con coma, y los suma
+        TR_requisito_libertad_condicional.dias = int((_montoDePena.dias * 2) / 3) # Hace los dos tercios y lo redondea para abajo
+        TR_2_3 +=relativedelta(days=TR_requisito_libertad_condicional.dias)
+
+        # Calcula los 2/3 de los meses
+        TR_requisito_libertad_condicional.meses = _montoDePena.meses
+        TR_requisito_libertad_condicional.meses = (TR_requisito_libertad_condicional.meses * 2) / 3
+        LC_dias_resto = 0
+        if TR_requisito_libertad_condicional.meses.is_integer() is False:
+            LC_dias_resto = TR_requisito_libertad_condicional.meses - int(TR_requisito_libertad_condicional.meses)
+            TR_requisito_libertad_condicional.meses = int(TR_requisito_libertad_condicional.meses)
+            if LC_dias_resto > 0.3 and LC_dias_resto < 0.4:
+                LC_dias_resto = int(10)
+            elif LC_dias_resto > 0.6 and LC_dias_resto < 0.7:
+                LC_dias_resto = int(20)
+            else:
+                print('ERROR: Al calcular los 2/3 de los meses, los decimales no son ni 0.3333 ni 0.6666!')
+            TR_2_3 +=relativedelta(days=LC_dias_resto)
+            TR_2_3 +=relativedelta(months=TR_requisito_libertad_condicional.meses)
+        else:
+            TR_2_3 +=relativedelta(months=TR_requisito_libertad_condicional.meses)
+
+        while LC_dias_resto >= 30:
+            TR_requisito_libertad_condicional.meses += 1
+            LC_dias_resto -= 30
+        TR_requisito_libertad_condicional.dias += LC_dias_resto
+
+        # 2/3 de los años
+        LC_años_en_meses = _montoDePena.años * 12
+        LC_años_en_meses = (LC_años_en_meses * 2) / 3
+        TR_2_3 +=relativedelta(months=LC_años_en_meses)
+
+        TR_requisito_libertad_condicional.años = 0
+        while LC_años_en_meses >= 12:
+            LC_años_en_meses -=12
+            TR_requisito_libertad_condicional.años +=1
+        TR_requisito_libertad_condicional.meses += LC_años_en_meses
+        if TR_requisito_libertad_condicional.meses >= 12:
+            TR_requisito_libertad_condicional.meses -=12
+            TR_requisito_libertad_condicional.años +=1
+        
+        if type(TR_requisito_libertad_condicional.años) is not int and TR_requisito_libertad_condicional.años.is_integer():
+            TR_requisito_libertad_condicional.años = int(TR_requisito_libertad_condicional.años)
+        if type(TR_requisito_libertad_condicional.meses) is not int and TR_requisito_libertad_condicional.meses.is_integer():
+            TR_requisito_libertad_condicional.meses = int(TR_requisito_libertad_condicional.meses)
+        if type(TR_requisito_libertad_condicional.dias) is not int and TR_requisito_libertad_condicional.dias.is_integer():
+            TR_requisito_libertad_condicional.dias = int(TR_requisito_libertad_condicional.dias)
+
+        TR_2_3 += relativedelta(days=-1)
+
+        return TR_2_3, TR_requisito_libertad_condicional
             
     def __CalcularVencimientoYCaducidadDePena(self, _fechaDeDetencion:datetime.date, _montoDePena:TiempoEnAños_Meses_Dias, _otrosTiemposDeDetencion="NULL"):
 

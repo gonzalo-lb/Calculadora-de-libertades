@@ -2,6 +2,7 @@ import os
 import datetime
 import json
 from dateutil.relativedelta import relativedelta
+from enum_keys import LC_KEYS, ST_KEYS, LA_KEYS, REGPREPLIB_KEYS
 
 class TiempoEnAños_Meses_Dias():
     def __init__(self, es_perpetua:bool=False):
@@ -56,6 +57,8 @@ class OtraDetencion():
 class RegimenNormativoAplicable():
     def __init__(self, _fechaDelHecho:datetime.date):
         
+        # CARGA LOS ARCHIVOS JSON EN VARIABLES
+
         with open('Regimenes/libertadCondicional.json') as reg_LC:
             self.__JSON_LC = json.load(reg_LC)
 
@@ -69,24 +72,48 @@ class RegimenNormativoAplicable():
             self.__JSON_PREPLIB = json.load(reg_PrepLib)
 
         # DETERMINA RÉGIMEN DE LIBERTAD CONDICIONAL
+
         self._regimen_LC = 'Sin determinar'
-        for key in self.__JSON_LC:
-            fecha_implementacion = self.__JSON_LC[key]
-            fecha_implementacion = fecha_implementacion["Fecha de implementacion"]
-            fecha_implementacion = datetime.date(fecha_implementacion['year'], fecha_implementacion['month'], fecha_implementacion['day'])            
+        for key in self.__JSON_LC:            
+            fecha_implementacion = datetime.date(self.__JSON_LC[key][LC_KEYS._fechaImplementacion_YEAR_KEY.value], self.__JSON_LC[key][LC_KEYS._fechaImplementacion_MONTH_KEY.value], self.__JSON_LC[key][LC_KEYS._fechaImplementacion_DAY_KEY.value])
             if FechaA_es_Mayor_O_Igual_Que_FechaB(_fechaDelHecho, fecha_implementacion):
-                self._regimen_LC = key
+                self._regimen_LC = key        
+
+        # DETERMINA RÉGIMEN DE SALIDAS TRANSITORIAS
+
+        self._regimen_ST = 'Sin determinar'
+        for key in self.__JSON_ST:            
+            fecha_implementacion = datetime.date(self.__JSON_ST[key][ST_KEYS._fechaImplementacion_YEAR_KEY.value], self.__JSON_ST[key][ST_KEYS._fechaImplementacion_MONTH_KEY.value], self.__JSON_ST[key][ST_KEYS._fechaImplementacion_DAY_KEY.value])
+            if FechaA_es_Mayor_O_Igual_Que_FechaB(_fechaDelHecho, fecha_implementacion):
+                self._regimen_ST = key        
+
+        # DETERMINA RÉGIMEN DE LIBERTAD ASISTIDA
+
+        self._regimen_LA = 'Sin determinar'
+        for key in self.__JSON_LA:            
+            fecha_implementacion = datetime.date(self.__JSON_LA[key][LA_KEYS._fechaImplementacion_YEAR_KEY.value], self.__JSON_LA[key][LA_KEYS._fechaImplementacion_MONTH_KEY.value], self.__JSON_LA[key][LA_KEYS._fechaImplementacion_DAY_KEY.value])
+            if FechaA_es_Mayor_O_Igual_Que_FechaB(_fechaDelHecho, fecha_implementacion):
+                self._regimen_LA = key
         
-        self._LC_fechaDeImplementacion = self.__JSON_LC[self._regimen_LC]
-        self._LC_fechaDeImplementacion = self._LC_fechaDeImplementacion["Fecha de implementacion"]
-        self._LC_fechaDeImplementacion = datetime.date(self._LC_fechaDeImplementacion['year'], self._LC_fechaDeImplementacion['month'], self._LC_fechaDeImplementacion['day'])            
-        self._LC_requisitoTemporalPenaPerpetua =  self.__JSON_LC[self._regimen_LC]["Requisito temporal pena perpetua"]
-        self._LC_preguntarSiEsReincidente =  self.__JSON_LC[self._regimen_LC]["Preguntar si es reincidente"]        
-        self._LC_preguntarSiEsComputoLCRevocada =  self.__JSON_LC[self._regimen_LC]["Preguntar si es un computo por LC revocada"]
-        self._LC_preguntarSiEsPorDelitosExcluidosLey25892 = self.__JSON_LC[self._regimen_LC]["Preguntar por delitos excluidos ley 25.892"]
-        self._LC_preguntarSiEsPorDelitosExcluidosLey27375 = self.__JSON_LC[self._regimen_LC]["Preguntar por delitos excluidos ley 27.375"]
-        self._LC_preguntarPor2_3ConCalificacionBUENO = self.__JSON_LC[self._regimen_LC]["Preguntar por 2/3 con calificacion BUENO"]
-        
+        # DETERMINA RÉGIMEN DE PREPARACIÓN PARA LA LIBERTAD
+
+        self._regimen_PREPLIB = 'Sin determinar'
+        for key in self.__JSON_PREPLIB:            
+            fecha_implementacion = datetime.date(self.__JSON_PREPLIB[key][REGPREPLIB_KEYS._fechaImplementacion_YEAR_KEY.value], self.__JSON_PREPLIB[key][REGPREPLIB_KEYS._fechaImplementacion_MONTH_KEY.value], self.__JSON_PREPLIB[key][REGPREPLIB_KEYS._fechaImplementacion_DAY_KEY.value])
+            if FechaA_es_Mayor_O_Igual_Que_FechaB(_fechaDelHecho, fecha_implementacion):
+                self._regimen_PREPLIB = key    
+    
+    def LIBERTAD_CONDICIONAL(self, ask:LC_KEYS):
+        return self.__JSON_LC[self._regimen_LC][ask.value]
+    
+    def SALIDAS_TRANSITORIAS(self, ask:ST_KEYS):
+        return self.__JSON_ST[self._regimen_ST][ask.value]
+    
+    def LIBERTAD_ASISTIDA(self, ask:LA_KEYS):
+        return self.__JSON_LA[self._regimen_LA][ask.value]
+    
+    def REGIMEN_PREPARACION_LIBERTAD(self, ask:REGPREPLIB_KEYS):
+        return self.__JSON_PREPLIB[self._regimen_PREPLIB][ask.value]
 
 class InformacionNormativaVIEJO():
     def __init__(self):
