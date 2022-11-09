@@ -5,11 +5,11 @@ from dateutil.relativedelta import relativedelta
 from enum_keys import LC_KEYS, ST_KEYS, LA_KEYS, REGPREPLIB_KEYS
 
 class TiempoEnAños_Meses_Dias():
-    def __init__(self, es_perpetua:bool=False):
+    def __init__(self, es_perpetua:bool=False, _años:int=0, _meses:int=0, _dias:int=0):
         self.perpetua = es_perpetua
-        self.años = 0
-        self.meses = 0
-        self.dias = 0
+        self.años = _años
+        self.meses = _meses
+        self.dias = _dias
     
     def __str__(self):
         # if self.perpetua:

@@ -25,13 +25,12 @@ class ComputoDePena():
         self._computo_libertad_asistida_3meses, self._computo_libertad_asistida_3meses_sinRestarOtrasDetenciones = self.__CalcularLibertadAsistida_3meses(self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones)
         self._computo_libertad_asistida_6meses, self._computo_libertad_asistida_6meses_sinRestarOtrasDetenciones = self.__CalcularLibertadAsistida_6meses(self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones)
 
-    def __Calcular_dos_tercios(self, _fechaDeDetencion:datetime.date, _montoDePena:TiempoEnAños_Meses_Dias):
-        TR_2_3 = _fechaDeDetencion
+    def __Calcular_dos_tercios(self, _montoDePena:TiempoEnAños_Meses_Dias):
+        
         TR_requisito_libertad_condicional = TiempoEnAños_Meses_Dias()
 
         # Calcula los 2/3 de los días, lo redondea para abajo si da con coma, y los suma
-        TR_requisito_libertad_condicional.dias = int((_montoDePena.dias * 2) / 3) # Hace los dos tercios y lo redondea para abajo
-        TR_2_3 +=relativedelta(days=TR_requisito_libertad_condicional.dias)
+        TR_requisito_libertad_condicional.dias = int((_montoDePena.dias * 2) / 3) # Hace los dos tercios y lo redondea para abajo        
 
         # Calcula los 2/3 de los meses
         TR_requisito_libertad_condicional.meses = _montoDePena.meses
@@ -45,11 +44,7 @@ class ComputoDePena():
             elif LC_dias_resto > 0.6 and LC_dias_resto < 0.7:
                 LC_dias_resto = int(20)
             else:
-                print('ERROR: Al calcular los 2/3 de los meses, los decimales no son ni 0.3333 ni 0.6666!')
-            TR_2_3 +=relativedelta(days=LC_dias_resto)
-            TR_2_3 +=relativedelta(months=TR_requisito_libertad_condicional.meses)
-        else:
-            TR_2_3 +=relativedelta(months=TR_requisito_libertad_condicional.meses)
+                print('ERROR: Al calcular los 2/3 de los meses, los decimales no son ni 0.3333 ni 0.6666!')                    
 
         while LC_dias_resto >= 30:
             TR_requisito_libertad_condicional.meses += 1
@@ -58,8 +53,7 @@ class ComputoDePena():
 
         # 2/3 de los años
         LC_años_en_meses = _montoDePena.años * 12
-        LC_años_en_meses = (LC_años_en_meses * 2) / 3
-        TR_2_3 +=relativedelta(months=LC_años_en_meses)
+        LC_años_en_meses = (LC_años_en_meses * 2) / 3        
 
         TR_requisito_libertad_condicional.años = 0
         while LC_años_en_meses >= 12:
@@ -75,11 +69,23 @@ class ComputoDePena():
         if type(TR_requisito_libertad_condicional.meses) is not int and TR_requisito_libertad_condicional.meses.is_integer():
             TR_requisito_libertad_condicional.meses = int(TR_requisito_libertad_condicional.meses)
         if type(TR_requisito_libertad_condicional.dias) is not int and TR_requisito_libertad_condicional.dias.is_integer():
-            TR_requisito_libertad_condicional.dias = int(TR_requisito_libertad_condicional.dias)
+            TR_requisito_libertad_condicional.dias = int(TR_requisito_libertad_condicional.dias)        
 
-        TR_2_3 += relativedelta(days=-1)
+        return TR_requisito_libertad_condicional
+    
+    def __SumarMontoDePena(self, _fecha:datetime.date, _montoDePena:TiempoEnAños_Meses_Dias):
+        TR_fecha = _fecha
+        TR_fecha += relativedelta(years=_montoDePena.años)
+        TR_fecha += relativedelta(months=_montoDePena.meses)
+        TR_fecha += relativedelta(days=_montoDePena.dias)
+        TR_fecha += relativedelta(days=-1)
+        return TR_fecha
 
-        return TR_2_3, TR_requisito_libertad_condicional
+    def __RestarOtrasDetenciones(self, _fecha:datetime.date, _otrasDetenciones:OtraDetencion):
+        TR_fecha = _fecha
+        if _otrasDetenciones != "NULL":
+            TR_fecha = RestarOtrasDetenciones(TR_fecha, _otrasDetenciones)
+        return TR_fecha
             
     def __CalcularVencimientoYCaducidadDePena(self, _fechaDeDetencion:datetime.date, _montoDePena:TiempoEnAños_Meses_Dias, _otrosTiemposDeDetencion="NULL"):
 
@@ -93,15 +99,10 @@ class ComputoDePena():
             TR_vencimientoDePena_sinRestarOtrasDetenciones = 'Pena perpetua'
             TR_caducidad_de_la_pena = 'Pena perpetua'
             TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = 'Pena perpetua'
-        else:
-            TR_vencimientoDePena = _fechaDeDetencion        
-            TR_vencimientoDePena += relativedelta(days=_montoDePena.dias)
-            TR_vencimientoDePena += relativedelta(months=_montoDePena.meses)
-            TR_vencimientoDePena += relativedelta(years=_montoDePena.años)
-            TR_vencimientoDePena += relativedelta(days=-1)
+        else:            
+            TR_vencimientoDePena = self.__SumarMontoDePena(_fechaDeDetencion, _montoDePena)
             TR_vencimientoDePena_sinRestarOtrasDetenciones = TR_vencimientoDePena
-            if _otrosTiemposDeDetencion != "NULL":
-                TR_vencimientoDePena = RestarOtrasDetenciones(TR_vencimientoDePena, _otrosTiemposDeDetencion)
+            TR_vencimientoDePena = self.__RestarOtrasDetenciones(TR_vencimientoDePena, _otrosTiemposDeDetencion)            
             TR_caducidad_de_la_pena = TR_vencimientoDePena + relativedelta(years=10)
             TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = TR_vencimientoDePena_sinRestarOtrasDetenciones + relativedelta(years=10)
         return TR_vencimientoDePena, TR_vencimientoDePena_sinRestarOtrasDetenciones, TR_caducidad_de_la_pena, TR_caducidad_de_la_pena_sinRestarOtrasDetenciones
@@ -115,81 +116,30 @@ class ComputoDePena():
             
             # CALCULO DE PENA PERPETUA
 
-            if self._regimenNormativoAplicable._libertadCondicional == "Ley 11.179":
-                TR_computo_libertad_condicional = _fechaDeDetencion
-                TR_computo_libertad_condicional += relativedelta(years=20)
-                TR_computo_libertad_condicional += relativedelta(days=-1)
+            if self._regimenNormativoAplicable._libertadCondicional == "Ley 11.179":                
                 TR_requisito_libertad_condicional.años = 20
+                TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)
+                
+
             
             if self._regimenNormativoAplicable._libertadCondicional == "Ley 25.892" or self._regimenNormativoAplicable._libertadCondicional == "Ley 27.375":
-                TR_computo_libertad_condicional = _fechaDeDetencion
-                TR_computo_libertad_condicional += relativedelta(years=35)
-                TR_computo_libertad_condicional += relativedelta(days=-1)
                 TR_requisito_libertad_condicional.años = 35
+                TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)                
 
         else:
 
             # CALCULO DE PENA TEMPORAL
 
-            if _montoDePena.años < 3 or (_montoDePena.años == 3 and _montoDePena.meses == 0 and _montoDePena.dias == 0):
-                TR_requisito_libertad_condicional.años = 0
-                TR_requisito_libertad_condicional.meses = 8
-                TR_requisito_libertad_condicional.dias = 0
-                TR_computo_libertad_condicional += relativedelta(months=8)
+            if _montoDePena.años < 3 or (_montoDePena.años == 3 and _montoDePena.meses == 0 and _montoDePena.dias == 0):                
+                TR_requisito_libertad_condicional.meses = 8                
+                TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)
             else:
-                # Calcula los 2/3 de los días, lo redondea para abajo si da con coma, y los suma
-                TR_requisito_libertad_condicional.dias = int((_montoDePena.dias * 2) / 3) # Hace los dos tercios y lo redondea para abajo
-                TR_computo_libertad_condicional +=relativedelta(days=TR_requisito_libertad_condicional.dias)
+                TR_requisito_libertad_condicional = self.__Calcular_dos_tercios(_montoDePena)
+                TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)                
 
-                # Calcula los 2/3 de los meses
-                TR_requisito_libertad_condicional.meses = _montoDePena.meses
-                TR_requisito_libertad_condicional.meses = (TR_requisito_libertad_condicional.meses * 2) / 3
-                LC_dias_resto = 0
-                if TR_requisito_libertad_condicional.meses.is_integer() is False:
-                    LC_dias_resto = TR_requisito_libertad_condicional.meses - int(TR_requisito_libertad_condicional.meses)
-                    TR_requisito_libertad_condicional.meses = int(TR_requisito_libertad_condicional.meses)
-                    if LC_dias_resto > 0.3 and LC_dias_resto < 0.4:
-                        LC_dias_resto = int(10)
-                    elif LC_dias_resto > 0.6 and LC_dias_resto < 0.7:
-                        LC_dias_resto = int(20)
-                    else:
-                        print('ERROR: Al calcular los 2/3 de los meses, los decimales no son ni 0.3333 ni 0.6666!')
-                    TR_computo_libertad_condicional +=relativedelta(days=LC_dias_resto)
-                    TR_computo_libertad_condicional +=relativedelta(months=TR_requisito_libertad_condicional.meses)
-                else:
-                    TR_computo_libertad_condicional +=relativedelta(months=TR_requisito_libertad_condicional.meses)
-
-                while LC_dias_resto >= 30:
-                    TR_requisito_libertad_condicional.meses += 1
-                    LC_dias_resto -= 30
-                TR_requisito_libertad_condicional.dias += LC_dias_resto
-
-                # 2/3 de los años
-                LC_años_en_meses = _montoDePena.años * 12
-                LC_años_en_meses = (LC_años_en_meses * 2) / 3
-                TR_computo_libertad_condicional +=relativedelta(months=LC_años_en_meses)
-
-                TR_requisito_libertad_condicional.años = 0
-                while LC_años_en_meses >= 12:
-                    LC_años_en_meses -=12
-                    TR_requisito_libertad_condicional.años +=1
-                TR_requisito_libertad_condicional.meses += LC_años_en_meses
-                if TR_requisito_libertad_condicional.meses >= 12:
-                    TR_requisito_libertad_condicional.meses -=12
-                    TR_requisito_libertad_condicional.años +=1
-                
-                if type(TR_requisito_libertad_condicional.años) is not int and TR_requisito_libertad_condicional.años.is_integer():
-                    TR_requisito_libertad_condicional.años = int(TR_requisito_libertad_condicional.años)
-                if type(TR_requisito_libertad_condicional.meses) is not int and TR_requisito_libertad_condicional.meses.is_integer():
-                    TR_requisito_libertad_condicional.meses = int(TR_requisito_libertad_condicional.meses)
-                if type(TR_requisito_libertad_condicional.dias) is not int and TR_requisito_libertad_condicional.dias.is_integer():
-                    TR_requisito_libertad_condicional.dias = int(TR_requisito_libertad_condicional.dias)
-
-                TR_computo_libertad_condicional += relativedelta(days=-1)
-
-        TR_computo_libertad_condicional_sinRestarOtrasDetenciones = TR_computo_libertad_condicional            
-        if _otrosTiemposDeDetencion != "NULL":
-            TR_computo_libertad_condicional = RestarOtrasDetenciones(TR_computo_libertad_condicional, _otrosTiemposDeDetencion)
+        # Resta otras detenciones, si hay
+        TR_computo_libertad_condicional_sinRestarOtrasDetenciones = TR_computo_libertad_condicional
+        TR_computo_libertad_condicional = self.__RestarOtrasDetenciones(TR_computo_libertad_condicional, _otrosTiemposDeDetencion)        
             
         return TR_computo_libertad_condicional, TR_computo_libertad_condicional_sinRestarOtrasDetenciones, TR_requisito_libertad_condicional
      
