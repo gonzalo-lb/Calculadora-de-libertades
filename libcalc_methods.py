@@ -10,10 +10,13 @@ class TiempoEnAños_Meses_Dias():
         self.años = _años
         self.meses = _meses
         self.dias = _dias
+
+        if self.perpetua:
+            self.años = self.meses = self.dias = 0
     
     def __str__(self):
-        # if self.perpetua:
-        #     return 'Es una pena perpetua'        
+        if self.perpetua:
+            return 'Es una pena perpetua'        
         return '...{} año(s), {} mes(es) y {} día(s)...'.format(self.años, self.meses, self.dias)
 
 class OtraDetencion():
