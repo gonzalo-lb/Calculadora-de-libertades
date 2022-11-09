@@ -1,1 +1,1 @@
-Calculadora de libertades
+Calculadora de libertades.
