@@ -19,7 +19,7 @@ class TiempoEnAños_Meses_Dias():
             return 'Es una pena perpetua'        
         return '...{} año(s), {} mes(es) y {} día(s)...'.format(self.años, self.meses, self.dias)
 
-class OtraDetencion():
+class OtraDetencion():    
     def __init__(self, fecha_de_detencion:datetime.datetime, fecha_de_libertad:datetime.datetime, nombre:str="Sin nombre"):
         self._nombre = nombre
         self._detencion = fecha_de_detencion
@@ -127,6 +127,166 @@ Libertad asistida: {}
 Régimen preparatorio para la liberación: {}
 '''.format(self._regimen_LA, self._regimen_ST, self._regimen_LA, self._regimen_PREPLIB)
 
+class GetConsoleInput_PreguntasSobreSituacionProcesal():
+    def __init__(self, _regimenNormativo:RegimenNormativoAplicable):
+        self._EsReincidente = False
+        self._EsComputoPorLCRevocada = False
+        self._EsComputoPorLARevocada = False
+        self._EsComputoPorSTRevocada = False
+        self._EsPorDelitosExcluidosLey25892 = False
+        self._EsPorDelitosExcluidosLey25948 = False
+        self._EsPorDelitosExcluidosLey27375 = False
+        self._2_3ConCalifBueno = False
+        self._HayAccesoriaDel52 = False
+        self._EstaEnPeriodoDePrueba = False
+        self._EstaEnPeriodoDePruebaDesde = False
+        self._RequisitoDeCalificacionDuranteElUltimoAño_ST = False                
+
+        # PREGUNTAR SI ES REINCIDENTE        
+        if _regimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_esReincidente_KEY):            
+            print(Separadores._separadorComun)
+            while True:
+                user_input = input('¿Hay declaración de reincidencia? (S/N): ')
+                if user_input == "N" or user_input == "n" or user_input == '':
+                    self._EsReincidente = False
+                    break
+                if user_input == "S" or user_input == "s":
+                    self._EsReincidente = True
+                    break
+                print('ERROR: Solo se puede responder con "s" o "n"')            
+        
+        # PREGUNTAR SI HAY ACCESORIA DEL 52 CP        
+        if _regimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siHayAccesoria52):
+            print(Separadores._separadorComun)
+            while True:
+                user_input = input('¿Hay accesoria del 52 CP? (S/N): ')
+                if user_input == "N" or user_input == "n" or user_input == '':
+                    self._HayAccesoriaDel52 = False
+                    break
+                if user_input == "S" or user_input == "s":
+                    self._HayAccesoriaDel52 = True
+                    break
+                print('ERROR: Solo se puede responder con "s" o "n"')  
+
+        #PREGUNTAR SI ES POR LIBERTAD REVOCADA        
+        if _regimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_esComputoPorLCRevocada_KEY) or _regimenNormativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_nuevoComputoLArevoc_KEY) or _regimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_esComputoPorEvasionDeST_KEY):
+            print(Separadores._separadorComun)
+            while True:
+                print('¿Este cómputo es por una libertad revocada?')
+                print(Separadores._separadorComun)
+                print('1 --> No. Es un cómputo común')
+                print('2 --> Si es por libertad condicional revocada')
+                print('3 --> Si es por libertad asistida revocada')
+                print('4 --> Si es por evasión estando en salidas transitorias')
+                print(Separadores._separadorComun)
+                user_input = input('INDICAR OPCIÓN: ')
+                if user_input == "1" or user_input == '':
+                    self._EsComputoPorLCRevocada = False
+                    self._EsComputoPorSTRevocada = False
+                    self._EsComputoPorLARevocada = False
+                    break
+                if user_input == "2":
+                    self._EsComputoPorLCRevocada = True
+                    self._EsComputoPorSTRevocada = False
+                    self._EsComputoPorLARevocada = False
+                    break
+                if user_input == "3":
+                    self._EsComputoPorLCRevocada = False
+                    self._EsComputoPorSTRevocada = False
+                    self._EsComputoPorLARevocada = True
+                    break
+                if user_input == "4":
+                    self._EsComputoPorLCRevocada = False
+                    self._EsComputoPorSTRevocada = True
+                    self._EsComputoPorLARevocada = False
+                    break
+                print('ERROR: Solo se puede responder con números del 1 al 4')
+
+        # PREGUNTAR SI ES POR DELITOS EXCLUIDOS LEY 25.892
+        if _regimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_delitosExcluidos25892_KEY):
+            print(Separadores._separadorComun)
+            while True:
+                print('Delitos excluidos por la ley 25.892: ...')
+                user_input = input('¿La condena es por alguno de los delitos enumerados en la ley 25.892? (S/N): ')
+                if user_input == "N" or user_input == "n" or user_input == '':
+                    self._EsPorDelitosExcluidosLey25892 = False
+                    break
+                if user_input == "S" or user_input == "s":
+                    self._EsPorDelitosExcluidosLey25892 = True
+                    break
+                print('ERROR: Solo se puede responder con "s" o "n"')
+
+        # PREGUNTAR SI ES POR DELITOS EXCLUIDOS LEY 25.948
+        if _regimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_delitosExcluidos25948_KEY) or _regimenNormativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_delitosExcluidos25948_KEY):
+            print(Separadores._separadorComun)
+            while True:
+                print('Delitos excluidos por la ley 25.948: ...')
+                user_input = input('¿La condena es por alguno de los delitos enumerados en la ley 25.948? (S/N): ')
+                if user_input == "N" or user_input == "n" or user_input == '':
+                    self._EsPorDelitosExcluidosLey25948 = False
+                    break
+                if user_input == "S" or user_input == "s":
+                    self._EsPorDelitosExcluidosLey25948 = True
+                    break
+                print('ERROR: Solo se puede responder con "s" o "n"')
+
+        # PREGUNTAR SI ES POR DELITOS EXCLUIDOS LEY 27.375
+        if _regimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_delitosExcluidos27375_KEY) or _regimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_delitosExcluidos27375_KEY) or _regimenNormativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_delitosExcluidos27375_KEY) or _regimenNormativo.REGIMEN_PREPARACION_LIBERTAD(REGPREPLIB_KEYS._ask_delitosExcluidos27375_KEY):
+            print(Separadores._separadorComun)
+            while True:
+                print('Delitos excluidos por la ley 27.375: ...')
+                user_input = input('¿La condena es por alguno de los delitos enumerados en la ley 27.375? (S/N): ')
+                if user_input == "N" or user_input == "n" or user_input == '':
+                    self._EsPorDelitosExcluidosLey27375 = False
+                    break
+                if user_input == "S" or user_input == "s":
+                    self._EsPorDelitosExcluidosLey27375 = True
+                    break
+                print('ERROR: Solo se puede responder con "s" o "n"')
+
+        # PREGUNTAR SI TIENE CONCEPTO BUENO DURANTE 2/3 DE LA EJECUCIÓN
+        if _regimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_2_3ConCalifBUENO_KEY):
+            print(Separadores._separadorComun)
+            while True:                
+                user_input = input('¿Logró alcanzar como mínimo conducta y concepto "BUENO" durante al menos 2/3 partes de la condena? (S/N): ')
+                if user_input == "N" or user_input == "n" or user_input == '':
+                    self._2_3ConCalifBueno = False
+                    break
+                if user_input == "S" or user_input == "s":
+                    self._2_3ConCalifBueno = True
+                    break
+                print('ERROR: Solo se puede responder con "s" o "n"')
+
+        # PREGUNTAR POR REQUISITO DE CALIFICACIÓN PARA ST
+        if _regimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_requisitoDeCalificacion):
+            print(Separadores._separadorComun)
+            while True:                
+                user_input = input('¿Logró alcanzar conducta "EJEMPLAR" (o el grado máximo de ser alcanzado durante el tiempo de ejecución) durante el último año de cumplimiento de pena? (S/N): ')
+                if user_input == "N" or user_input == "n" or user_input == '':
+                    self._RequisitoDeCalificacionDuranteElUltimoAño_ST = False
+                    break
+                if user_input == "S" or user_input == "s":
+                    self._RequisitoDeCalificacionDuranteElUltimoAño_ST = True
+                    break
+                print('ERROR: Solo se puede responder con "s" o "n"')
+
+        # PREGUNTAR SI ESTA EN PERIODO DE PRUEBA, Y DESDE CUÁNDO
+        if _regimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siEstaPeriodoDePruebaYDesdeCuando):
+            print(Separadores._separadorComun)
+            while True:                
+                user_input = input('¿Logró alcanzar el periodo de prueba? (S/N): ')
+                if user_input == "N" or user_input == "n" or user_input == '':
+                    self._EstaEnPeriodoDePrueba = False
+                    break
+                if user_input == "S" or user_input == "s":
+                    self._EstaEnPeriodoDePrueba = True
+                    self._EstaEnPeriodoDePruebaDesde = GetConsoleInput_Fecha('¿Desde cuándo? (Ingresar fecha en formato XX/XX/XXXX: ')
+                    break
+                print('ERROR: Solo se puede responder con "s" o "n"')
+
+class Separadores():
+    _separadorComun = ''
+
 def Datetime_date_enFormatoXX_XX_XXXX(_date:datetime.date):
     if type(_date) is not datetime.date:
         return _date
@@ -160,15 +320,18 @@ def es_multiplo(numero, multiplo):
 
 def GetConsoleInput_Fecha(mensaje_para_el_usuario="Ingrese fecha en formato año-mes-día (XX/XX/XXXX): "):
     '''Hace ingresar por consola una fecha de detención en formato XX/XX/XXXX y la devuelve como un datetime.date'''
-    fechaDeDetencionInput = input(mensaje_para_el_usuario)
-    # fechaDeDetencionInput_año = fechaDeDetencionInput[0:4]
-    # fechaDeDetencionInput_mes = fechaDeDetencionInput[5:7]
-    # fechaDeDetencionInput_dia = fechaDeDetencionInput[8:10]
-    fechaDeDetencionInput_dia = fechaDeDetencionInput[0:2]
-    fechaDeDetencionInput_mes = fechaDeDetencionInput[3:5]
-    fechaDeDetencionInput_año = fechaDeDetencionInput[6:10]
-    fechaDeDetencionInput = datetime.date(int(fechaDeDetencionInput_año), int(fechaDeDetencionInput_mes), int(fechaDeDetencionInput_dia))
-    return fechaDeDetencionInput
+    while True:
+        try:        
+            fechaDeDetencionInput = input(mensaje_para_el_usuario)    
+            fechaDeDetencionInput_dia = fechaDeDetencionInput[0:2]
+            fechaDeDetencionInput_mes = fechaDeDetencionInput[3:5]
+            fechaDeDetencionInput_año = fechaDeDetencionInput[6:10]
+            if fechaDeDetencionInput[2] != "/" or fechaDeDetencionInput[5]:
+                raise Exception
+            fechaDeDetencionInput = datetime.date(int(fechaDeDetencionInput_año), int(fechaDeDetencionInput_mes), int(fechaDeDetencionInput_dia))        
+            return fechaDeDetencionInput
+        except:
+            print('ERROR: Fecha en formato inválido. La fecha ingresada no tiene formato XX/XX/XXXX o no es una fecha válida.')
 
 def GetConsoleInput_MontoDePena():
     '''Hace ingresar por consola un monto de pena temporal y la devuelve como un TiempoEnAños_Meses_Dias()'''
@@ -178,7 +341,6 @@ def GetConsoleInput_MontoDePena():
     solicitar_tipo_de_pena_a_calcular = '''Indicar tipo de pena a calcular:
 1 --> Pena temporal
 2 --> Pena perpetua
-
 '''
     print(solicitar_tipo_de_pena_a_calcular)
     opciones_validas = ['1', '2']
@@ -213,7 +375,7 @@ def GetConsoleInput_MontoDePena():
 def GetConsoleInput_OtrosTiemposDeDetencion():
     OTDD = []
     seguir_preguntando = True
-    init_query = input('Ingresar tiempos de detención? (Y/N): ')
+    init_query = input('Ingresar tiempos de detención? (S/N): ')
     if init_query == "N" or init_query == "n":
         return "NULL"
     else:
@@ -224,12 +386,12 @@ def GetConsoleInput_OtrosTiemposDeDetencion():
             f_lib = GetConsoleInput_Fecha('Ingresar fecha de libertad (XXXX/XX/XX): ')
             este = OtraDetencion(f_det, f_lib)
             OTDD.append(este)
-            seguir = input('Necesita ingresar otro tiempo de detención? (Y/N): ')
-            if seguir == "Y" or seguir == "y":
+            seguir = input('Necesita ingresar otro tiempo de detención? (S/N): ')
+            if seguir == "S" or seguir == "s":
                 seguir_preguntando = True
             else:
                 seguir_preguntando = False        
-        return OTDD
+        return OTDD    
 
 def RestarOtrasDetenciones(fecha_de_requisito_temporal:datetime.date, otras_detenciones:list[OtraDetencion]):
         toreturn = fecha_de_requisito_temporal
@@ -240,4 +402,5 @@ def RestarOtrasDetenciones(fecha_de_requisito_temporal:datetime.date, otras_dete
         return toreturn
 
 if __name__ == '__main__':
-    pass
+    regnorm = RegimenNormativoAplicable(datetime.date(2018, 1, 20))
+    x = GetConsoleInput_PreguntasSobreSituacionProcesal(regnorm)

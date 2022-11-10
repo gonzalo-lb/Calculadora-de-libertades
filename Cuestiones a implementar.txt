@@ -1,12 +1,10 @@
 Lo que hice ahora:
-- Solucionar el error (excepción) que tira cuando se intenta calcular una pena perpetua
-- Solucionar los problemas con los string cuando en las perpetuas dice los vencimientos de pena, caducidad, y libertades asistidas
-- Solucionar: En la transitoria no indica como requisito temporal los 15 años.
-- Reformar el cálculo de LA para que evalúe el régimen según ley aplicable y reste 3 o 6 meses
-
-Con qué seguir:
  - Las salidas transitorias no evalúan régimen cuando es pena temporal. Agregar el de la 27.375
+ - En el Get Input de fecha, armar los while True para que no tire una excepción si está mal ingresado.
  - Armar la interacción con el usuario para que vaya haciendo consultas según el régimen en el que se encuentre
+
+Con qué seguir: 
+ - En los restantes Get Input (monto de pena, etc) armar los while True para que no tire una excepción si está mal ingresado.
  - Integrar las consultas a la devolución que se hace con el cómputo
  - EN ST y LC, agregar un else para los casos de que no sean ninguno de los regímenes (no debería suceder pero...)
  - Cuando pregunta si es pena temporal o perpetua, sacar los espacios ("enter") de más
@@ -24,6 +22,10 @@ Funcionalidad a implementar:
  - Régimen de salida anticipada para los casos del 56 bis (1 año antes)
 
  Hecho:
+ - Solucionar el error (excepción) que tira cuando se intenta calcular una pena perpetua
+ - Solucionar los problemas con los string cuando en las perpetuas dice los vencimientos de pena, caducidad, y libertades asistidas
+ - Solucionar: En la transitoria no indica como requisito temporal los 15 años.
+ - Reformar el cálculo de LA para que evalúe el régimen según ley aplicable y reste 3 o 6 meses
  - Readapté las class de cómputo para que no use el régimen normativo aplicable viejo
  - Readapté el __init__ de la class de cómputo para que use los métodos nuevos
  - Mejoré la devolución por escrito que le da al usuario

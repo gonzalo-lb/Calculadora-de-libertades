@@ -12,5 +12,5 @@ if __name__ == '__main__':
     montoDePena = GetConsoleInput_MontoDePena()
     otrasDetenciones = GetConsoleInput_OtrosTiemposDeDetencion()
         
-    computo = ComputoDePena(fechaDelHecho, fechaDeDetencionInput, montoDePena, RegimenNormativoAplicableVIEJO(fechaDelHecho), otrasDetenciones)    
-    computo._ImprimirResultados()
+    # computo = ComputoDePena(fechaDelHecho, fechaDeDetencionInput, montoDePena, RegimenNormativoAplicableVIEJO(fechaDelHecho), otrasDetenciones)    
+    # computo._ImprimirResultados()

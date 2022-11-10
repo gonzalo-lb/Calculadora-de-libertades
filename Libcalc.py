@@ -4,7 +4,7 @@ from libcalc_methods import *
 
 class ComputoDePena():
     
-    def __init__(self, fechaDelHecho:datetime.date, fechaDeDetencion:datetime.date, montoDePena:TiempoEnAños_Meses_Dias, otrosTiemposDeDetencion='NULL'):
+    def __init__(self, fechaDelHecho:datetime.date, fechaDeDetencion:datetime.date, montoDePena:TiempoEnAños_Meses_Dias, otrosTiemposDeDetencion='NULL', _fechaIngresoAPeriodoDePrueba:datetime.date=None):
 
         # DEFINE LAS VARIABLES QUE DEPENDEN DE LOS PARÁMETROS INGRESADOS
         self._fecha_del_hecho = fechaDelHecho
@@ -202,7 +202,7 @@ class ComputoDePena():
             
         return TR_computo_libertad_condicional, TR_computo_libertad_condicional_sinRestarOtrasDetenciones, TR_requisito_libertad_condicional
      
-    def __CalcularSalidasTransitorias(self, _fechaDeDetencion:datetime.date, _montoDePena:TiempoEnAños_Meses_Dias, _otrosTiemposDeDetencion="NULL"):
+    def __CalcularSalidasTransitorias(self, _fechaDeDetencion:datetime.date, _montoDePena:TiempoEnAños_Meses_Dias, _otrosTiemposDeDetencion="NULL", _fechaIngresoAPeriodoDePrueba:datetime.date=None):
         TR_computo_salidas_transitorias = _fechaDeDetencion
         TR_computo_salidas_transitorias_sinRestarOtrasDetenciones = datetime.date
         TR_requisito_salidas_transitorias = TiempoEnAños_Meses_Dias()        
@@ -224,8 +224,17 @@ class ComputoDePena():
                 TR_requisito_salidas_transitorias.dias = '***'
         else:   
 
-            TR_requisito_salidas_transitorias = self.__Calcular_la_mitad(_montoDePena)
-            TR_computo_salidas_transitorias = self.__SumarMontoDePena(TR_computo_salidas_transitorias, TR_requisito_salidas_transitorias)
+            if self._regimenNormativoAplicable._regimen_ST == "Decreto Ley 412/58" or self._regimenNormativoAplicable._regimen_ST == "Ley 24.660" or self._regimenNormativoAplicable._regimen_ST == "Ley 25.948":
+                
+                TR_requisito_salidas_transitorias = self.__Calcular_la_mitad(_montoDePena)
+                TR_computo_salidas_transitorias = self.__SumarMontoDePena(TR_computo_salidas_transitorias, TR_requisito_salidas_transitorias)
+            
+            if  self._regimenNormativoAplicable._regimen_ST == "Ley 27.375":
+                TR_computo_salidas_transitorias = 'Se requiere un año luego de haber ingresado al periodo de prueba'
+                TR_computo_salidas_transitorias_sinRestarOtrasDetenciones = 'Se requiere un año luego de haber ingresado al periodo de prueba'
+                TR_requisito_salidas_transitorias.años = '***'
+                TR_requisito_salidas_transitorias.meses = '***'
+                TR_requisito_salidas_transitorias.dias = '***'            
         
         # Resta otras detenciones, si hay
         TR_computo_salidas_transitorias_sinRestarOtrasDetenciones = TR_computo_salidas_transitorias
