@@ -4,21 +4,19 @@ from libcalc_methods import *
 
 class ComputoDePena():
     
-    def __init__(self, fechaDelHecho:datetime.date, fechaDeDetencion:datetime.date, montoDePena:TiempoEnAños_Meses_Dias, regimenNormativoAplicable:RegimenNormativoAplicableVIEJO, otrosTiemposDeDetencion='NULL'):
+    def __init__(self, fechaDelHecho:datetime.date, fechaDeDetencion:datetime.date, montoDePena:TiempoEnAños_Meses_Dias, otrosTiemposDeDetencion='NULL'):
 
         # DEFINE LAS VARIABLES QUE DEPENDEN DE LOS PARÁMETROS INGRESADOS
         self._fecha_del_hecho = fechaDelHecho
         self._fecha_de_detencion = fechaDeDetencion
         self._monto_de_pena = montoDePena
-        self._otros_tiempos_de_detencion = otrosTiemposDeDetencion
-        self._regimenNormativoAplicable = regimenNormativoAplicable
+        self._otros_tiempos_de_detencion = otrosTiemposDeDetencion        
         
         # DETERMINA EL REGIMEN NORMATIVO A UTILIZAR
-        regimenNormativoAplicable = RegimenNormativoAplicableVIEJO(self._fecha_del_hecho)
-        print(regimenNormativoAplicable)
+        self._regimenNormativoAplicable = RegimenNormativoAplicable(self._fecha_del_hecho)
+        print(self._regimenNormativoAplicable)
 
         # CALCULA LAS LIBERTADES
-
         self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones, self._caducidad_de_la_pena, self._caducidad_de_la_pena_sinRestarOtrasDetenciones = self.__CalcularVencimientoYCaducidadDePena(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)                
         self._computo_libertad_condicional, self._computo_libertad_condicional_sinRestarOtrasDetenciones, self._requisito_libertad_condicional = self.__CalcularLibertadCondicional(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)
         self._computo_salidas_transitorias, self._computo_salidas_transitorias_sinRestarOtrasDetenciones, self._requisito_salidas_transitorias = self.__CalcularSalidasTransitorias(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)
@@ -179,13 +177,12 @@ class ComputoDePena():
 
             # CALCULO DE PENA PERPETUA
 
-            if self._regimenNormativoAplicable._libertadCondicional == "Ley 11.179":                                
+            if self._regimenNormativoAplicable._regimen_LC == "Ley 11.179":                                
                 TR_requisito_libertad_condicional.años = 20
-                TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)
-                
+                TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)               
 
             
-            if self._regimenNormativoAplicable._libertadCondicional == "Ley 25.892" or self._regimenNormativoAplicable._libertadCondicional == "Ley 27.375":
+            if self._regimenNormativoAplicable._regimen_LC == "Ley 25.892" or self._regimenNormativoAplicable._libertadCondicional == "Ley 27.375":
                 TR_requisito_libertad_condicional.años = 35
                 TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)                
 
@@ -215,12 +212,12 @@ class ComputoDePena():
 
             TR_requisito_salidas_transitorias.perpetua = True
 
-            if self._regimenNormativoAplicable._libertadCondicional == "Ley 11.179" or self._regimenNormativoAplicable._libertadCondicional == "Ley 25.892":
+            if self._regimenNormativoAplicable._regimen_ST == "Ley 11.179" or self._regimenNormativoAplicable._libertadCondicional == "Ley 25.892":
                 
                 TR_requisito_salidas_transitorias.años = 15
                 TR_computo_salidas_transitorias = self.__SumarMontoDePena(_fechaDeDetencion, TR_computo_salidas_transitorias)                
             
-            if  self._regimenNormativoAplicable._libertadCondicional == "Ley 27.375":
+            if  self._regimenNormativoAplicable._regimen_ST == "Ley 27.375":
                 TR_computo_salidas_transitorias = 'Se requiere un año luego de haber ingresado al periodo de prueba'
                 TR_computo_salidas_transitorias_sinRestarOtrasDetenciones = 'Se requiere un año luego de haber ingresado al periodo de prueba'
                 TR_requisito_salidas_transitorias.años = '***'
@@ -272,8 +269,7 @@ class ComputoDePena():
         return TR_computo_libertad_asistida_6meses, TR_computo_libertad_asistida_6meses_sinRestarOtrasDetenciones
 
     def _ImprimirResultados(self):
-        resultadosFinales = '''
-Cómputo de pena
+        resultadosFinales = '''CÓMPUTO DE PENA
 ---------------
 Fecha de detención: {}
 Vencimiento de pena: {}
@@ -294,8 +290,7 @@ Libertad asistida -6 meses-: {}
         Datetime_date_enFormatoXX_XX_XXXX(self._computo_libertad_asistida_3meses),
         Datetime_date_enFormatoXX_XX_XXXX(self._computo_libertad_asistida_6meses))
 
-        resultadosSinRestarOtrasDetenciones = '''
-Resultados sin restar otras detenciones
+        resultadosSinRestarOtrasDetenciones = '''RESULTADOS SIN RESTAR OTRAS DETENCIONES
 ---------------------------------------
 Fecha de detención: {}
 Vencimiento de pena: {}

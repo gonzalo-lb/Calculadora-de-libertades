@@ -1,18 +1,24 @@
+Lo que hice:
+ - Readapté las class de cómputo para que no use el régimen normativo aplicable viejo
+ - Readapté el __init__ de la class de cómputo para que use los métodos nuevos
+ - Mejoré la devolución por escrito que le da al usuario
+
 Con qué seguir:
- - JSON para los regímenes legales
- - Armar la lógica de toda la calculadora antes de seguir
+ - Solucionar el error que tira cuando se intenta calcular una pena perpetua
+ - Reformar el cálculo de LA para que evalúe el régimen según ley aplicable y reste 3 o 6 meses
+ - Armar la interacción con el usuario para que vaya haciendo consultas según el régimen en el que se encuentre
+ - Integrar las consultas a la devolución que se hace con el cómputo
+ - EN ST y LC, agregar un else para los casos de que no sean ninguno de los regímenes (no debería suceder pero...)
+ - Cuando pregunta si es pena temporal o perpetua, sacar los espacios ("enter") de más
+ - Cuando indique los regímenes de detención, que aclara las fechas de vigencia de las leyes que aplica
+ - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación
+ - Controlar cuando se restan detenciones y ya se está en condiciones de salir (podría comparar con la fecha de la pc y avisar que se está en condiciones de salir, o poner el texto de la consola de otro color)
 
-A implementar:
-
+Funcionalidad a implementar:
  - Estímulo educativo
  - Nuevo cómputo para libertad condicional revocada (no se contabiliza el tiempo que se estuvo en libertad)
- - Fecha del hecho, para evaluar leyes penal más benignas en reincidencia, ejecución penal, multas, etc.
  - Penas de ejecución condicional y plazos para las reglas de conducta.
  - Alertas por reincidencia, delitos excluidos del régimen de libertades (por ley 27.375), libertades revocadas, etc. con indicación de la normativa específica.
  - Requisito temporal extra para la ST, de permanencia en periodo de prueba (art. 17, ley 24.660)
  - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)
  - Régimen de salida anticipada para los casos del 56 bis (1 año antes)
-
-A mejorar:
- - Penas perpetuas.
-	Ser mas específico con los regímenes en la devolución cuando imprime los resultados
