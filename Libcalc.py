@@ -20,9 +20,8 @@ class ComputoDePena():
         self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones, self._caducidad_de_la_pena, self._caducidad_de_la_pena_sinRestarOtrasDetenciones = self.__CalcularVencimientoYCaducidadDePena(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)                
         self._computo_libertad_condicional, self._computo_libertad_condicional_sinRestarOtrasDetenciones, self._requisito_libertad_condicional = self.__CalcularLibertadCondicional(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)
         self._computo_salidas_transitorias, self._computo_salidas_transitorias_sinRestarOtrasDetenciones, self._requisito_salidas_transitorias = self.__CalcularSalidasTransitorias(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)
-        self._computo_libertad_asistida_3meses, self._computo_libertad_asistida_3meses_sinRestarOtrasDetenciones = self.__CalcularLibertadAsistida_3meses(self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones)
-        self._computo_libertad_asistida_6meses, self._computo_libertad_asistida_6meses_sinRestarOtrasDetenciones = self.__CalcularLibertadAsistida_6meses(self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones)
-
+        self._computo_libertad_asistida, self._computo_libertad_asistida_sinRestarOtrasDetenciones = self.__CalcularLibertadAsistida(self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones)
+        
     def __Calcular_dos_tercios(self, _montoDePena:TiempoEnAños_Meses_Dias):
 
         if _montoDePena.perpetua:
@@ -177,12 +176,12 @@ class ComputoDePena():
 
             # CALCULO DE PENA PERPETUA
 
-            if self._regimenNormativoAplicable._regimen_LC == "Ley 11.179":                                
+            if self._regimenNormativoAplicable._regimen_LA == "Ley 11.179":                                
                 TR_requisito_libertad_condicional.años = 20
-                TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)               
+                TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)
 
             
-            if self._regimenNormativoAplicable._regimen_LC == "Ley 25.892" or self._regimenNormativoAplicable._libertadCondicional == "Ley 27.375":
+            if self._regimenNormativoAplicable._regimen_LA == "Ley 25.892" or self._regimenNormativoAplicable._libertadCondicional == "Ley 27.375":
                 TR_requisito_libertad_condicional.años = 35
                 TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)                
 
@@ -212,10 +211,10 @@ class ComputoDePena():
 
             TR_requisito_salidas_transitorias.perpetua = True
 
-            if self._regimenNormativoAplicable._regimen_ST == "Ley 11.179" or self._regimenNormativoAplicable._libertadCondicional == "Ley 25.892":
+            if self._regimenNormativoAplicable._regimen_ST == "Decreto Ley 412/58" or self._regimenNormativoAplicable._regimen_ST == "Ley 24.660" or self._regimenNormativoAplicable._regimen_ST == "Ley 25.948":
                 
                 TR_requisito_salidas_transitorias.años = 15
-                TR_computo_salidas_transitorias = self.__SumarMontoDePena(_fechaDeDetencion, TR_computo_salidas_transitorias)                
+                TR_computo_salidas_transitorias = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_salidas_transitorias)                
             
             if  self._regimenNormativoAplicable._regimen_ST == "Ley 27.375":
                 TR_computo_salidas_transitorias = 'Se requiere un año luego de haber ingresado al periodo de prueba'
@@ -233,42 +232,36 @@ class ComputoDePena():
         TR_computo_salidas_transitorias = self.__RestarOtrasDetenciones(TR_computo_salidas_transitorias, _otrosTiemposDeDetencion)
 
         return TR_computo_salidas_transitorias, TR_computo_salidas_transitorias_sinRestarOtrasDetenciones, TR_requisito_salidas_transitorias
-
-    def __CalcularLibertadAsistida_3meses(self, _vencimientoDePena:datetime.date, _vencimiento_sinRestarOtrasDetenciones:datetime.date):
+    
+    def __CalcularLibertadAsistida(self, _vencimientoDePena:datetime.date, _vencimiento_sinRestarOtrasDetenciones:datetime.date):
         
-        TR_computo_libertad_asistida_3meses = ''
-        TR_computo_libertad_asistida_3meses_sinRestarOtrasDetenciones = ''
+        TR_computo_libertad_asistida = ''
+        TR_computo_libertad_asistida_sinRestarOtrasDetenciones = ''
 
         if self._monto_de_pena.perpetua:
-            TR_computo_libertad_asistida_3meses = 'Pena perpetua'
-            TR_computo_libertad_asistida_3meses_sinRestarOtrasDetenciones = 'Pena perpetua'
+            TR_computo_libertad_asistida = 'Pena perpetua'
+            TR_computo_libertad_asistida_sinRestarOtrasDetenciones = 'Pena perpetua'
+
         else:
-            TR_computo_libertad_asistida_3meses = _vencimientoDePena
-            TR_computo_libertad_asistida_3meses += relativedelta(months=-3)
+            if self._regimenNormativoAplicable._regimen_LA == "Ley 24.660" or self._regimenNormativoAplicable._regimen_LA == "Ley 25.948":
 
-            TR_computo_libertad_asistida_3meses_sinRestarOtrasDetenciones = _vencimiento_sinRestarOtrasDetenciones
-            TR_computo_libertad_asistida_3meses_sinRestarOtrasDetenciones += relativedelta(months=-3)
-        
-        return TR_computo_libertad_asistida_3meses, TR_computo_libertad_asistida_3meses_sinRestarOtrasDetenciones
-        
-    def __CalcularLibertadAsistida_6meses(self, _vencimientoDePena:datetime.date, _vencimiento_sinRestarOtrasDetenciones:datetime.date):
-        
-        TR_computo_libertad_asistida_6meses = ''
-        TR_computo_libertad_asistida_6meses_sinRestarOtrasDetenciones = ''
+                TR_computo_libertad_asistida = _vencimientoDePena
+                TR_computo_libertad_asistida += relativedelta(months=-6)
 
-        if self._monto_de_pena.perpetua:
-            TR_computo_libertad_asistida_6meses = 'Pena perpetua'
-            TR_computo_libertad_asistida_6meses_sinRestarOtrasDetenciones = 'Pena perpetua'
-        else:
-            TR_computo_libertad_asistida_6meses = _vencimientoDePena
-            TR_computo_libertad_asistida_6meses += relativedelta(months=-3)
+                TR_computo_libertad_asistida_sinRestarOtrasDetenciones = _vencimiento_sinRestarOtrasDetenciones
+                TR_computo_libertad_asistida_sinRestarOtrasDetenciones += relativedelta(months=-6)
+            
+            if self._regimenNormativoAplicable._regimen_LA == "Ley 27.375":
 
-            TR_computo_libertad_asistida_6meses_sinRestarOtrasDetenciones = _vencimiento_sinRestarOtrasDetenciones
-            TR_computo_libertad_asistida_6meses_sinRestarOtrasDetenciones += relativedelta(months=-3)
+                TR_computo_libertad_asistida = _vencimientoDePena
+                TR_computo_libertad_asistida += relativedelta(months=-3)
+
+                TR_computo_libertad_asistida_sinRestarOtrasDetenciones = _vencimiento_sinRestarOtrasDetenciones
+                TR_computo_libertad_asistida_sinRestarOtrasDetenciones += relativedelta(months=-3)
         
-        return TR_computo_libertad_asistida_6meses, TR_computo_libertad_asistida_6meses_sinRestarOtrasDetenciones
+        return TR_computo_libertad_asistida, TR_computo_libertad_asistida_sinRestarOtrasDetenciones
 
-    def _ImprimirResultados(self):
+    def _ImprimirResultados(self):        
         resultadosFinales = '''CÓMPUTO DE PENA
 ---------------
 Fecha de detención: {}
@@ -278,8 +271,8 @@ La libertad condicional se obtiene a los {} año(s), {} mes(es) y {} día(s) de 
 Libertad condicional: {}
 Las salidas transitorias se obtienen a los {} año(s), {} mes(es) y {} día(s) de detención.
 Salidas transitorias: {}
-Libertad asistida -3 meses-: {}
-Libertad asistida -6 meses-: {}
+La libertad asistida se obtiene {} meses antes del vencimiento de pena
+Libertad asistida: {}
 '''.format(Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_detencion),
         Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena),
         Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_la_pena), 
@@ -287,8 +280,8 @@ Libertad asistida -6 meses-: {}
         Datetime_date_enFormatoXX_XX_XXXX(self._computo_libertad_condicional),
         self._requisito_salidas_transitorias.años, self._requisito_salidas_transitorias.meses, self._requisito_salidas_transitorias.dias,
         Datetime_date_enFormatoXX_XX_XXXX(self._computo_salidas_transitorias),
-        Datetime_date_enFormatoXX_XX_XXXX(self._computo_libertad_asistida_3meses),
-        Datetime_date_enFormatoXX_XX_XXXX(self._computo_libertad_asistida_6meses))
+        self._regimenNormativoAplicable.LIBERTAD_ASISTIDA(LA_KEYS._requisitoTemporal_KEY),
+        Datetime_date_enFormatoXX_XX_XXXX(self._computo_libertad_asistida))
 
         resultadosSinRestarOtrasDetenciones = '''RESULTADOS SIN RESTAR OTRAS DETENCIONES
 ---------------------------------------
@@ -297,15 +290,13 @@ Vencimiento de pena: {}
 Caducidad de la pena: {}
 Libertad condicional: {}
 Salidas transitorias: {}
-Libertad asistida -3 meses-: {}
-Libertad asistida -6 meses-: {}
+Libertad asistida: {}
 '''.format(Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_detencion), 
         Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena_sinRestarOtrasDetenciones), 
         Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_la_pena_sinRestarOtrasDetenciones), 
         Datetime_date_enFormatoXX_XX_XXXX(self._computo_libertad_condicional_sinRestarOtrasDetenciones),        
         Datetime_date_enFormatoXX_XX_XXXX(self._computo_salidas_transitorias_sinRestarOtrasDetenciones),
-        Datetime_date_enFormatoXX_XX_XXXX(self._computo_libertad_asistida_3meses_sinRestarOtrasDetenciones),
-        Datetime_date_enFormatoXX_XX_XXXX(self._computo_libertad_asistida_6meses_sinRestarOtrasDetenciones))
+        Datetime_date_enFormatoXX_XX_XXXX(self._computo_libertad_asistida_sinRestarOtrasDetenciones))
 
         print(resultadosFinales)
         print(resultadosSinRestarOtrasDetenciones)

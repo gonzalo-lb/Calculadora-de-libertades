@@ -76,11 +76,11 @@ class RegimenNormativoAplicable():
 
         # DETERMINA RÉGIMEN DE LIBERTAD CONDICIONAL
 
-        self._regimen_LC = 'No aplica'
+        self._regimen_LA = 'No aplica'
         for key in self.__JSON_LC:            
             fecha_implementacion = datetime.date(self.__JSON_LC[key][LC_KEYS._fechaImplementacion_YEAR_KEY.value], self.__JSON_LC[key][LC_KEYS._fechaImplementacion_MONTH_KEY.value], self.__JSON_LC[key][LC_KEYS._fechaImplementacion_DAY_KEY.value])
             if FechaA_es_Mayor_O_Igual_Que_FechaB(_fechaDelHecho, fecha_implementacion):
-                self._regimen_LC = key        
+                self._regimen_LA = key        
 
         # DETERMINA RÉGIMEN DE SALIDAS TRANSITORIAS
 
@@ -107,7 +107,7 @@ class RegimenNormativoAplicable():
                 self._regimen_PREPLIB = key    
     
     def LIBERTAD_CONDICIONAL(self, ask:LC_KEYS):
-        return self.__JSON_LC[self._regimen_LC][ask.value]
+        return self.__JSON_LC[self._regimen_LA][ask.value]
     
     def SALIDAS_TRANSITORIAS(self, ask:ST_KEYS):
         return self.__JSON_ST[self._regimen_ST][ask.value]
@@ -125,9 +125,12 @@ Libertad condicional: {}
 Salidas transitorias: {}
 Libertad asistida: {}
 Régimen preparatorio para la liberación: {}
-'''.format(self._regimen_LC, self._regimen_ST, self._regimen_LA, self._regimen_PREPLIB)
+'''.format(self._regimen_LA, self._regimen_ST, self._regimen_LA, self._regimen_PREPLIB)
 
 def Datetime_date_enFormatoXX_XX_XXXX(_date:datetime.date):
+    if type(_date) is not datetime.date:
+        return _date
+    
     toRT = str(_date)
     return '{}/{}/{}'.format(toRT[8:10], toRT[5:7], toRT[0:4])
 

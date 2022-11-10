@@ -1,11 +1,11 @@
-Lo que hice:
- - Readapté las class de cómputo para que no use el régimen normativo aplicable viejo
- - Readapté el __init__ de la class de cómputo para que use los métodos nuevos
- - Mejoré la devolución por escrito que le da al usuario
+Lo que hice ahora:
+- Solucionar el error (excepción) que tira cuando se intenta calcular una pena perpetua
+- Solucionar los problemas con los string cuando en las perpetuas dice los vencimientos de pena, caducidad, y libertades asistidas
+- Solucionar: En la transitoria no indica como requisito temporal los 15 años.
+- Reformar el cálculo de LA para que evalúe el régimen según ley aplicable y reste 3 o 6 meses
 
 Con qué seguir:
- - Solucionar el error que tira cuando se intenta calcular una pena perpetua
- - Reformar el cálculo de LA para que evalúe el régimen según ley aplicable y reste 3 o 6 meses
+ - Las salidas transitorias no evalúan régimen cuando es pena temporal. Agregar el de la 27.375
  - Armar la interacción con el usuario para que vaya haciendo consultas según el régimen en el que se encuentre
  - Integrar las consultas a la devolución que se hace con el cómputo
  - EN ST y LC, agregar un else para los casos de que no sean ninguno de los regímenes (no debería suceder pero...)
@@ -22,3 +22,8 @@ Funcionalidad a implementar:
  - Requisito temporal extra para la ST, de permanencia en periodo de prueba (art. 17, ley 24.660)
  - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)
  - Régimen de salida anticipada para los casos del 56 bis (1 año antes)
+
+ Hecho:
+ - Readapté las class de cómputo para que no use el régimen normativo aplicable viejo
+ - Readapté el __init__ de la class de cómputo para que use los métodos nuevos
+ - Mejoré la devolución por escrito que le da al usuario
