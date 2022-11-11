@@ -151,20 +151,30 @@ class ComputoDePena():
         TR_vencimientoDePena = ''
         TR_vencimientoDePena_sinRestarOtrasDetenciones = ''
         TR_caducidad_de_la_pena = ''
-        TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = ''
+        TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = ''        
 
         if _montoDePena.perpetua:
-            TR_vencimientoDePena = 'Pena perpetua'
-            TR_vencimientoDePena_sinRestarOtrasDetenciones = 'Pena perpetua'
-            TR_caducidad_de_la_pena = 'Pena perpetua'
-            TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = 'Pena perpetua'
+            TR_vencimientoDePena = 'Vencimiento de pena: Pena perpetua'
+            TR_vencimientoDePena_sinRestarOtrasDetenciones = 'Vencimiento de pena: Pena perpetua'
+            TR_caducidad_de_la_pena = 'Vencimiento de pena: Pena perpetua'
+            TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = 'Vencimiento de pena: Pena perpetua'
         else:            
             TR_vencimientoDePena = self.__SumarMontoDePena(_fechaDeDetencion, _montoDePena)
             TR_vencimientoDePena_sinRestarOtrasDetenciones = TR_vencimientoDePena
             TR_vencimientoDePena = self.__RestarOtrasDetenciones(TR_vencimientoDePena, _otrosTiemposDeDetencion)            
             TR_caducidad_de_la_pena = TR_vencimientoDePena + relativedelta(years=10)
             TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = TR_vencimientoDePena_sinRestarOtrasDetenciones + relativedelta(years=10)
-        return TR_vencimientoDePena, TR_vencimientoDePena_sinRestarOtrasDetenciones, TR_caducidad_de_la_pena, TR_caducidad_de_la_pena_sinRestarOtrasDetenciones
+            
+            # Arma los string
+            TR_vencimientoDePena_STR = f'Vencimiento de pena: {TR_vencimientoDePena}'
+            TR_vencimientoDePena_sinRestarOtrasDetenciones_STR = f'Vencimiento de pena: {TR_vencimientoDePena_sinRestarOtrasDetenciones}'
+            TR_caducidad_de_la_pena_STR = f'Caducidad de la pena: {TR_caducidad_de_la_pena}'
+            TR_caducidad_de_la_pena_sinRestarOtrasDetenciones_STR = f'Caducidad de la pena: {TR_caducidad_de_la_pena_sinRestarOtrasDetenciones}'        
+        
+        return (TR_vencimientoDePena,
+        TR_vencimientoDePena_sinRestarOtrasDetenciones,
+        TR_caducidad_de_la_pena,
+        TR_caducidad_de_la_pena_sinRestarOtrasDetenciones)
         
     def __CalcularLibertadCondicional(self, _fechaDeDetencion:datetime.date, _montoDePena:TiempoEnAños_Meses_Dias, _otrosTiemposDeDetencion="NULL"):
 
@@ -177,12 +187,12 @@ class ComputoDePena():
 
             # CALCULO DE PENA PERPETUA
 
-            if self._regimenNormativoAplicable._regimen_LA == "Ley 11.179":                                
+            if self._regimenNormativoAplicable._regimen_LC == "Ley 11.179":                                
                 TR_requisito_libertad_condicional.años = 20
                 TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)
 
             
-            if self._regimenNormativoAplicable._regimen_LA == "Ley 25.892" or self._regimenNormativoAplicable._libertadCondicional == "Ley 27.375":
+            if self._regimenNormativoAplicable._regimen_LC == "Ley 25.892" or self._regimenNormativoAplicable._libertadCondicional == "Ley 27.375":
                 TR_requisito_libertad_condicional.años = 35
                 TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)                
 
@@ -271,7 +281,7 @@ class ComputoDePena():
         
         return TR_computo_libertad_asistida, TR_computo_libertad_asistida_sinRestarOtrasDetenciones
 
-    def _ImprimirResultados(self):        
+    def _ImprimirResultadosVIEJO(self):        
         resultadosFinales = '''CÓMPUTO DE PENA
 ---------------
 Fecha de detención: {}
@@ -311,6 +321,34 @@ Libertad asistida: {}
         print(resultadosFinales)
         print(resultadosSinRestarOtrasDetenciones)
 
+    def _ImprimirResultados(self):
+        # Arma el vencimiento de pena
+        vencimientoDePena = ''
+        vencimientoDePenaSinRestarOtrasDetenciones = ''
+        if self._monto_de_pena.perpetua:
+            vencimientoDePena = vencimientoDePenaSinRestarOtrasDetenciones = 'Vencimiento de pena: Pena perpetua'
+        else:
+            vencimientoDePena = f'Vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}'
+            vencimientoDePenaSinRestarOtrasDetenciones  = f'Vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena_sinRestarOtrasDetenciones)}'
+        
+        # Arma la caducidad de la pena
+        caducidadDeLaPena = ''
+        caducidadDeLaPenaSinRestarOtrasDetenciones = ''
+        if self._monto_de_pena.perpetua:
+            caducidadDeLaPena = caducidadDeLaPenaSinRestarOtrasDetenciones = 'Caducidad de la pena: Pena perpetua'
+        else:
+            caducidadDeLaPena = f'Caducidad de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_la_pena)}'
+            caducidadDeLaPenaSinRestarOtrasDetenciones = f'Caducidad de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_la_pena_sinRestarOtrasDetenciones)}'
+        
+        # Arma la libertad condicional
+        libertadCondicional = ''
+        libertadCondicional_requisito = f'La libertad condicional se obtiene a los {self._requisito_libertad_condicional.años} año(s), {self._requisito_libertad_condicional.meses} mes(es) y {self._requisito_libertad_condicional.dias} día(s) de detención.'
+        libertadCondicional_computo = f'Libertad condicional: {Datetime_date_enFormatoXX_XX_XXXX(self._computo_libertad_condicional)}'
+        libertadCondicional_advertenciaReincidencia = 'ADVERTENCIA: En el caso la persona es reincidente. No aplicaría el instituto de la libertad condicional (art. 14 CP).'
+        libertadCondicional_advertenciaDelitosExcluidosLey25892 = 'ADVERTENCIA: Persona condenada por los delitos enumerados en el art. 14 CP. No aplicaría el instituto de la libertad condicional.'
+        libertadCondicional_advertenciaDelitosExcluidosLey27375 = 'ADVERTENCIA: Persona condenada por los delitos enumerados en el art. 14 CP. No aplicaría el instituto de la libertad condicional.'
+        
+
 def _DEBUG():    
     
     fechaDelHecho = GetConsoleInput_Fecha('Ingresar fecha del hecho en formato día/mes/año (XX/XX/XXXX): ')
@@ -319,7 +357,7 @@ def _DEBUG():
     otrasDetenciones = GetConsoleInput_OtrosTiemposDeDetencion()
     
     computo = ComputoDePena(fechaDelHecho, fechaDeDetencionInput, montoDePena, otrasDetenciones)    
-    computo._ImprimirResultados()    
+    computo._ImprimirResultadosVIEJO()    
 
 if __name__ == '__main__':
     _DEBUG()

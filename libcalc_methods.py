@@ -76,11 +76,11 @@ class RegimenNormativoAplicable():
 
         # DETERMINA RÉGIMEN DE LIBERTAD CONDICIONAL
 
-        self._regimen_LA = 'No aplica'
+        self._regimen_LC = 'No aplica'
         for key in self.__JSON_LC:            
             fecha_implementacion = datetime.date(self.__JSON_LC[key][LC_KEYS._fechaImplementacion_YEAR_KEY.value], self.__JSON_LC[key][LC_KEYS._fechaImplementacion_MONTH_KEY.value], self.__JSON_LC[key][LC_KEYS._fechaImplementacion_DAY_KEY.value])
             if FechaA_es_Mayor_O_Igual_Que_FechaB(_fechaDelHecho, fecha_implementacion):
-                self._regimen_LA = key        
+                self._regimen_LC = key        
 
         # DETERMINA RÉGIMEN DE SALIDAS TRANSITORIAS
 

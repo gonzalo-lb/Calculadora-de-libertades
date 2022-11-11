@@ -4,7 +4,7 @@
         "Fecha de implementacion - month":1,
         "Fecha de implementacion - day":1,        
         "Requisito temporal pena perpetua":20,
-        "Preguntar si es reincidente":true,
+        "Preguntar si es reincidente":true,        
         "Preguntar si es un computo por LC revocada":true,
         "Preguntar por delitos excluidos ley 25.892":false,
         "Preguntar por delitos excluidos ley 27.375":false,
