@@ -127,8 +127,9 @@ Libertad asistida: {}
 Régimen preparatorio para la liberación: {}
 '''.format(self._regimen_LA, self._regimen_ST, self._regimen_LA, self._regimen_PREPLIB)
 
-class GetConsoleInput_PreguntasSobreSituacionProcesal():
-    def __init__(self, _regimenNormativo:RegimenNormativoAplicable):
+class SituacionProcesal():
+    def __init__(self, _regimenNormativo:RegimenNormativoAplicable, _getInputPreguntas:bool=True):
+        self._RegimenNormativo = _regimenNormativo
         self._EsReincidente = False
         self._EsComputoPorLCRevocada = False
         self._EsComputoPorLARevocada = False
@@ -140,10 +141,15 @@ class GetConsoleInput_PreguntasSobreSituacionProcesal():
         self._HayAccesoriaDel52 = False
         self._EstaEnPeriodoDePrueba = False
         self._EstaEnPeriodoDePruebaDesde = False
-        self._RequisitoDeCalificacionDuranteElUltimoAño_ST = False                
+        self._RequisitoDeCalificacionDuranteElUltimoAño_ST = False
+
+        if _getInputPreguntas:
+            self.GetConsoleInput_PreguntasSobreSituacionProcesal()
+
+    def GetConsoleInput_PreguntasSobreSituacionProcesal(self):                  
 
         # PREGUNTAR SI ES REINCIDENTE        
-        if _regimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_esReincidente_KEY):            
+        if self._RegimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_esReincidente_KEY):            
             print(Separadores._separadorComun)
             while True:
                 user_input = input('¿Hay declaración de reincidencia? (S/N): ')
@@ -156,7 +162,7 @@ class GetConsoleInput_PreguntasSobreSituacionProcesal():
                 print('ERROR: Solo se puede responder con "s" o "n"')            
         
         # PREGUNTAR SI HAY ACCESORIA DEL 52 CP        
-        if _regimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siHayAccesoria52):
+        if self._RegimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siHayAccesoria52):
             print(Separadores._separadorComun)
             while True:
                 user_input = input('¿Hay accesoria del 52 CP? (S/N): ')
@@ -169,7 +175,7 @@ class GetConsoleInput_PreguntasSobreSituacionProcesal():
                 print('ERROR: Solo se puede responder con "s" o "n"')  
 
         #PREGUNTAR SI ES POR LIBERTAD REVOCADA        
-        if _regimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_esComputoPorLCRevocada_KEY) or _regimenNormativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_nuevoComputoLArevoc_KEY) or _regimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_esComputoPorEvasionDeST_KEY):
+        if self._RegimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_esComputoPorLCRevocada_KEY) or self._RegimenNormativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_nuevoComputoLArevoc_KEY) or self._RegimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_esComputoPorEvasionDeST_KEY):
             print(Separadores._separadorComun)
             while True:
                 print('¿Este cómputo es por una libertad revocada?')
@@ -203,7 +209,7 @@ class GetConsoleInput_PreguntasSobreSituacionProcesal():
                 print('ERROR: Solo se puede responder con números del 1 al 4')
 
         # PREGUNTAR SI ES POR DELITOS EXCLUIDOS LEY 25.892
-        if _regimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_delitosExcluidos25892_KEY):
+        if self._RegimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_delitosExcluidos25892_KEY):
             print(Separadores._separadorComun)
             while True:
                 print('Delitos excluidos por la ley 25.892: ...')
@@ -217,7 +223,7 @@ class GetConsoleInput_PreguntasSobreSituacionProcesal():
                 print('ERROR: Solo se puede responder con "s" o "n"')
 
         # PREGUNTAR SI ES POR DELITOS EXCLUIDOS LEY 25.948
-        if _regimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_delitosExcluidos25948_KEY) or _regimenNormativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_delitosExcluidos25948_KEY):
+        if self._RegimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_delitosExcluidos25948_KEY) or self._RegimenNormativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_delitosExcluidos25948_KEY):
             print(Separadores._separadorComun)
             while True:
                 print('Delitos excluidos por la ley 25.948: ...')
@@ -231,7 +237,7 @@ class GetConsoleInput_PreguntasSobreSituacionProcesal():
                 print('ERROR: Solo se puede responder con "s" o "n"')
 
         # PREGUNTAR SI ES POR DELITOS EXCLUIDOS LEY 27.375
-        if _regimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_delitosExcluidos27375_KEY) or _regimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_delitosExcluidos27375_KEY) or _regimenNormativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_delitosExcluidos27375_KEY) or _regimenNormativo.REGIMEN_PREPARACION_LIBERTAD(REGPREPLIB_KEYS._ask_delitosExcluidos27375_KEY):
+        if self._RegimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_delitosExcluidos27375_KEY) or self._RegimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_delitosExcluidos27375_KEY) or self._RegimenNormativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_delitosExcluidos27375_KEY) or self._RegimenNormativo.REGIMEN_PREPARACION_LIBERTAD(REGPREPLIB_KEYS._ask_delitosExcluidos27375_KEY):
             print(Separadores._separadorComun)
             while True:
                 print('Delitos excluidos por la ley 27.375: ...')
@@ -245,7 +251,7 @@ class GetConsoleInput_PreguntasSobreSituacionProcesal():
                 print('ERROR: Solo se puede responder con "s" o "n"')
 
         # PREGUNTAR SI TIENE CONCEPTO BUENO DURANTE 2/3 DE LA EJECUCIÓN
-        if _regimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_2_3ConCalifBUENO_KEY):
+        if self._RegimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_2_3ConCalifBUENO_KEY):
             print(Separadores._separadorComun)
             while True:                
                 user_input = input('¿Logró alcanzar como mínimo conducta y concepto "BUENO" durante al menos 2/3 partes de la condena? (S/N): ')
@@ -258,7 +264,7 @@ class GetConsoleInput_PreguntasSobreSituacionProcesal():
                 print('ERROR: Solo se puede responder con "s" o "n"')
 
         # PREGUNTAR POR REQUISITO DE CALIFICACIÓN PARA ST
-        if _regimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_requisitoDeCalificacion):
+        if self._RegimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_requisitoDeCalificacion):
             print(Separadores._separadorComun)
             while True:                
                 user_input = input('¿Logró alcanzar conducta "EJEMPLAR" (o el grado máximo de ser alcanzado durante el tiempo de ejecución) durante el último año de cumplimiento de pena? (S/N): ')
@@ -271,7 +277,7 @@ class GetConsoleInput_PreguntasSobreSituacionProcesal():
                 print('ERROR: Solo se puede responder con "s" o "n"')
 
         # PREGUNTAR SI ESTA EN PERIODO DE PRUEBA, Y DESDE CUÁNDO
-        if _regimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siEstaPeriodoDePruebaYDesdeCuando):
+        if self._RegimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siEstaPeriodoDePruebaYDesdeCuando):
             print(Separadores._separadorComun)
             while True:                
                 user_input = input('¿Logró alcanzar el periodo de prueba? (S/N): ')
@@ -403,4 +409,4 @@ def RestarOtrasDetenciones(fecha_de_requisito_temporal:datetime.date, otras_dete
 
 if __name__ == '__main__':
     regnorm = RegimenNormativoAplicable(datetime.date(2018, 1, 20))
-    x = GetConsoleInput_PreguntasSobreSituacionProcesal(regnorm)
+    x = SituacionProcesal(regnorm)

@@ -10,7 +10,4 @@ if __name__ == '__main__':
     
     fechaDeDetencionInput = GetConsoleInput_Fecha('Ingresar fecha de detención en formato día/mes/año (XX/XX/XXXX): ')
     montoDePena = GetConsoleInput_MontoDePena()
-    otrasDetenciones = GetConsoleInput_OtrosTiemposDeDetencion()
-        
-    # computo = ComputoDePena(fechaDelHecho, fechaDeDetencionInput, montoDePena, RegimenNormativoAplicableVIEJO(fechaDelHecho), otrasDetenciones)    
-    # computo._ImprimirResultados()
+    otrasDetenciones = GetConsoleInput_OtrosTiemposDeDetencion()    

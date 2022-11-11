@@ -4,13 +4,14 @@ from libcalc_methods import *
 
 class ComputoDePena():
     
-    def __init__(self, fechaDelHecho:datetime.date, fechaDeDetencion:datetime.date, montoDePena:TiempoEnAños_Meses_Dias, otrosTiemposDeDetencion='NULL', _fechaIngresoAPeriodoDePrueba:datetime.date=None):
+    def __init__(self, fechaDelHecho:datetime.date, fechaDeDetencion:datetime.date, montoDePena:TiempoEnAños_Meses_Dias, otrosTiemposDeDetencion='NULL', situacionProcesal:SituacionProcesal=None):
 
         # DEFINE LAS VARIABLES QUE DEPENDEN DE LOS PARÁMETROS INGRESADOS
         self._fecha_del_hecho = fechaDelHecho
         self._fecha_de_detencion = fechaDeDetencion
         self._monto_de_pena = montoDePena
-        self._otros_tiempos_de_detencion = otrosTiemposDeDetencion        
+        self._otros_tiempos_de_detencion = otrosTiemposDeDetencion 
+        self._situacionProcesal = situacionProcesal
         
         # DETERMINA EL REGIMEN NORMATIVO A UTILIZAR
         self._regimenNormativoAplicable = RegimenNormativoAplicable(self._fecha_del_hecho)
