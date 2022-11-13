@@ -1,11 +1,16 @@
 Lo que hice ahora:
- - Comencé a armar la parte que imprime según el régimen legal aplicable
- - Corregí algunos bugs sencillos
- - Agregué enum_keys para los regímenes de los institutos
+ - Hice parte de _ImprimirResultados, pero lo interrumpí porque vi que me faltan cuestiones en los cálculos
+ - Reformé en la documentación la parte de la libertad condicional para los requisitos cuando hay accesoria del 52 CP
+ - Agergué la pregunta de si hay accesoria del 52 por la libertad condicional
+ - Armar class por separado para los montos de pena (que derive de TiempoEnAños...()) y revisar en el código que se pueda reemplazar sin problema
 
-Con qué seguir:  
- - Seguir desde def _ImprimirResultados en la parte que arma la libertad condicional
+Con qué seguir: 
+ - Indicar caducidad para las penas de ejecución condicional 
+ - Reformar los cálculos de vencimiento y otros para la reclusión por tiempo indeterminado
  - Para los casos de LC en el régimen de la ley 27.375, habría que preguntar cuándo comenzó a ejecutar pena y cuando alcanzó la calificación "BUENO"
+ - Implementar cálculos para casos de reclusión por tiempo indeterminado
+ - Implementar cálculos para los requisitos de calificación en el régimen de la ley 27.375
+ - Seguir desde def _ImprimirResultados en la parte que arma la libertad condicional [CUANDO ESTÉ TERMINADA LA PARTE DE LOS CÁLCULOS] 
  - Integrar las consultas a la devolución que se hace con el cómputo
  - EN ST y LC, agregar un else para los casos de que no sean ninguno de los regímenes (no debería suceder pero...) 
  - Cuando indique los regímenes de detención, que aclara las fechas de vigencia de las leyes que aplica
@@ -22,6 +27,9 @@ Funcionalidad a implementar:
  - Régimen de salida anticipada para los casos del 56 bis (1 año antes)
 
  Hecho:
+ - Comencé a armar la parte que imprime según el régimen legal aplicable
+ - Corregí algunos bugs sencillos
+ - Agregué enum_keys para los regímenes de los institutos
  - En los restantes Get Input (monto de pena, etc) armar los while True para que no tire una excepción si está mal ingresado.
  - Cuando pregunta si es pena temporal o perpetua, sacar los espacios ("enter") de más
  - Reformé Class SituacionProcesal()

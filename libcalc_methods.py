@@ -2,29 +2,41 @@ import os
 import datetime
 import json
 from dateutil.relativedelta import relativedelta
-from enum_keys import LC_KEYS, ST_KEYS, LA_KEYS, REGPREPLIB_KEYS
+from enum_keys import *
 
-class TiempoEnAños_Meses_Dias():
-    def __init__(self, es_perpetua:bool=False, _años:int=0, _meses:int=0, _dias:int=0):
-        self.perpetua = es_perpetua
+class TiempoEn_Años_Meses_Dias():
+    def __init__(self, _años:int=0, _meses:int=0, _dias:int=0):        
         self.años = _años
         self.meses = _meses
-        self.dias = _dias
+        self.dias = _dias        
+    
+    def __str__(self):               
+        return '...{} año(s), {} mes(es) y {} día(s)...'.format(self.años, self.meses, self.dias)
+
+class MontoDePena(TiempoEn_Años_Meses_Dias):
+    def __init__(self, es_perpetua: bool = False, hayReclusionIndetArt52CP:bool=False, _años: int = 0, _meses: int = 0, _dias: int = 0):
+        super().__init__(es_perpetua, _años, _meses, _dias)
+        self.perpetua = es_perpetua
+        self.reclusionPorTiempoIndeterminado = hayReclusionIndetArt52CP
 
         if self.perpetua:
             self.años = self.meses = self.dias = 0
     
     def __str__(self):
         if self.perpetua:
-            return 'Es una pena perpetua'        
-        return '...{} año(s), {} mes(es) y {} día(s)...'.format(self.años, self.meses, self.dias)
+            return 'Es una pena perpetua'
+        'La pena es de {} año(s), {} mes(es) y {} día(s).'.format(self.años, self.meses, self.dias)
+        if self.reclusionPorTiempoIndeterminado:
+            return 'La pena es de {} año(s), {} mes(es) y {} día(s), con la accesoria de reclusión por tiempo indeterminado (art. 52 CP).'.format(self.años, self.meses, self.dias)
+        else:
+            return 'La pena es de {} año(s), {} mes(es) y {} día(s).'.format(self.años, self.meses, self.dias)
 
 class OtraDetencion():    
     def __init__(self, fecha_de_detencion:datetime.datetime, fecha_de_libertad:datetime.datetime, nombre:str="Sin nombre"):
         self._nombre = nombre
         self._detencion = fecha_de_detencion
         self._libertad = fecha_de_libertad
-        self._tiempoDeDetencion = TiempoEnAños_Meses_Dias()
+        self._tiempoDeDetencion = MontoDePena()
         self._CalcularTiempoDeDetencion()
     
     def _CalcularTiempoDeDetencion(self):
@@ -162,7 +174,7 @@ class SituacionProcesal():
                 print('ERROR: Solo se puede responder con "s" o "n"')            
         
         # PREGUNTAR SI HAY ACCESORIA DEL 52 CP        
-        if self._RegimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siHayAccesoria52):
+        if self._RegimenNormativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siHayAccesoria52) or self._RegimenNormativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_siHayAccesoria52):
             print(Separadores._separadorComun)
             while True:
                 user_input = input('¿Hay accesoria del 52 CP? (S/N): ')
@@ -340,9 +352,9 @@ def GetConsoleInput_Fecha(mensaje_para_el_usuario="Ingrese fecha en formato año
             print('ERROR: Fecha en formato inválido. La fecha ingresada no tiene formato XX/XX/XXXX o no es una fecha válida.')
 
 def GetConsoleInput_MontoDePena():
-    '''Hace ingresar por consola un monto de pena temporal y la devuelve como un TiempoEnAños_Meses_Dias()'''
+    '''Hace ingresar por consola un monto de pena temporal y la devuelve como un MontoDePena()'''
     clear = lambda: os.system('cls')
-    montoDePena = TiempoEnAños_Meses_Dias()
+    montoDePena = MontoDePena()
 
     solicitar_tipo_de_pena_a_calcular = '''Indicar tipo de pena a calcular:
 1 --> Pena temporal

@@ -6,6 +6,7 @@ class LC_KEYS(Enum):
     _fechaImplementacion_DAY_KEY = 'Fecha de implementacion - day'    
     _requisitoTemporalPenaPerpetua_KEY = 'Requisito temporal pena perpetua'
     _ask_esReincidente_KEY = 'Preguntar si es reincidente'
+    _ask_siHayAccesoria52 = 'Preguntar si hay accesoria del 52 CP'
     _ask_esComputoPorLCRevocada_KEY = 'Preguntar si es un computo por LC revocada'
     _ask_delitosExcluidos25892_KEY = 'Preguntar por delitos excluidos ley 25.892'
     _ask_delitosExcluidos27375_KEY = 'Preguntar por delitos excluidos ley 27.375'

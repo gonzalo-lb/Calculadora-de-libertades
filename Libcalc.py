@@ -4,7 +4,7 @@ from libcalc_methods import *
 
 class ComputoDePena():
     
-    def __init__(self, fechaDelHecho:datetime.date, fechaDeDetencion:datetime.date, montoDePena:TiempoEnAños_Meses_Dias, otrosTiemposDeDetencion='NULL', situacionProcesal:SituacionProcesal=None):
+    def __init__(self, fechaDelHecho:datetime.date, fechaDeDetencion:datetime.date, montoDePena:MontoDePena, otrosTiemposDeDetencion='NULL', situacionProcesal:SituacionProcesal=None):
 
         # DEFINE LAS VARIABLES QUE DEPENDEN DE LOS PARÁMETROS INGRESADOS
         self._fecha_del_hecho = fechaDelHecho
@@ -23,12 +23,12 @@ class ComputoDePena():
         self._computo_salidas_transitorias, self._computo_salidas_transitorias_sinRestarOtrasDetenciones, self._requisito_salidas_transitorias = self.__CalcularSalidasTransitorias(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)
         self._computo_libertad_asistida, self._computo_libertad_asistida_sinRestarOtrasDetenciones = self.__CalcularLibertadAsistida(self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones)
         
-    def __Calcular_dos_tercios(self, _montoDePena:TiempoEnAños_Meses_Dias):
+    def __Calcular_dos_tercios(self, _montoDePena:MontoDePena):
 
         if _montoDePena.perpetua:
             return _montoDePena
         
-        TR_dos_tercios = TiempoEnAños_Meses_Dias()
+        TR_dos_tercios = MontoDePena()
 
         # Calcula los 2/3 de los días, lo redondea para abajo si da con coma, y los suma
         TR_dos_tercios.dias = int((_montoDePena.dias * 2) / 3) # Hace los dos tercios y lo redondea para abajo        
@@ -74,12 +74,12 @@ class ComputoDePena():
 
         return TR_dos_tercios
     
-    def __Calcular_la_mitad(self, _montoDePena:TiempoEnAños_Meses_Dias):  
+    def __Calcular_la_mitad(self, _montoDePena:MontoDePena):  
 
         if _montoDePena.perpetua:
             return _montoDePena
               
-        TR_mitad_de_pena = TiempoEnAños_Meses_Dias()        
+        TR_mitad_de_pena = MontoDePena()        
         
         # Calcula la mitad de los días lo redondea para abajo si da con coma, y los suma
         TR_mitad_de_pena.dias = int(_montoDePena.dias / 2) # Hace la mitad y lo redondea para abajo        
@@ -132,7 +132,7 @@ class ComputoDePena():
         
         return TR_mitad_de_pena
     
-    def __SumarMontoDePena(self, _fecha:datetime.date, _montoDePena:TiempoEnAños_Meses_Dias):
+    def __SumarMontoDePena(self, _fecha:datetime.date, _montoDePena:MontoDePena):
         TR_fecha = _fecha
         TR_fecha += relativedelta(years=_montoDePena.años)
         TR_fecha += relativedelta(months=_montoDePena.meses)
@@ -146,7 +146,7 @@ class ComputoDePena():
             TR_fecha = RestarOtrasDetenciones(TR_fecha, _otrasDetenciones)
         return TR_fecha
             
-    def __CalcularVencimientoYCaducidadDePena(self, _fechaDeDetencion:datetime.date, _montoDePena:TiempoEnAños_Meses_Dias, _otrosTiemposDeDetencion="NULL"):
+    def __CalcularVencimientoYCaducidadDePena(self, _fechaDeDetencion:datetime.date, _montoDePena:MontoDePena, _otrosTiemposDeDetencion="NULL"):
 
         TR_vencimientoDePena = ''
         TR_vencimientoDePena_sinRestarOtrasDetenciones = ''
@@ -163,23 +163,17 @@ class ComputoDePena():
             TR_vencimientoDePena_sinRestarOtrasDetenciones = TR_vencimientoDePena
             TR_vencimientoDePena = self.__RestarOtrasDetenciones(TR_vencimientoDePena, _otrosTiemposDeDetencion)            
             TR_caducidad_de_la_pena = TR_vencimientoDePena + relativedelta(years=10)
-            TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = TR_vencimientoDePena_sinRestarOtrasDetenciones + relativedelta(years=10)
-            
-            # Arma los string
-            TR_vencimientoDePena_STR = f'Vencimiento de pena: {TR_vencimientoDePena}'
-            TR_vencimientoDePena_sinRestarOtrasDetenciones_STR = f'Vencimiento de pena: {TR_vencimientoDePena_sinRestarOtrasDetenciones}'
-            TR_caducidad_de_la_pena_STR = f'Caducidad de la pena: {TR_caducidad_de_la_pena}'
-            TR_caducidad_de_la_pena_sinRestarOtrasDetenciones_STR = f'Caducidad de la pena: {TR_caducidad_de_la_pena_sinRestarOtrasDetenciones}'        
+            TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = TR_vencimientoDePena_sinRestarOtrasDetenciones + relativedelta(years=10)            
         
         return (TR_vencimientoDePena,
         TR_vencimientoDePena_sinRestarOtrasDetenciones,
         TR_caducidad_de_la_pena,
         TR_caducidad_de_la_pena_sinRestarOtrasDetenciones)
         
-    def __CalcularLibertadCondicional(self, _fechaDeDetencion:datetime.date, _montoDePena:TiempoEnAños_Meses_Dias, _otrosTiemposDeDetencion="NULL"):
+    def __CalcularLibertadCondicional(self, _fechaDeDetencion:datetime.date, _montoDePena:MontoDePena, _otrosTiemposDeDetencion="NULL"):
 
         TR_computo_libertad_condicional = _fechaDeDetencion
-        TR_requisito_libertad_condicional = TiempoEnAños_Meses_Dias()        
+        TR_requisito_libertad_condicional = MontoDePena()        
 
         if _montoDePena.perpetua:
             
@@ -213,10 +207,10 @@ class ComputoDePena():
             
         return TR_computo_libertad_condicional, TR_computo_libertad_condicional_sinRestarOtrasDetenciones, TR_requisito_libertad_condicional
      
-    def __CalcularSalidasTransitorias(self, _fechaDeDetencion:datetime.date, _montoDePena:TiempoEnAños_Meses_Dias, _otrosTiemposDeDetencion="NULL", _fechaIngresoAPeriodoDePrueba:datetime.date=None):
+    def __CalcularSalidasTransitorias(self, _fechaDeDetencion:datetime.date, _montoDePena:MontoDePena, _otrosTiemposDeDetencion="NULL", _fechaIngresoAPeriodoDePrueba:datetime.date=None):
         TR_computo_salidas_transitorias = _fechaDeDetencion
         TR_computo_salidas_transitorias_sinRestarOtrasDetenciones = datetime.date
-        TR_requisito_salidas_transitorias = TiempoEnAños_Meses_Dias()        
+        TR_requisito_salidas_transitorias = MontoDePena()        
 
         if _montoDePena.perpetua:
 
@@ -347,6 +341,22 @@ Libertad asistida: {}
         libertadCondicional_advertenciaReincidencia = 'ADVERTENCIA: En el caso la persona es reincidente. No aplicaría el instituto de la libertad condicional (art. 14 CP).'
         libertadCondicional_advertenciaDelitosExcluidosLey25892 = 'ADVERTENCIA: Persona condenada por los delitos enumerados en el art. 14 CP. No aplicaría el instituto de la libertad condicional.'
         libertadCondicional_advertenciaDelitosExcluidosLey27375 = 'ADVERTENCIA: Persona condenada por los delitos enumerados en el art. 14 CP. No aplicaría el instituto de la libertad condicional.'
+
+        libertadCondicional = f'{libertadCondicional_requisito}\n'\
+            f'{libertadCondicional_computo}'
+        if self._situacionProcesal._EsReincidente:
+                libertadCondicional = f'{libertadCondicional}\n'\
+                f'{libertadCondicional_advertenciaReincidencia}'       
+
+        if self._regimenNormativoAplicable._regimen_LC == LC_REGIMENES._Ley_25892:            
+            if self._situacionProcesal._EsPorDelitosExcluidosLey25892:
+                libertadCondicional = f'{libertadCondicional}\n'\
+                f'{libertadCondicional_advertenciaDelitosExcluidosLey25892}'
+        
+        if self._regimenNormativoAplicable._regimen_LC == LC_REGIMENES._Ley_27375:            
+            if self._situacionProcesal._EsPorDelitosExcluidosLey27375:
+                libertadCondicional = f'{libertadCondicional}\n'\
+                f'{libertadCondicional_advertenciaDelitosExcluidosLey27375}'        
         
 
 def _DEBUG():    
