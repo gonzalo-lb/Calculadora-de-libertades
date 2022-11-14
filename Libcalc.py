@@ -4,10 +4,11 @@ from libcalc_methods import *
 
 class ComputoDePena():
     
-    def __init__(self, fechaDelHecho:datetime.date, fechaDeDetencion:datetime.date, montoDePena:MontoDePena, otrosTiemposDeDetencion='NULL', situacionProcesal:SituacionProcesal=None):
+    def __init__(self, fechaDelHecho:datetime.date, fechaDeDetencion:datetime.date, fechaDeSentencia:datetime.date, montoDePena:MontoDePena, otrosTiemposDeDetencion='NULL', situacionProcesal:SituacionProcesal=None):
 
         # DEFINE LAS VARIABLES QUE DEPENDEN DE LOS PARÁMETROS INGRESADOS
         self._fecha_del_hecho = fechaDelHecho
+        self._fecha_de_sentencia = fechaDeSentencia
         self._fecha_de_detencion = fechaDeDetencion
         self._monto_de_pena = montoDePena
         self._otros_tiempos_de_detencion = otrosTiemposDeDetencion 
@@ -146,18 +147,28 @@ class ComputoDePena():
             TR_fecha = RestarOtrasDetenciones(TR_fecha, _otrasDetenciones)
         return TR_fecha
             
-    def __CalcularVencimientoYCaducidadDePena(self, _fechaDeDetencion:datetime.date, _montoDePena:MontoDePena, _otrosTiemposDeDetencion="NULL"):
+    def __CalcularVencimientoYCaducidadDePena(self, _fechaDeDetencion:datetime.date, _fechaDeSentencia:datetime.date, _montoDePena:MontoDePena, _otrosTiemposDeDetencion="NULL"):
 
         TR_vencimientoDePena = ''
         TR_vencimientoDePena_sinRestarOtrasDetenciones = ''
         TR_caducidad_de_la_pena = ''
         TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = ''        
 
-        if _montoDePena.perpetua:
+        if _montoDePena.ejecuciónCondicional:
+            TR_vencimientoDePena = self.__SumarMontoDePena(_fechaDeSentencia, _montoDePena)            
+            TR_caducidad_de_la_pena = TR_vencimientoDePena + relativedelta(years=10)    
+            TR_vencimientoDePena_sinRestarOtrasDetenciones = 'No aplica'        
+            TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = 'No aplica'
+        elif _montoDePena.perpetua and not _montoDePena.reclusionPorTiempoIndeterminado:
             TR_vencimientoDePena = 'Vencimiento de pena: Pena perpetua'
             TR_vencimientoDePena_sinRestarOtrasDetenciones = 'Vencimiento de pena: Pena perpetua'
             TR_caducidad_de_la_pena = 'Vencimiento de pena: Pena perpetua'
             TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = 'Vencimiento de pena: Pena perpetua'
+        elif _montoDePena.perpetua and _montoDePena.reclusionPorTiempoIndeterminado:
+            TR_vencimientoDePena = 'Vencimiento de pena: Pena perpetua y reclusión por tiempo indeterminado'
+            TR_vencimientoDePena_sinRestarOtrasDetenciones = 'Vencimiento de pena: Pena perpetua y reclusión por tiempo indeterminado'
+            TR_caducidad_de_la_pena = 'Vencimiento de pena: Pena perpetua y reclusión por tiempo indeterminado'
+            TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = 'Vencimiento de pena: Pena perpetua y reclusión por tiempo indeterminado'        
         else:            
             TR_vencimientoDePena = self.__SumarMontoDePena(_fechaDeDetencion, _montoDePena)
             TR_vencimientoDePena_sinRestarOtrasDetenciones = TR_vencimientoDePena
