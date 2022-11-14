@@ -1,5 +1,5 @@
 Lo que hice ahora:
- - Terminé el vencimiento y caducidad de pena. Habría que probarlo
+ - Hice el vencimiento y caducidad de pena, y ahora estoy haciendo la parte que imprime los resultados
 
 Con qué seguir: 
  - Probar el vencimiento y caducidad de pena
