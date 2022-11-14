@@ -72,7 +72,7 @@ class ComputoDePena():
         if type(TR_dos_tercios.dias) is not int and TR_dos_tercios.dias.is_integer():
             TR_dos_tercios.dias = int(TR_dos_tercios.dias)        
 
-        return TR_dos_tercios
+        return TR_dos_tercios # MontoDePena()
     
     def __Calcular_la_mitad(self, _montoDePena:MontoDePena):  
 

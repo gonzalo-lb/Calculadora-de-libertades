@@ -14,10 +14,16 @@ class TiempoEn_Años_Meses_Dias():
         return '...{} año(s), {} mes(es) y {} día(s)...'.format(self.años, self.meses, self.dias)
 
 class MontoDePena(TiempoEn_Años_Meses_Dias):
-    def __init__(self, es_perpetua: bool = False, hayReclusionIndetArt52CP:bool=False, _años: int = 0, _meses: int = 0, _dias: int = 0):
-        super().__init__(es_perpetua, _años, _meses, _dias)
+    def __init__(self, _años: int = 0, _meses: int = 0, _dias: int = 0, es_perpetua: bool = False, esDeEjecucionCondicional:bool=False, hayReclusionIndetArt52CP:bool=False, _plazoControlAños:int=0, _plazoControlMeses:int=0, _plazoControlDias:int=0, _esReincidente:bool=False):
+        super().__init__(_años, _meses, _dias)
+        self.reincidencia = _esReincidente
         self.perpetua = es_perpetua
+        self.ejecuciónCondicional = esDeEjecucionCondicional
         self.reclusionPorTiempoIndeterminado = hayReclusionIndetArt52CP
+
+        warning = self.perpetua + self.ejecuciónCondicional + self.reclusionPorTiempoIndeterminado + self.reincidencia
+        if warning > 1 and self.ejecuciónCondicional:
+            print('[[[ADVERTENCIA: Se ingresó pena de ejecución condicional junto con otra circunstancia incompatible (reincidencia, pena perpetua o reclusión por tiempo indeterminado)]]]')
 
         if self.perpetua:
             self.años = self.meses = self.dias = 0

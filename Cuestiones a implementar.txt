@@ -1,11 +1,10 @@
 Lo que hice ahora:
- - Hice parte de _ImprimirResultados, pero lo interrumpí porque vi que me faltan cuestiones en los cálculos
- - Reformé en la documentación la parte de la libertad condicional para los requisitos cuando hay accesoria del 52 CP
- - Agergué la pregunta de si hay accesoria del 52 por la libertad condicional
- - Armar class por separado para los montos de pena (que derive de TiempoEnAños...()) y revisar en el código que se pueda reemplazar sin problema
+ - En documentación, terminé los casos de "Vencimiento de Pena"
+ - Reformé la Class MontoDePena() y le agregué los tipos de pena que faltaban
 
 Con qué seguir: 
- - Indicar caducidad para las penas de ejecución condicional 
+ - En Documentación agregar la caducidad de las penas
+ - Terminar la función que calcula vencimiento y caducidad
  - Reformar los cálculos de vencimiento y otros para la reclusión por tiempo indeterminado
  - Para los casos de LC en el régimen de la ley 27.375, habría que preguntar cuándo comenzó a ejecutar pena y cuando alcanzó la calificación "BUENO"
  - Implementar cálculos para casos de reclusión por tiempo indeterminado
@@ -27,6 +26,10 @@ Funcionalidad a implementar:
  - Régimen de salida anticipada para los casos del 56 bis (1 año antes)
 
  Hecho:
+ - Hice parte de _ImprimirResultados, pero lo interrumpí porque vi que me faltan cuestiones en los cálculos
+ - Reformé en la documentación la parte de la libertad condicional para los requisitos cuando hay accesoria del 52 CP
+ - Agergué la pregunta de si hay accesoria del 52 por la libertad condicional
+ - Armar class por separado para los montos de pena (que derive de TiempoEnAños...()) y revisar en el código que se pueda reemplazar sin problema
  - Comencé a armar la parte que imprime según el régimen legal aplicable
  - Corregí algunos bugs sencillos
  - Agregué enum_keys para los regímenes de los institutos
