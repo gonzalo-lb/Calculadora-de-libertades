@@ -1,9 +1,8 @@
 Lo que hice ahora:
- - Hice el vencimiento y caducidad de pena, y ahora estoy haciendo la parte que imprime los resultados
+ - Hice el vencimiento y caducidad de pena para penas de ejecución condicional. 
 
-Con qué seguir: 
- - Probar el vencimiento y caducidad de pena
- - En Documentación agregar la caducidad de las penas 
+Con qué seguir:
+ - Terminar vencimiento y caducidad para el resto de las penas.
  - Reformar los cálculos de vencimiento y otros para la reclusión por tiempo indeterminado
  - Para los casos de LC en el régimen de la ley 27.375, habría que preguntar cuándo comenzó a ejecutar pena y cuando alcanzó la calificación "BUENO"
  - Implementar cálculos para casos de reclusión por tiempo indeterminado
@@ -25,6 +24,8 @@ Funcionalidad a implementar:
  - Régimen de salida anticipada para los casos del 56 bis (1 año antes)
 
  Hecho:
+ - En Documentación agregar la caducidad de las penas
+ - Probar el vencimiento y caducidad de pena
  - En documentación, terminé los casos de "Vencimiento de Pena"
  - Reformé la Class MontoDePena() y le agregué los tipos de pena que faltaban
  - Hice parte de _ImprimirResultados, pero lo interrumpí porque vi que me faltan cuestiones en los cálculos

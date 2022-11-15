@@ -14,6 +14,10 @@ class ComputoDePena():
         self._otros_tiempos_de_detencion = otrosTiemposDeDetencion 
         self._situacionProcesal = situacionProcesal
 
+        # DEFINE VARIABLES INTERNAS
+        self.requisito27CP = TiempoEn_Años_Meses_Dias(_años=4)
+        self.requisito51CP_EjecCond  = TiempoEn_Años_Meses_Dias(_años=10)
+
         # DEFINE LAS VARIABLES PARA EL OUTPUT
         self._vencimiento_de_pena = ''
         self._vencimiento_de_pena_sinRestarOtrasDetenciones = ''
@@ -29,8 +33,7 @@ class ComputoDePena():
         self._computo_libertad_asistida_sinRestarOtrasDetenciones = ''
         
         # DETERMINA EL REGIMEN NORMATIVO A UTILIZAR
-        self._regimenNormativoAplicable = RegimenNormativoAplicable(self._fecha_del_hecho)
-        print(self._regimenNormativoAplicable)
+        self._regimenNormativoAplicable = RegimenNormativoAplicable(self._fecha_del_hecho)        
 
         # CALCULA LAS LIBERTADES
         if self._monto_de_pena.ejecuciónCondicional:
@@ -172,9 +175,9 @@ class ComputoDePena():
         TR_caducidad_de_la_pena = ''
         TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = ''        
 
-        if _montoDePena.ejecuciónCondicional:
-            TR_vencimientoDePena = self.__SumarMontoDePena(_fechaDeSentencia, _montoDePena)            
-            TR_caducidad_de_la_pena = TR_vencimientoDePena + relativedelta(years=10)    
+        if _montoDePena.ejecuciónCondicional:            
+            TR_vencimientoDePena = self.__SumarMontoDePena(_fechaDeSentencia, self.requisito27CP)
+            TR_caducidad_de_la_pena = self.__SumarMontoDePena(_fechaDeSentencia, self.requisito51CP_EjecCond)
             TR_vencimientoDePena_sinRestarOtrasDetenciones = 'No aplica'        
             TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = 'No aplica'
         elif _montoDePena.perpetua and not _montoDePena.reclusionPorTiempoIndeterminado:
@@ -346,9 +349,19 @@ Libertad asistida: {}
 
     def _ImprimirResultados(self):
         
+        # IMPRIME PENA DE EJECUCIÓN CONDICIONAL
+        # -------------------------------------
         if self._monto_de_pena.ejecuciónCondicional:
             vencimientoDePena = Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)
             caducidadDeLaPena = Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_la_pena)
+
+            COMPUTO_PRINT = 'COMPUTO DE PENA\n'\
+                '---------------\n'\
+                f'La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s) de ejecución condicional.\n'\
+                f'Fecha de sentencia: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_sentencia)}\n'\
+                f'Se tiene por no pronunciada el día {Datetime_date_enFormatoXX_XX_XXXX(vencimientoDePena)}\n'\
+                f'Caducidad: {Datetime_date_enFormatoXX_XX_XXXX(caducidadDeLaPena)}\n'
+            print(COMPUTO_PRINT)
             return
         
         # Arma el vencimiento de pena
@@ -402,7 +415,7 @@ def _DEBUG():
     montoDePena = MontoDePena(_años=2, _meses=6, esDeEjecucionCondicional=True)    
     
     computo = ComputoDePena(fechaDelHecho, fechaDeDetencionInput, fechaDeSentencia, montoDePena)
-    computo._ImprimirResultadosVIEJO()    
+    computo._ImprimirResultados()    
 
 if __name__ == '__main__':
     _DEBUG()
