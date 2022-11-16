@@ -1,5 +1,6 @@
 Lo que hice ahora:
  - Hice el vencimiento y caducidad de pena para penas de ejecución condicional. 
+ - Hice el README.md para documentar la forma de hacer los cálculos.
 
 Con qué seguir:
  - Terminar vencimiento y caducidad para el resto de las penas.

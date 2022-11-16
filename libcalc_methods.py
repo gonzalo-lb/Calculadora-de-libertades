@@ -20,6 +20,9 @@ class MontoDePena(TiempoEn_Años_Meses_Dias):
         self.perpetua = es_perpetua
         self.ejecuciónCondicional = esDeEjecucionCondicional
         self.reclusionPorTiempoIndeterminado = hayReclusionIndetArt52CP
+        self.plazoControl_años = _plazoControlAños
+        self.plazoControl_meses = _plazoControlMeses
+        self.plazoControl_dias = _plazoControlDias
 
         warning = self.perpetua + self.ejecuciónCondicional + self.reclusionPorTiempoIndeterminado + self.reincidencia
         if warning > 1 and self.ejecuciónCondicional:
