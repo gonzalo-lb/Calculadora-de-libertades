@@ -1,8 +1,12 @@
 Lo que hice ahora:
- - Hice el vencimiento y caducidad de pena para penas de ejecución condicional. 
+ - Hice el vencimiento y caducidad de pena para penas de ejecución condicional.
+ - Cálculo de plazo de reglas de conducta.
  - Hice el README.md para documentar la forma de hacer los cálculos.
+ - Hace la cuenta del estímulo educativo y la aplica en los cálculos
 
 Con qué seguir:
+ - En el cálculo de libertad condicional, hacer lo de los 2/3 con calificación "BUENO", y lo del cómputo por LC revocada
+ - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
  - Terminar vencimiento y caducidad para el resto de las penas.
  - Reformar los cálculos de vencimiento y otros para la reclusión por tiempo indeterminado
  - Para los casos de LC en el régimen de la ley 27.375, habría que preguntar cuándo comenzó a ejecutar pena y cuando alcanzó la calificación "BUENO"
@@ -15,16 +19,16 @@ Con qué seguir:
  - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación
  - Controlar cuando se restan detenciones y ya se está en condiciones de salir (podría comparar con la fecha de la pc y avisar que se está en condiciones de salir, o poner el texto de la consola de otro color)
 
-Funcionalidad a implementar:
- - Estímulo educativo
- - Nuevo cómputo para libertad condicional revocada (no se contabiliza el tiempo que se estuvo en libertad)
- - Penas de ejecución condicional y plazos para las reglas de conducta.
+Funcionalidad a implementar: 
+ - Nuevo cómputo para libertad condicional revocada (no se contabiliza el tiempo que se estuvo en libertad) 
  - Alertas por reincidencia, delitos excluidos del régimen de libertades (por ley 27.375), libertades revocadas, etc. con indicación de la normativa específica.
  - Requisito temporal extra para la ST, de permanencia en periodo de prueba (art. 17, ley 24.660)
  - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)
  - Régimen de salida anticipada para los casos del 56 bis (1 año antes)
 
  Hecho:
+ - FUNCIONALIDAD IMPLEMENTADA: Estímulo educativo
+ - FUNCIONALIDAD IMPLEMENTADA: Penas de ejecución condicional y plazos para las reglas de conducta.
  - En Documentación agregar la caducidad de las penas
  - Probar el vencimiento y caducidad de pena
  - En documentación, terminé los casos de "Vencimiento de Pena"
