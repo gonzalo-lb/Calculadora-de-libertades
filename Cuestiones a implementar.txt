@@ -1,12 +1,8 @@
 Lo que hice ahora:
- - Hice una función para calcular 1/3 de un lapso de tiempo en años/meses/días.
- - Implementé 2 de los 3 casos de requisito de calificación en la LC
-    - Que no se haya iniciado la ejecución de la pena
-    - Que se haya iniciado la ejecución de la pena pero que no se haya obtenido aún el requisito "BUENO"
+ - Hice una función para multiplicar TiempoEn_Años_Meses_Dias
 
 Con qué seguir:
- - Con el tercer caso de requisito de calificación en la LC (haber iniciado ejecución y tener requisito "BUENO")
-    - Para esto necesito una función que multiplique lapsos en años/meses/días.
+ - Con el tercer caso de requisito de calificación en la LC (haber iniciado ejecución y tener requisito "BUENO")    
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
  - Terminar vencimiento y caducidad para el resto de las penas.
@@ -27,8 +23,13 @@ Funcionalidad a implementar:
  - Requisito temporal extra para la ST, de permanencia en periodo de prueba (art. 17, ley 24.660)
  - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)
  - Régimen de salida anticipada para los casos del 56 bis (1 año antes)
+ - Monto de las Unidades Fijas
 
  Hecho:
+ - Hice una función para calcular 1/3 de un lapso de tiempo en años/meses/días.
+ - Implementé 2 de los 3 casos de requisito de calificación en la LC
+    - Que no se haya iniciado la ejecución de la pena
+    - Que se haya iniciado la ejecución de la pena pero que no se haya obtenido aún el requisito "BUENO"
  - Hice el vencimiento y caducidad de pena para penas de ejecución condicional.
  - Cálculo de plazo de reglas de conducta.
  - Hice el README.md para documentar la forma de hacer los cálculos.

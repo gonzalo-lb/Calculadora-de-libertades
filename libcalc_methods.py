@@ -31,6 +31,9 @@ class MontoDePena(TiempoEn_Años_Meses_Dias):
         if self.perpetua:
             self.años = self.meses = self.dias = 0
     
+    def _Return_TiempoEn_Años_Meses_Dias(self):
+        return TiempoEn_Años_Meses_Dias(self.años, self.meses, self.dias)
+    
     def __str__(self):
         if self.perpetua:
             return 'Es una pena perpetua'

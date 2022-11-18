@@ -231,6 +231,22 @@ class ComputoDePena():
             TR_fecha += relativedelta(days=-1)
         return TR_fecha
 
+    def __Multiplicar_Tiempo(tiempo:TiempoEn_Años_Meses_Dias, factor:int):
+        
+        tiempo.dias *= factor
+        tiempo.meses *= factor
+        tiempo.años *= factor
+
+        while tiempo.dias > 30:
+            tiempo.meses += 1
+            tiempo.dias -= 30    
+        
+        while tiempo.meses >= 12:
+            tiempo.años += 1
+            tiempo.meses -= 12    
+
+        return tiempo
+
     def __RestarOtrasDetenciones(self, _fecha:datetime.date, _otrasDetenciones:OtraDetencion):
         TR_fecha = _fecha
         if _otrasDetenciones != "NULL":
