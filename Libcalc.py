@@ -5,12 +5,13 @@ from libcalc_methods import *
 
 class ComputoDePena():
     
-    def __init__(self, fechaDelHecho:datetime.date, fechaDeDetencion:datetime.date, fechaDeSentencia:datetime.date, fechaFirmezaDeSentencia:datetime.date, montoDePena:MontoDePena, otrosTiemposDeDetencion='NULL', situacionProcesal:SituacionProcesal=None, esComputoPorLCRevocada:bool=False, esComputoPorSTRevocada:bool=False, esComputoPorLARevocada:bool=False, estimuloEducativo:TiempoEn_Años_Meses_Dias='NULL'):
+    def __init__(self, fechaDelHecho:datetime.date='NULL', fechaDeDetencion:datetime.date='NULL', fechaDeSentencia:datetime.date='NULL', montoDePena:MontoDePena='NULL', fechaFirmezaDeSentencia:datetime.date='NULL', fechaComienzoEjecucion:datetime.date='NULL', otrosTiemposDeDetencion='NULL', situacionProcesal:SituacionProcesal=None, esComputoPorLCRevocada:bool=False, esComputoPorSTRevocada:bool=False, esComputoPorLARevocada:bool=False, estimuloEducativo:TiempoEn_Años_Meses_Dias='NULL', _fechaCalificacionBUENO:datetime.date='NULL'):
 
         # DEFINE LAS VARIABLES QUE DEPENDEN DE LOS PARÁMETROS INGRESADOS
         self._fecha_del_hecho = fechaDelHecho
         self._fecha_de_sentencia = fechaDeSentencia
         self._fecha_de_firmeza_de_sentencia = fechaFirmezaDeSentencia
+        self._fecha_comienzo_ejecucion = fechaComienzoEjecucion
         self._fecha_de_detencion = fechaDeDetencion
         self._monto_de_pena = montoDePena
         self._otros_tiempos_de_detencion = otrosTiemposDeDetencion 
@@ -21,25 +22,41 @@ class ComputoDePena():
         self._estimulo_educativo = TiempoEn_Años_Meses_Dias()
         if estimuloEducativo != 'NULL':
             self._estimulo_educativo = estimuloEducativo
+        self.fecha_calificacion_BUENO = _fechaCalificacionBUENO
+
+        if self.__CorregirProblemasEnElIngresoDeParametros() == 'RETURN':
+            return
 
         # DEFINE VARIABLES INTERNAS
         self.requisito27CP = TiempoEn_Años_Meses_Dias(_años=4)
         self.requisito51CP_EjecCond  = TiempoEn_Años_Meses_Dias(_años=10)
 
         # DEFINE LAS VARIABLES PARA EL OUTPUT
+        # Vencimiento de pena
         self._vencimiento_de_pena = ''
         self._vencimiento_de_pena_sinRestarOtrasDetenciones = ''
         self._caducidad_de_la_pena = ''
         self._caducidad_de_la_pena_sinRestarOtrasDetenciones = ''
-        self._vencimiento_plazo_de_control = ''        
+        self._vencimiento_plazo_de_control = ''
+        self._vencimiento_y_caducidad_STRING = 'VENCIMIENTO Y CADUCIDAD STRING'
+        self._vencimiento_y_caducidad_STRING_SROT = 'VENCIMIENTO Y CADUCIDAD STRING SIN RESTAR OTRAS DETENCIONES'
+
         self._computo_libertad_condicional = ''
         self._computo_libertad_condicional_sinRestarOtrasDetenciones = ''
         self._requisito_libertad_condicional = MontoDePena()
+        self._requisitoCalificacion_libertad_condicional = ''
+        self._requisitoCalificacion_libertad_condicional_SITUACION = ''
+        self._libertad_condicional_STRING = 'LIBERTAD CONDICIONAL STRING'
+        self._libertad_condicional_STRING_SROT = 'LIBERTAD CONDICIONAL STRING SIN RESTAR OTRAS DETENCIONES'
+
         self._computo_salidas_transitorias = ''
         self._computo_salidas_transitorias_sinRestarOtrasDetenciones = ''
         self._requisito_salidas_transitorias = MontoDePena()
+        self._salidas_transitorias_STRING = 'SALIDAS TRANSITORIAS STRING'
+
         self._computo_libertad_asistida = ''
         self._computo_libertad_asistida_sinRestarOtrasDetenciones = ''
+        self._libertad_asistida_STRING = 'LIBERTAD ASISTIDA STRING'
         
         # DETERMINA EL REGIMEN NORMATIVO A UTILIZAR
         self._regimenNormativoAplicable = RegimenNormativoAplicable(self._fecha_del_hecho)        
@@ -52,11 +69,25 @@ class ComputoDePena():
         # CÓMPUTO DE PENA TEMPORAL SIN RECLUSIÓN POR TIEMPO INDETERMINADO
         if not self._monto_de_pena.ejecuciónCondicional and not self._monto_de_pena.perpetua and not self._monto_de_pena.reclusionPorTiempoIndeterminado:
             self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones, self._caducidad_de_la_pena, self._caducidad_de_la_pena_sinRestarOtrasDetenciones = self.__CalcularVencimientoYCaducidadDePena_Temporal(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)
+            self._computo_libertad_condicional, self._computo_libertad_condicional_sinRestarOtrasDetenciones, self._requisito_libertad_condicional = self.__CalcularLibertadCondicional(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)
+            if self._regimenNormativoAplicable._regimen_LC == LC_REGIMENES._Ley_27375.value:
+                self._requisitoCalificacion_libertad_condicional, self._requisitoCalificacion_libertad_condicional_SITUACION = self.__CalcularRequisitoCalificacion_LC(self._computo_libertad_condicional, self._fecha_comienzo_ejecucion, self.fecha_calificacion_BUENO)
 
-        self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones, self._caducidad_de_la_pena, self._caducidad_de_la_pena_sinRestarOtrasDetenciones = self.__CalcularVencimientoYCaducidadDePena_Temporal(self._fecha_de_detencion, self._fecha_de_sentencia, self._monto_de_pena, self._otros_tiempos_de_detencion)
-        self._computo_libertad_condicional, self._computo_libertad_condicional_sinRestarOtrasDetenciones, self._requisito_libertad_condicional = self.__CalcularLibertadCondicional(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)
-        self._computo_salidas_transitorias, self._computo_salidas_transitorias_sinRestarOtrasDetenciones, self._requisito_salidas_transitorias = self.__CalcularSalidasTransitorias(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)
-        self._computo_libertad_asistida, self._computo_libertad_asistida_sinRestarOtrasDetenciones = self.__CalcularLibertadAsistida(self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones)
+        # self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones, self._caducidad_de_la_pena, self._caducidad_de_la_pena_sinRestarOtrasDetenciones = self.__CalcularVencimientoYCaducidadDePena_Temporal(self._fecha_de_detencion, self._fecha_de_sentencia, self._monto_de_pena, self._otros_tiempos_de_detencion)
+        # self._computo_libertad_condicional, self._computo_libertad_condicional_sinRestarOtrasDetenciones, self._requisito_libertad_condicional = self.__CalcularLibertadCondicional(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)
+        # self._computo_salidas_transitorias, self._computo_salidas_transitorias_sinRestarOtrasDetenciones, self._requisito_salidas_transitorias = self.__CalcularSalidasTransitorias(self._fecha_de_detencion, self._monto_de_pena, self._otros_tiempos_de_detencion)
+        # self._computo_libertad_asistida, self._computo_libertad_asistida_sinRestarOtrasDetenciones = self.__CalcularLibertadAsistida(self._vencimiento_de_pena, self._vencimiento_de_pena_sinRestarOtrasDetenciones)
+
+    def __CorregirProblemasEnElIngresoDeParametros(self):        
+        # NO SE INGRESÓ MONTO DE PENA
+        if self._monto_de_pena == 'NULL':
+            print('ERROR: Es imposible calcular un cómputo si no se ingresa el monto de pena')
+            return 'RETURN'
+        
+        # SE INGRESÓ FECHA DE FIRMEZA DE SENTENCIA PERO NO SE INGRESÓ FECHA DE COMIENZO DE EJECUCIÓN
+        # En ese caso ambas fechas son la misma
+        if self._fecha_de_firmeza_de_sentencia != 'NULL' and self._fecha_comienzo_ejecucion == 'NULL':
+            self._fecha_comienzo_ejecucion = self._fecha_de_firmeza_de_sentencia
 
     def __Calcular_un_tercio(self, _montoDePena:MontoDePena):
         if _montoDePena.perpetua:
@@ -67,19 +98,22 @@ class ComputoDePena():
         # Calcula 1/3 de los días, lo redondea para abajo si da con coma, y los suma
         TR_dos_tercios.dias = int(_montoDePena.dias / 3) # Hace los dos tercios y lo redondea para abajo        
 
-        # Calcula los 1/3 de los meses
+        # Calcula 1/3 de los meses
         TR_dos_tercios.meses = _montoDePena.meses
         TR_dos_tercios.meses = TR_dos_tercios.meses / 3
         LC_dias_resto = 0
-        if TR_dos_tercios.meses.is_integer() is False:
+        if TR_dos_tercios.meses.is_integer() is False:            
             LC_dias_resto = TR_dos_tercios.meses - int(TR_dos_tercios.meses)
+            if LC_dias_resto < 0:
+                LC_dias_resto += 1
             TR_dos_tercios.meses = int(TR_dos_tercios.meses)
             if LC_dias_resto > 0.3 and LC_dias_resto < 0.4:
                 LC_dias_resto = int(10)
             elif LC_dias_resto > 0.6 and LC_dias_resto < 0.7:
                 LC_dias_resto = int(20)
             else:
-                print('ERROR: Al calcular los 2/3 de los meses, los decimales no son ni 0.3333 ni 0.6666!')                    
+                print(LC_dias_resto)
+                print('ERROR: Al calcular 1/3 de los meses, los decimales no son ni 0.3333 ni 0.6666!')                    
 
         while LC_dias_resto >= 30:
             TR_dos_tercios.meses += 1
@@ -124,6 +158,8 @@ class ComputoDePena():
         LC_dias_resto = 0
         if TR_dos_tercios.meses.is_integer() is False:
             LC_dias_resto = TR_dos_tercios.meses - int(TR_dos_tercios.meses)
+            if LC_dias_resto < 0:
+                LC_dias_resto += 1
             TR_dos_tercios.meses = int(TR_dos_tercios.meses)
             if LC_dias_resto > 0.3 and LC_dias_resto < 0.4:
                 LC_dias_resto = int(10)
@@ -231,7 +267,7 @@ class ComputoDePena():
             TR_fecha += relativedelta(days=-1)
         return TR_fecha
 
-    def __Multiplicar_Tiempo(tiempo:TiempoEn_Años_Meses_Dias, factor:int):
+    def __Multiplicar_Tiempo(self, tiempo:TiempoEn_Años_Meses_Dias, factor:int):        
         
         tiempo.dias *= factor
         tiempo.meses *= factor
@@ -265,6 +301,16 @@ class ComputoDePena():
         TR_vencimientoDePena = self.__SumarMontoDePena(_fechaDeSentencia, self.requisito27CP)
         TR_caducidad_de_la_pena = self.__SumarMontoDePena(_fechaDeSentencia, self.requisito51CP_EjecCond)        
         TR_vencimiento_plazoDeControl = self.__SumarMontoDePena(_fechaFirmezaDeSentencia, _montoDePena, _sumarPlazoControl=True)
+
+        self._vencimiento_y_caducidad_STRING = 'COMPUTO DE PENA\n'\
+                '---------------\n'\
+                f'La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s) de ejecución condicional.\n'\
+                f'El plazo de control es de {self._monto_de_pena.plazoControl_años} año(s), {self._monto_de_pena.plazoControl_meses} mes(es) y {self._monto_de_pena.plazoControl_dias} día(s) de ejecución condicional.\n'\
+                f'Fecha de sentencia: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_sentencia)} (adquirió firmeza el {self._fecha_de_firmeza_de_sentencia})\n'\
+                f'Se tiene por no pronunciada el día {Datetime_date_enFormatoXX_XX_XXXX(TR_vencimientoDePena)}\n'\
+                f'El plazo de control finaliza el {Datetime_date_enFormatoXX_XX_XXXX(TR_vencimiento_plazoDeControl)}\n'\
+                f'Caducidad: {Datetime_date_enFormatoXX_XX_XXXX(TR_caducidad_de_la_pena)}\n'
+
         return (TR_vencimientoDePena,        
         TR_caducidad_de_la_pena,
         TR_vencimiento_plazoDeControl)
@@ -274,24 +320,19 @@ class ComputoDePena():
         TR_vencimientoDePena = ''
         TR_vencimientoDePena_sinRestarOtrasDetenciones = ''
         TR_caducidad_de_la_pena = ''
-        TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = ''        
+        TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = ''
         
-        if _montoDePena.perpetua and not _montoDePena.reclusionPorTiempoIndeterminado:
-            TR_vencimientoDePena = 'Vencimiento de pena: Pena perpetua'
-            TR_vencimientoDePena_sinRestarOtrasDetenciones = 'Vencimiento de pena: Pena perpetua'
-            TR_caducidad_de_la_pena = 'Vencimiento de pena: Pena perpetua'
-            TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = 'Vencimiento de pena: Pena perpetua'
-        elif _montoDePena.perpetua and _montoDePena.reclusionPorTiempoIndeterminado:
-            TR_vencimientoDePena = 'Vencimiento de pena: Pena perpetua y reclusión por tiempo indeterminado'
-            TR_vencimientoDePena_sinRestarOtrasDetenciones = 'Vencimiento de pena: Pena perpetua y reclusión por tiempo indeterminado'
-            TR_caducidad_de_la_pena = 'Vencimiento de pena: Pena perpetua y reclusión por tiempo indeterminado'
-            TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = 'Vencimiento de pena: Pena perpetua y reclusión por tiempo indeterminado'
-        else:            
-            TR_vencimientoDePena = self.__SumarMontoDePena(_fechaDeDetencion, _montoDePena)
-            TR_vencimientoDePena_sinRestarOtrasDetenciones = TR_vencimientoDePena
-            TR_vencimientoDePena = self.__RestarOtrasDetenciones(TR_vencimientoDePena, _otrosTiemposDeDetencion)            
-            TR_caducidad_de_la_pena = TR_vencimientoDePena + relativedelta(years=10)
-            TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = TR_vencimientoDePena_sinRestarOtrasDetenciones + relativedelta(years=10)            
+        TR_vencimientoDePena = self.__SumarMontoDePena(_fechaDeDetencion, _montoDePena)
+        TR_vencimientoDePena_sinRestarOtrasDetenciones = TR_vencimientoDePena
+        TR_vencimientoDePena = self.__RestarOtrasDetenciones(TR_vencimientoDePena, _otrosTiemposDeDetencion)            
+        TR_caducidad_de_la_pena = TR_vencimientoDePena + relativedelta(years=10)
+        TR_caducidad_de_la_pena_sinRestarOtrasDetenciones = TR_vencimientoDePena_sinRestarOtrasDetenciones + relativedelta(years=10)            
+
+        # Arma el string para imprimir el cómputo
+        self._vencimiento_y_caducidad_STRING = f'Vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(TR_vencimientoDePena)}\n'\
+                f'Caducidad de la pena: {Datetime_date_enFormatoXX_XX_XXXX(TR_caducidad_de_la_pena)}\n'
+        self._vencimiento_y_caducidad_STRING_SROT = f'Vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(TR_vencimientoDePena_sinRestarOtrasDetenciones)}\n'\
+                f'Caducidad de la pena: {Datetime_date_enFormatoXX_XX_XXXX(TR_caducidad_de_la_pena_sinRestarOtrasDetenciones)}\n'                
         
         return (TR_vencimientoDePena,
         TR_vencimientoDePena_sinRestarOtrasDetenciones,
@@ -317,7 +358,7 @@ class ComputoDePena():
                 TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)
 
             
-            if self._regimenNormativoAplicable._regimen_LC == LC_REGIMENES._Ley_25892 or self._regimenNormativoAplicable._libertadCondicional == LC_REGIMENES._Ley_27375:
+            if self._regimenNormativoAplicable._regimen_LC == LC_REGIMENES._Ley_25892 or self._regimenNormativoAplicable._libertadCondicional == LC_REGIMENES._Ley_27375.value:
                 TR_requisito_libertad_condicional.años = 35
                 TR_computo_libertad_condicional = self.__SumarMontoDePena(_fechaDeDetencion, TR_requisito_libertad_condicional)                           
             
@@ -338,32 +379,55 @@ class ComputoDePena():
 
         # Aplica el estímulo educativo, si hay
         TR_computo_libertad_condicional = self.__AplicarEstimuloEducativo(TR_computo_libertad_condicional, self._estimulo_educativo)    
+
+        # Arma el string para imprimir el cómputo
+        self._libertad_condicional_STRING = f'Libertad condicional: {Datetime_date_enFormatoXX_XX_XXXX(TR_computo_libertad_condicional)}'
+        self._libertad_condicional_STRING_SROT = f'Libertad condicional: {Datetime_date_enFormatoXX_XX_XXXX(TR_computo_libertad_condicional_sinRestarOtrasDetenciones)}'
+
+        if _montoDePena.reincidencia:
+            advertencia = '\nADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque la pena incluye reincidencia.'
+            self._libertad_condicional_STRING += advertencia
+        
+        if self._regimenNormativoAplicable._regimen_LC == LC_REGIMENES._Ley_27375.value and _montoDePena.delitosExcluidosLey27375:
+            advertencia = '\nADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque se condenó por alguno de los delitos excluídos, por art. 14 CP (según reforma de la ley 27.375).'
+            self._libertad_condicional_STRING += advertencia
         return TR_computo_libertad_condicional, TR_computo_libertad_condicional_sinRestarOtrasDetenciones, TR_requisito_libertad_condicional
     
     def __CalcularRequisitoCalificacion_LC(self, _fechaLC, _fechaInicioEjecucion='NULL', _fechaCalificacionBueno='NULL'):
-        if _fechaInicioEjecucion == 'NULL':
+        situacion = 0
 
+        if _fechaInicioEjecucion == 'NULL':
+            # SITUACIÓN 1
             # SI TODAVÍA NO COMENZÓ LA EJECUCIÓN DE PENA
 
-            return 'Al no encontrarse aún ejecutando pena, no es posible determinar la fecha desde la cual se cumplirá con este requisito.'
+            situacion = 1            
+            return 'Al no encontrarse aún ejecutando pena, no es posible determinar la fecha desde la cual se cumplirá con este requisito.', situacion
         
         elif _fechaInicioEjecucion != 'NULL' and _fechaCalificacionBueno == 'NULL':
-
+            # SITUACIÓN 2
             # SI COMENZÓ LA EJECUCIÓN DE PENA PERO AÚN NO CALIFICÓ COMO "BUENO"
 
-            delta = relativedelta.relativedelta(_fechaInicioEjecucion, _fechaLC)
+            situacion = 2            
+            delta = relativedelta(_fechaInicioEjecucion, _fechaLC)
             pena1_3=MontoDePena(_años=delta.years, _meses=delta.months, _dias=delta.days)
             pena1_3 = self.__Calcular_un_tercio(pena1_3)
             fechaMinRequisitoCalif = self.__SumarMontoDePena(_fechaInicioEjecucion, pena1_3)
 
             #Devuelve la fecha límite para obtener el requisito "BUENO" teniendo en cuenta el requisito temporal LC en el caso concreto
-            return fechaMinRequisitoCalif 
+            return fechaMinRequisitoCalif, situacion
 
         elif _fechaInicioEjecucion != 'NULL' and _fechaCalificacionBueno != 'NULL':
-
+            # SITUACIÓN 3
             # SI SE ENCEUNTRA EJECUTANDO PENA Y TIENE REQUISITO DE CALIFICACIÓN "BUENO"
 
-            pass
+            situacion = 3
+            delta = relativedelta(_fechaInicioEjecucion, _fechaCalificacionBueno)
+            delta_TAMD = TiempoEn_Años_Meses_Dias(_años=delta.years, _meses=delta.months, _dias=delta.days)
+            delta_x_3 = self.__Multiplicar_Tiempo(delta_TAMD, 3)
+            fechaReqCalif = self.__SumarMontoDePena(_fechaInicioEjecucion, delta_x_3)
+
+            # Devuelve la fecha desde la que se encontrará cumplido el requisito de calificación
+            return fechaReqCalif, situacion
      
     def __CalcularSalidasTransitorias(self, _fechaDeDetencion:datetime.date, _montoDePena:MontoDePena, _otrosTiemposDeDetencion="NULL", _fechaIngresoAPeriodoDePrueba:datetime.date=None):
         TR_computo_salidas_transitorias = _fechaDeDetencion
@@ -482,22 +546,44 @@ Libertad asistida: {}
 
     def _ImprimirResultados(self):
         
-        # IMPRIME PENA DE EJECUCIÓN CONDICIONAL
+        # IMPRIME CÓMPUTO PENA DE EJECUCIÓN CONDICIONAL
         # -------------------------------------
-        if self._monto_de_pena.ejecuciónCondicional:
-            vencimientoDePena = Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)
-            caducidadDeLaPena = Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_la_pena)
-            vnecimientoDelPlazoDeControl = Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_plazo_de_control)
+        if self._monto_de_pena.ejecuciónCondicional:            
+            print(self._vencimiento_y_caducidad_STRING)
+            return
+        
+        # IMPRIME CÓMPUTO DE PENA TEMPORAL SIN RECLUSIÓN POR TIEMPO INDETERMINADO
+        # -----------------------------------------------------------------------
+        if not self._monto_de_pena.ejecuciónCondicional and not self._monto_de_pena.perpetua and not self._monto_de_pena.reclusionPorTiempoIndeterminado:            
 
-            COMPUTO_PRINT = 'COMPUTO DE PENA\n'\
-                '---------------\n'\
-                f'La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s) de ejecución condicional.\n'\
-                f'El plazo de control es de {self._monto_de_pena.plazoControl_años} año(s), {self._monto_de_pena.plazoControl_meses} mes(es) y {self._monto_de_pena.plazoControl_dias} día(s) de ejecución condicional.\n'\
-                f'Fecha de sentencia: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_sentencia)} (adquirió firmeza el {self._fecha_de_firmeza_de_sentencia})\n'\
-                f'Se tiene por no pronunciada el día {Datetime_date_enFormatoXX_XX_XXXX(vencimientoDePena)}\n'\
-                f'El plazo de control finaliza el {Datetime_date_enFormatoXX_XX_XXXX(vnecimientoDelPlazoDeControl)}\n'\
-                f'Caducidad: {Datetime_date_enFormatoXX_XX_XXXX(caducidadDeLaPena)}\n'
-            print(COMPUTO_PRINT)
+            INFORMACION_SOBRE_EL_COMPUTO = 'INFORMACIÓN SOBRE EL CÓMPUTO\n'\
+                '----------------------------\n'\
+                f'Fecha del hecho: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_del_hecho)}\n'\
+                f'La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s).\n'\
+                f'El requisito temporal de la libertad condicional se alcanza a los {self._requisito_libertad_condicional.años} año(s), {self._requisito_libertad_condicional.meses} mes(es) y {self._requisito_libertad_condicional.dias} día(s).'            
+            print(self._regimenNormativoAplicable)
+            print(INFORMACION_SOBRE_EL_COMPUTO)
+
+            print('CÓMPUTO DE PENA')
+            print('---------------')
+            print(self._vencimiento_y_caducidad_STRING)
+            print(self._libertad_condicional_STRING)
+            if self._regimenNormativoAplicable._regimen_LC == LC_REGIMENES._Ley_27375.value:
+                if self._requisitoCalificacion_libertad_condicional_SITUACION == 1:
+                    print('En tanto no se ha comenzado aún a ejecutar pena, no es posible calcular el requisito de calificación del art. 28, ley 24.660 (según ley 27.375).')
+                if self._requisitoCalificacion_libertad_condicional_SITUACION == 2:
+                    _print = 'La persona se encuentra ejecutando pena pero aún no cuenta con el requisito de calificación "BUENO".\n'\
+                        f'La fecha límite para obtener la calificación "BUENO" sin postergar el requisito temporal de la libertad condicional es: {self._requisitoCalificacion_libertad_condicional}'
+                    print(_print)
+                if self._requisitoCalificacion_libertad_condicional_SITUACION == 3:
+                    _print = f'La persona se encuentra ejecutando pena y cuenta con el requisito de calificación "BUENO" desde el día: {Datetime_date_enFormatoXX_XX_XXXX(self.fecha_calificacion_BUENO)}\n'\
+                        f'Requisito temporal de calificación: {Datetime_date_enFormatoXX_XX_XXXX(self._requisitoCalificacion_libertad_condicional)}'
+                    print(_print)
+
+            print('CÓMPUTO DE PENA (SIN RESTAR OTRAS DETENCIONES)')
+            print('---------------------------------------------)')
+            print(self._vencimiento_y_caducidad_STRING_SROT)
+            print(self._libertad_condicional_STRING_SROT)
             return
 
         # Arma el vencimiento de pena
@@ -537,22 +623,33 @@ Libertad asistida: {}
                 libertadCondicional = f'{libertadCondicional}\n'\
                 f'{libertadCondicional_advertenciaDelitosExcluidosLey25892}'
         
-        if self._regimenNormativoAplicable._regimen_LC == LC_REGIMENES._Ley_27375:            
+        if self._regimenNormativoAplicable._regimen_LC == LC_REGIMENES._Ley_27375.value:            
             if self._situacionProcesal._EsPorDelitosExcluidosLey27375:
                 libertadCondicional = f'{libertadCondicional}\n'\
                 f'{libertadCondicional_advertenciaDelitosExcluidosLey27375}'        
         
 
-def _DEBUG():    
+def _DEBUG_PENA_EJECUCION_CONDICIONAL():        
     
-    fechaDelHecho = datetime.date(2015, 5, 26)
-    fechaDeDetencionInput = datetime.date(2015, 5, 26)
+    fechaDelHecho = datetime.date(2015, 5, 26)    
     fechaDeSentencia = datetime.date(2017, 3, 15)
     fechaFirmezaSentencia = datetime.date(2017, 3, 29)
     montoDePena = MontoDePena(_años=2, _meses=6, esDeEjecucionCondicional=True, _plazoControlAños=2)    
         
-    computo = ComputoDePena(fechaDelHecho, fechaDeDetencionInput, fechaDeSentencia, fechaFirmezaSentencia, montoDePena)
-    computo._ImprimirResultados()    
+    computo = ComputoDePena(fechaDelHecho=fechaDelHecho, fechaDeSentencia=fechaDeSentencia, fechaFirmezaDeSentencia=fechaFirmezaSentencia, montoDePena=montoDePena)
+    computo._ImprimirResultados()
+
+def _DEBUG_PENA_TEMPORAL():    
+    fechaDelHecho = datetime.date(2016, 5, 26)
+    fechaDeDetencionInput = datetime.date(2019, 5, 26)
+    montoDePena = MontoDePena(_años=4, _meses=0, _esReincidente=True, _esPorDelitosExcluidosLey27375=True)
+    fechaComienzoEjecucion = datetime.date(2021, 5, 2)
+    fechaREQBUENO = datetime.date(2022, 5, 2)
+    computo = ComputoDePena(fechaDelHecho=fechaDelHecho, fechaDeDetencion=fechaDeDetencionInput, montoDePena=montoDePena, fechaComienzoEjecucion=fechaComienzoEjecucion, _fechaCalificacionBUENO=fechaREQBUENO)
+    computo._ImprimirResultados()
+
+def _DEBUG_ERROR():
+    c = ComputoDePena()
 
 if __name__ == '__main__':
-    _DEBUG()
+    _DEBUG_PENA_TEMPORAL()
