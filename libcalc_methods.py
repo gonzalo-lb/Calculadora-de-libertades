@@ -357,6 +357,20 @@ def FechaA_es_Igual_Que_FechaB(fecha_a:datetime.date, fecha_b:datetime.date):
     else:
         return False
 
+def MontoDeTiempoA_es_Mayor_que_MontoDeTiempoB(tiempo_a:TiempoEn_Años_Meses_Dias, tiempo_b:TiempoEn_Años_Meses_Dias):
+    if tiempo_a.años > tiempo_b.años:
+        return True
+    if tiempo_a.años < tiempo_b.años:
+        return False
+    if tiempo_a.meses > tiempo_b.meses:
+        return True
+    if tiempo_a.meses < tiempo_b.meses:
+        return False
+    if tiempo_a.dias > tiempo_b.dias:
+        return True
+    else:
+        return False    
+
 def es_multiplo(numero, multiplo):
     return numero % multiplo == 0
 

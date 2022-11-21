@@ -7,7 +7,7 @@ Caducidad: Suma 10 años desde la fecha de la sentencia<br />
 Vencimiento del plazo de control: Suma los años/meses/días del plazo de control ingresado desde la fecha de la firmeza de la sentencia
 
 ## Vencimiento de pena temporal
-> Vencimiento: A la fecha de detención se le suma el monto de pena<br/>
+> Vencimiento: A la fecha de detención se le suma el monto de pena, y luego se le restan las otras detenciones (si hay)<br/>
 Caducidad: A la fecha del vencimiento de pena, suma 10 años
 
 ## Cálculo de requisito de calificación en la libertad condicional (ley 27.375)

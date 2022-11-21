@@ -1,0 +1,73 @@
+En todos los casos:
+    Necesita:
+        Fecha del hecho
+    Output:
+        Meses aplicados por estímulo educativo
+
+Vencimiento y caducidad de pena:
+    Necesita:
+        Fecha de detención
+        Monto de pena
+        Otras detenciones para restar
+    Output:
+        Fecha de vencimiento de pena
+        Fecha de caducidad de pena
+
+Libertad condicional:
+    Necesita:
+        Fecha de detención
+        Monto de pena
+        Otras detenciones para restar
+        Estímulo educativo
+        Saber si es reincidente
+        Saber si la condena es por delitos excluidos ley 25.892
+        Saber si la condena es por delitos excluidos ley 27.375
+        Requisito de calificación:
+            Fecha de requisito temporal LC
+            Fecha de comienzo de ejecucion
+            Fecha en que se alcanzó calificación "BUENO"
+    Output:
+        Requisito temporal LC
+        Computo LC
+        Requisito Calificacion "BUENO"
+        Computo Req Calif
+        Computo integral
+        Advertencia por reincidencia
+        Advertencia por delitos excluidos
+
+Salidas transitorias:
+    Necesita:
+        Fecha de detención
+        Monto de pena
+        Otras detenciones para restar
+        Estímulo educativo
+        Saber si la condena es por delitos excluidos ley 25.948
+        Saber si la condena es por delitos excluidos ley 27.375
+        Fecha de ingreso a periodo de prueba
+        Requisito de calificación "BUENO" (mismo que en LC):
+            Fecha de requisito temporal LC
+            Fecha de comienzo de ejecucion
+            Fecha en que se alcanzó calificación "BUENO"
+        Requisito de calificación "EJEMPLAR":
+            Fecha en que se alcanzó calificación "EJEMPLAR"
+    Output:
+        Requisito temporal ST
+        Computo ST
+        Requisito temporal periodo de prueba
+        Computo Periodo de prueba
+        Requisito Calificacion "BUENO"
+        Computo Req Calif BUENO
+        Requisito Calificacion "EJEMPLAR"
+        Computo Req Calif EJEMPLAR
+        Advertencia por delitos excluidos
+
+Libertad asistida:
+    Necesita:
+        Vencimiento de pena
+        Estímulo educativo
+        Saber si la condena es por delitos excluidos ley 25.948
+        Saber si la condena es por delitos excluidos ley 27.375
+    Output:
+        Requisito temporal
+        Cómputo
+        Advertencia por delitos excluidos

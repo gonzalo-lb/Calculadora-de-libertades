@@ -1,4 +1,4 @@
-from libcalc import ComputoDePena
+from libcalc import ComputoDePena_VIEJO
 from libcalc_methods import *
 
 if __name__ == '__main__':

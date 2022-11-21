@@ -34,6 +34,11 @@ class ST_REGIMENES(Enum):
     _Ley_25948 = 'Ley 25.948'
     _Ley_27375 = 'Ley 27.375'
 
+class ST_COMPUTO_SITUACION(Enum):    
+    NO_HAY_COMPUTO_CALCULADO = 0
+    HAY_COMPUTO = 1
+    HAY_FECHA_DE_REQUISITO_TEMPORAL_DE_PERIODO_DE_PRUEBA = 2    
+
 class LA_KEYS(Enum):    
     _fechaImplementacion_YEAR_KEY = 'Fecha de implementacion - year'
     _fechaImplementacion_MONTH_KEY = 'Fecha de implementacion - month'
