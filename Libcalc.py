@@ -220,7 +220,9 @@ class ComputoPenaTemporal(Computo):
     fechaDeDetencion:datetime.date='NULL',
     montoDePena:MontoDePena='NULL',
     otrasDetenciones:OtraDetencion='NULL',
-    estimuloEducativo:TiempoEn_Años_Meses_Dias=TiempoEn_Años_Meses_Dias()) -> None:
+    estimuloEducativo:TiempoEn_Años_Meses_Dias=TiempoEn_Años_Meses_Dias(),
+    fechaInicioEjecucion:datetime.date='NULL',
+    fechaCalificacionBUENO:datetime.date='NULL') -> None:
         super().__init__()
         
         # INPUT
@@ -229,6 +231,8 @@ class ComputoPenaTemporal(Computo):
         self._monto_de_pena = montoDePena
         self._otras_detenciones = otrasDetenciones
         self._estimulo_educativo = estimuloEducativo
+        self._fecha_inicio_ejecucion = fechaInicioEjecucion
+        self._fecha_calificacion_BUENO = fechaCalificacionBUENO
 
         # VARIABLES CON LOS DATOS
         self._regimen_normativo = 'NULL'
@@ -238,6 +242,9 @@ class ComputoPenaTemporal(Computo):
 
         self._libertad_condicional_COMPUTO = 'NULL'
         self._libertad_condicional_REQUISITO_TEMPORAL = 'NULL'
+        self._libertad_condicional_REQUISITO_CALIFICACION_BUENO = 'NULL'
+        self._libertad_condicional_REQUISITO_CALIFICACION_SITUACION = 'NULL'
+        self._libertad_condicional_COMPUTO_INTEGRAL = 'NULL'
 
         # VARIABLES OUTPUT (STRING)
         self._STRING_vencimiento_de_pena = ''
@@ -289,8 +296,8 @@ class ComputoPenaTemporal(Computo):
         _computo_libertad_condicional = self._fecha_de_detencion
         _requisito_temporal_libertad_condicional = TiempoEn_Años_Meses_Dias()
 
-        # Si es reincidente, o por delitos excluídos, igual hace el cálculo. La reincidencia solo va a influír
-        # cuando se imprima el resultado, como una advertencia                
+        # Si es reincidente, o por delitos excluídos, igual hace el cálculo, pero arroja advertencias
+        # Las advertencias las manejan las funciones que arman los string
 
         print(f'DEBUG: self._monto_de_pena es mayor a 3 años? --> {MontoDeTiempoA_es_Mayor_que_MontoDeTiempoB(self._monto_de_pena, TiempoEn_Años_Meses_Dias(_años=3))}')
         if MontoDeTiempoA_es_Mayor_que_MontoDeTiempoB(self._monto_de_pena, TiempoEn_Años_Meses_Dias(_años=3)) != True:
@@ -301,15 +308,83 @@ class ComputoPenaTemporal(Computo):
             _computo_libertad_condicional = self._SumarMontoDePena(self._fecha_de_detencion, _requisito_temporal_libertad_condicional)                
 
         # Resta otras detenciones, si hay
-        print(f'DEBUG: Cómputo Libertad Condicional sin restar otras detenciones = {Datetime_date_enFormatoXX_XX_XXXX(_computo_libertad_condicional)}')        
+        print(f'DEBUG: Cómputo Libertad Condicional sin restar otras detenciones = {Datetime_date_enFormatoXX_XX_XXXX(_computo_libertad_condicional)}')
         _computo_libertad_condicional = self._RestarOtrasDetenciones(_computo_libertad_condicional, self._otras_detenciones)
 
         # Aplica el estímulo educativo, si hay
+        print(f'DEBUG: Cómputo Libertad Condicional sin aplicar estímulo educativo = {Datetime_date_enFormatoXX_XX_XXXX(_computo_libertad_condicional)}')
         _computo_libertad_condicional = self._AplicarEstimuloEducativo(_computo_libertad_condicional, self._estimulo_educativo)    
 
         # Aplica la información obtenida a las variables de datos
         self._libertad_condicional_COMPUTO = _computo_libertad_condicional
         self._libertad_condicional_REQUISITO_TEMPORAL = _requisito_temporal_libertad_condicional
+
+        # Si aplica la ley 27.375, calcula además el requisito de calificación, y el integral
+        if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value:
+            self._CalcularLibertadCondicional_RequisitoCalificacion()
+            self._CalcularLibertadCondicional_ComputoIntegral()
+    
+    def _CalcularLibertadCondicional_RequisitoCalificacion(self):
+
+        # Guarda los resultados en:
+            #   self._libertad_condicional_REQUISITO_CALIFICACION_BUENO
+            #   self._libertad_condicional_REQUISITO_CALIFICACION_SITUACION
+        
+        _fechaLC = self._libertad_condicional_COMPUTO
+        _fechaInicioEjecucion = self._fecha_inicio_ejecucion
+        _fechaCalificacionBueno = self._fecha_calificacion_BUENO
+        self._libertad_condicional_REQUISITO_CALIFICACION_SITUACION = 0
+
+        if _fechaInicioEjecucion == 'NULL':
+            # SITUACIÓN 1
+            # SI TODAVÍA NO COMENZÓ LA EJECUCIÓN DE PENA
+            # En este caso no es posible calcular el requisito
+            
+            self._libertad_condicional_REQUISITO_CALIFICACION_SITUACION = 1
+            return
+        
+        elif _fechaInicioEjecucion != 'NULL' and _fechaCalificacionBueno == 'NULL':
+            # SITUACIÓN 2
+            # SI COMENZÓ LA EJECUCIÓN DE PENA PERO AÚN NO CALIFICÓ COMO "BUENO"
+            # Determina la fecha límite para obtener el requisito "BUENO" teniendo en cuenta el requisito temporal LC en el caso concreto            
+            
+            delta = relativedelta(_fechaLC, _fechaInicioEjecucion)
+            pena1_3=MontoDePena(_años=delta.years, _meses=delta.months, _dias=delta.days)
+            pena1_3 = self._Calcular_un_tercio(pena1_3)            
+            self._libertad_condicional_REQUISITO_CALIFICACION_BUENO = self._SumarMontoDePena(_fechaInicioEjecucion, pena1_3)
+            self._libertad_condicional_REQUISITO_CALIFICACION_SITUACION = 2            
+            return
+
+        elif _fechaInicioEjecucion != 'NULL' and _fechaCalificacionBueno != 'NULL':
+            # SITUACIÓN 3
+            # SI SE ENCEUNTRA EJECUTANDO PENA Y TIENE REQUISITO DE CALIFICACIÓN "BUENO"
+            # Determina la fecha desde la que se encontrará cumplido el requisito de calificación
+
+            self._libertad_condicional_REQUISITO_CALIFICACION_SITUACION = 3            
+            delta = relativedelta(_fechaCalificacionBueno, _fechaInicioEjecucion)
+            delta_TAMD = TiempoEn_Años_Meses_Dias(_años=delta.years, _meses=delta.months, _dias=delta.days)
+            delta_x_3 = self._Multiplicar_Tiempo(delta_TAMD, 3)
+            self._libertad_condicional_REQUISITO_CALIFICACION_BUENO = self._SumarMontoDePena(_fechaInicioEjecucion, delta_x_3)
+            self._libertad_condicional_REQUISITO_CALIFICACION_SITUACION = 3            
+            return
+    
+    def _CalcularLibertadCondicional_ComputoIntegral(self):
+        '''Este cómputo solo aplicaría en la situación 3 (contar con requisito de calificación "BUENO")'''
+        # Guarda el resultado en:
+        #   self._libertad_condicional_COMPUTO_INTEGRAL
+
+        if type(self._libertad_condicional_COMPUTO) is not datetime.date:
+            print('DEBUG: def _CalcularLibertadCondicional_ComputoIntegral: self._libertad_condicional_COMPUTO is not datetime.date')
+            return
+        if type(self._libertad_condicional_REQUISITO_CALIFICACION_BUENO) is not datetime.date:
+            print('DEBUG: def _CalcularLibertadCondicional_ComputoIntegral: self._libertad_condicional_REQUISITO_CALIFICACION_BUENO is not datetime.date')
+            return        
+
+        if self._libertad_condicional_REQUISITO_CALIFICACION_SITUACION == 3:
+            if FechaA_es_Mayor_Que_FechaB(self._libertad_condicional_COMPUTO, self._libertad_condicional_REQUISITO_CALIFICACION_BUENO):
+                self._libertad_condicional_COMPUTO_INTEGRAL = self._libertad_condicional_COMPUTO
+            else:
+                self._libertad_condicional_COMPUTO_INTEGRAL = self._libertad_condicional_REQUISITO_CALIFICACION_BUENO
 
     def _ArmarSTRINGGeneral(self):
         pass
@@ -328,6 +403,8 @@ class ComputoPenaTemporal(Computo):
         # if self._regimenNormativoAplicable._regimen_LC == LC_REGIMENES._Ley_27375.value and _montoDePena.delitosExcluidosLey27375:
         #     advertencia = '\nADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque se condenó por alguno de los delitos excluídos, por art. 14 CP (según reforma de la ley 27.375).'
         #     self._libertad_condicional_STRING += advertencia
+
+        # SI SITUACIÓN ES 1 O 2, HAY QUE AVISAR QUE NO SE PUEDE CALCULAR EL REQUISITO INTEGRAL
         pass
 
     def _ArmarSTRINGSalidasTransitorias(self):
@@ -339,8 +416,7 @@ class ComputoPenaTemporal(Computo):
     def _ArmarSTRINGRegimenPreparatorioParaLaLiberacion(self):
         pass
 
-class ComputoDePena_VIEJO():
-    
+class ComputoDePena_VIEJO():    
     def __init__(self, fechaDelHecho:datetime.date='NULL',
     fechaDeDetencion:datetime.date='NULL',
     fechaDeSentencia:datetime.date='NULL',
@@ -1095,38 +1171,22 @@ Libertad asistida: {}
                 libertadCondicional = f'{libertadCondicional}\n'\
                 f'{libertadCondicional_advertenciaDelitosExcluidosLey27375}'        
    
-def _DEBUG_PENA_EJECUCION_CONDICIONAL():        
-    
-    fechaDelHecho = datetime.date(2015, 5, 26)    
-    fechaDeSentencia = datetime.date(2017, 3, 15)
-    fechaFirmezaSentencia = datetime.date(2017, 3, 29)
-    montoDePena = MontoDePena(_años=2, _meses=6, esDeEjecucionCondicional=True, _plazoControlAños=2)    
-        
-    computo = ComputoDePena_VIEJO(fechaDelHecho=fechaDelHecho, fechaDeSentencia=fechaDeSentencia, fechaFirmezaDeSentencia=fechaFirmezaSentencia, montoDePena=montoDePena)
-    computo._ImprimirResultados()
-
-def _DEBUG_NUEVO_COMPUTO_POR_LC_REVOCADA():   
-
-    fechaDelHecho = datetime.date(2015, 5, 26)
-    LCEnComputoAnterior = datetime.date(2018, 8, 12)
-    VencimientoDePenaAnterior = datetime.date(2020, 3, 20)
-    NuevaDetencion = datetime.date(2019, 12, 24)
-    montoDePena = MontoDePena(_años=12)    
-
-    computo = ComputoDePena_VIEJO(fechaDelHecho=fechaDelHecho,
-    esComputoPorLCRevocada=True,
-    libertadCondicionalEnComputoAnterior=LCEnComputoAnterior,
-    vencimientoDePenaEnComputoAnterior=VencimientoDePenaAnterior,
-    nuevaFechaDeDetencion=NuevaDetencion,
-    montoDePena=montoDePena)
-
-    computo._ImprimirResultados()
-
 def _DEBUG_PENA_TEMPORAL():    
     fechaDelHecho = datetime.date(2018, 5, 26)
     fechaDeDetencionInput = datetime.date(2020, 1, 1)
-    montoDePena = MontoDePena(_años=2, _meses=6, _esReincidente=True, _esPorDelitosExcluidosLey27375=True)
-    computo = ComputoPenaTemporal(fechaDelHecho=fechaDelHecho, fechaDeDetencion=fechaDeDetencionInput, montoDePena=montoDePena)
+    montoDePena = MontoDePena(_años=6, _esPorDelitosExcluidosLey27375=True)
+    otrasDetenciones='NULL'
+    estimuloEducativo=TiempoEn_Años_Meses_Dias()
+    fechaInicioEjecucion=datetime.date(2021, 1, 1)
+    fechaCalificacionBUENO=datetime.date(2022, 3, 10)
+    
+    computo = ComputoPenaTemporal(fechaDelHecho=fechaDelHecho,
+    fechaDeDetencion=fechaDeDetencionInput,
+    montoDePena=montoDePena,
+    otrasDetenciones=otrasDetenciones,
+    estimuloEducativo=estimuloEducativo,
+    fechaInicioEjecucion=fechaInicioEjecucion,
+    fechaCalificacionBUENO=fechaCalificacionBUENO)
     print('')
     print(f'Fecha del hecho: {Datetime_date_enFormatoXX_XX_XXXX(computo._fecha_del_hecho)}')
     print(f'Fecha de detención: {Datetime_date_enFormatoXX_XX_XXXX(computo._fecha_de_detencion)}')
@@ -1136,12 +1196,11 @@ def _DEBUG_PENA_TEMPORAL():
     print(f'Vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(computo._vencimiento_de_pena)}')
     print(f'Caducidad de pena: {Datetime_date_enFormatoXX_XX_XXXX(computo._caducidad_de_pena)}')
     print('')
-    print(f'Requisito temporal Libertad Condicional: {computo._libertad_condicional_REQUISITO_TEMPORAL}')
-    print(f'Libertad condicional (cómputo): {computo._libertad_condicional_COMPUTO}')
-
-
-def _DEBUG_ERROR():
-    c = ComputoDePena_VIEJO()
+    print(f'Requisito temporal Libertad Condicional: {Datetime_date_enFormatoXX_XX_XXXX(computo._libertad_condicional_REQUISITO_TEMPORAL)}')
+    print(f'Libertad condicional (cómputo): {Datetime_date_enFormatoXX_XX_XXXX(computo._libertad_condicional_COMPUTO)}')
+    print(f'Libertad condicional (fecha requisito calif. BUENO): {Datetime_date_enFormatoXX_XX_XXXX(computo._libertad_condicional_REQUISITO_CALIFICACION_BUENO)}')
+    print(f'Libertad condicional (fecha requisito calif. Situacion): {computo._libertad_condicional_REQUISITO_CALIFICACION_SITUACION}')
+    print(f'Libertad condicional (cómputo integral): {Datetime_date_enFormatoXX_XX_XXXX(computo._libertad_condicional_COMPUTO_INTEGRAL)}')    
 
 if __name__ == '__main__':
     _DEBUG_PENA_TEMPORAL()

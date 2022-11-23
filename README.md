@@ -18,5 +18,10 @@ En ese caso determina la fecha mínima para obtener el requisito, y que coincida
 > 3) Se comenzó con la ejecución de pena y se obtuvo el requisito "BUENO":<br/>
 En ese caso determina la fecha en la que se obtendrán los 2/3 con ese requisito.
 
+## Cálculo de cómputo integral (ley 27.375)
+> Se trata de comparar el cómputo de la libertad por LC o ST con la fecha en la que se cumplirán los requisitos temporales de calificación.<br/>
+El cómputo integral es el mayor de esos dos valores.<br/>
+Si falta la fecha del requisito temporal de calificación, no se puede calcular este cómputo.
+
 ## Cálculos generales que se realizan en todos los casos
 > Siempre que se suma una fecha, al resultado final se le resta un día

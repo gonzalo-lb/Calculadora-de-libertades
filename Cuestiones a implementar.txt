@@ -1,11 +1,8 @@
 Lo que hice ahora:
- - Armé una class base con las funciones mínimas que necesita un cómputo.
- - Estoy armando una subclass de esa, para penas temporales.
- - Le armé vencimiento y caducidad de pena, y LC básica (sin los casos de ley 27.375)
+ - Terminé la libertad condicional (incluídos los casos de ley 27.375) para penas temporales. La probé por arriba y funciona. Falta probar con casos reales.
 
-Con qué seguir:
- - Libertad condicional para la 27.375.
- - Quizá habría que hacer una class de cómputo base, y otras sub-classes para cada cómputo. Luego una por separado para decidir cuál usar en cada caso.
+Con qué seguir: 
+ - Salidas transitorias para ley 27.375.
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
  - Terminar vencimiento y caducidad para el resto de las penas.
@@ -29,6 +26,10 @@ Funcionalidad a implementar:
  - Monto de las Unidades Fijas
 
  Hecho:
+ - Armé una class base con las funciones mínimas que necesita un cómputo.
+ - Estoy armando una subclass de esa, para penas temporales.
+ - Quizá habría que hacer una class de cómputo base, y otras sub-classes para cada cómputo. Luego una por separado para decidir cuál usar en cada caso.
+ - Le armé vencimiento y caducidad de pena, y LC básica (sin los casos de ley 27.375)
  - Hice una función para calcular un nuevo cómputo por libertad condicional revocada, pero no la probé.
  - Agregué requisito integral de libertad condicional para los casos de ley 27.375
  - Probé la libertad condicional en penas temporales, y parece funcionar (solucioné varios errores)

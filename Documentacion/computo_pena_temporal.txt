@@ -29,7 +29,7 @@ Libertad condicional:
     Output:
         Requisito temporal LC
         Computo LC
-        Requisito Calificacion "BUENO"
+        Requisito Calificacion "BUENO" ("SITUACIÓN")
         Computo Req Calif
         Computo integral
         Advertencia por reincidencia
