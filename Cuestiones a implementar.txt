@@ -1,8 +1,8 @@
 Lo que hice ahora:
- - Terminé la libertad condicional (incluídos los casos de ley 27.375) para penas temporales. La probé por arriba y funciona. Falta probar con casos reales.
+ - Hice las salidas transitorias y el cálculo del periodo de prueba para los casos de la ley 27.375 (no llegúe a probar cuando se ingresa fecha de ingreso a periodo de prueba)
 
 Con qué seguir: 
- - Salidas transitorias para ley 27.375.
+ - Probar las cuentas cuando hay fecha de ingreso a periodo de prueba; Calculos de requisitos de calificación para salidas transitorias (ley 27.375)
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
  - Terminar vencimiento y caducidad para el resto de las penas.
@@ -26,6 +26,7 @@ Funcionalidad a implementar:
  - Monto de las Unidades Fijas
 
  Hecho:
+ - Terminé la libertad condicional (incluídos los casos de ley 27.375) para penas temporales. La probé por arriba y funciona. Falta probar con casos reales.
  - Armé una class base con las funciones mínimas que necesita un cómputo.
  - Estoy armando una subclass de esa, para penas temporales.
  - Quizá habría que hacer una class de cómputo base, y otras sub-classes para cada cómputo. Luego una por separado para decidir cuál usar en cada caso.
