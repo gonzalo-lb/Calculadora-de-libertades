@@ -1,0 +1,66 @@
+Ley 27.302
+Publicación en el Boletín Oficial: 08/11/2016
+Entrada en vigencia: 16/11/2016
+
+Resolucion MSEG 270/2016
+Fecha: 23/06/2016
+Publicación en Boletín Oficial: 04/07/2016
+¿Indica entrada en vigencia?: Si. 8 días luego de la publicación.
+Entrada en vigencia: 12/07/2016
+Valor del F01: 1700
+
+Resolucion MSEG 145-E/2017
+Fecha: 10/02/2017
+Publicación en Boletín Oficial: 15/02/2017
+¿Indica entrada en vigencia?: No.
+Entrada en vigencia: 15/02/2017
+Valor del F01: 2500
+
+Resolucion MSEG 71-E/2018
+Fecha: 25/01/2018
+Publicación en Boletín Oficial: 29/01/2018
+¿Indica entrada en vigencia?: No
+Entrada en vigencia: 29/01/2018
+Valor del F01: 3000
+
+Resolucion MSEG 123/2019
+Fecha: 11/02/2019
+Publicación en Boletín Oficial: 14/02/2019
+¿Indica entrada en vigencia?: No
+Entrada en vigencia: 14/02/2019
+Valor del F01: 3600
+
+Resolucion MSEG 13/2020
+Fecha: 30/01/2020
+Publicación en Boletín Oficial: 31/01/2020
+¿Indica entrada en vigencia?: Si. A partir del 01/02/2020
+Entrada en vigencia: 01/02/2020
+Valor del F01: 5400
+
+Resolucion MSEG 85/2021
+Fecha: 26/02/2021
+Publicación en Boletín Oficial: 01/03/2021
+¿Indica entrada en vigencia?: Si. A partir de su publicación en el Boletín Oficial.
+Entrada en vigencia: 01/03/2021
+Valor del F01: 7000
+
+Resolucion MSEG 647/2021
+Fecha: 30/12/2021
+Publicación en Boletín Oficial: 04/01/2022
+¿Indica entrada en vigencia?: Si. A partir de su publicación en el boletín Oficial
+Entrada en vigencia: 04/01/2022
+Valor del F01: 9500
+
+Resolucion MSEG 486/2022
+Fecha: 20/07/2022
+Publicación en Boletín Oficial: 22/07/2022
+¿Indica entrada en vigencia?: Si. Desde el 01/08/2022
+Entrada en vigencia: 01/08/2022
+Valor del F01: 13000
+
+Resolucion MSEG 
+Fecha: 
+Publicación en Boletín Oficial: 
+¿Indica entrada en vigencia?: 
+Entrada en vigencia: 
+Valor del F01:

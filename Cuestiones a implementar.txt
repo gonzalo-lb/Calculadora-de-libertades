@@ -1,7 +1,9 @@
-Lo que hice ahora:
- - Hice las salidas transitorias y el cálculo del periodo de prueba para los casos de la ley 27.375 (no llegúe a probar cuando se ingresa fecha de ingreso a periodo de prueba)
+Lo que hice ahora: 
+ - Hice el JSON con la información de las Unidades Fijas
+ - Avancé con el cálculo de las salidas transitorias por ley 27.375. Hay que rearmarlo de cero.
 
 Con qué seguir: 
+ - La función _CalcularSalidasTransitorias_RequisitoCalificacion quedó a medio hacer.
  - Probar las cuentas cuando hay fecha de ingreso a periodo de prueba; Calculos de requisitos de calificación para salidas transitorias (ley 27.375)
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
@@ -26,6 +28,7 @@ Funcionalidad a implementar:
  - Monto de las Unidades Fijas
 
  Hecho:
+ - Hice las salidas transitorias y el cálculo del periodo de prueba para los casos de la ley 27.375 (no llegúe a probar cuando se ingresa fecha de ingreso a periodo de prueba)
  - Terminé la libertad condicional (incluídos los casos de ley 27.375) para penas temporales. La probé por arriba y funciona. Falta probar con casos reales.
  - Armé una class base con las funciones mínimas que necesita un cómputo.
  - Estoy armando una subclass de esa, para penas temporales.
