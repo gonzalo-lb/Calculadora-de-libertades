@@ -2,6 +2,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 from dateutil import relativedelta
 from libcalc_methods import *
+from copy import deepcopy
 
 class Computo():
     def _Calcular_un_tercio(self, _montoDePena:MontoDePena):
@@ -224,7 +225,8 @@ class ComputoPenaTemporal(Computo):
     fechaInicioEjecucion:datetime.date='NULL',
     fechaCalificacionBUENO:datetime.date='NULL',
     fechaIngresoPeriodoDePrueba:datetime.date='NULL',
-    fechaCalificacionEJEMPLAR:datetime.date='NULL') -> None:
+    fechaCalificacionEJEMPLAR:datetime.date='NULL',
+    vuelveARestarOtrasDetencionesyAplicar140enST=False) -> None:
         super().__init__()
         
         # INPUT
@@ -237,6 +239,7 @@ class ComputoPenaTemporal(Computo):
         self._fecha_calificacion_BUENO = fechaCalificacionBUENO
         self._fecha_calificacion_EJEMPLAR = fechaCalificacionEJEMPLAR
         self._fecha_ingreso_a_periodo_de_prueba = fechaIngresoPeriodoDePrueba
+        self._vuelve_a_restar_otras_detenciones_y_140_en_ST= vuelveARestarOtrasDetencionesyAplicar140enST
 
         # VARIABLES CON LOS DATOS
         self._regimen_normativo = 'NULL'
@@ -255,9 +258,10 @@ class ComputoPenaTemporal(Computo):
         self._salidas_transitorias_27375_SITUACION = 'NULL'
         self._salidas_transitorias_COMPUTO_PERIODO_DE_PRUEBA = 'NULL'        
         self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA = 'NULL'
+        self._salidas_transitorias_REQUISITO_TEMPORAL_INTEGRAL = 'NULL'
         self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR = 'NULL'
         self._salidas_transitorias_REQUISITO_CALIF_BUENO = 'NULL'
-        self._salidas_transitorias_REQUISITO_CALIF_SITUACION = 'NULL'
+        self._salidas_transitorias_REQUISITO_CALIF_SITUACION = 'NULL'        
 
         # VARIABLES OUTPUT (STRING)
         self._STRING_vencimiento_de_pena = ''
@@ -420,15 +424,17 @@ class ComputoPenaTemporal(Computo):
 
             # Aplica la información obtenida a las variables de datos
             self._salidas_transitorias_COMPUTO = _computo_salidas_transitorias
-            self._salidas_transitorias_REQUISITO_TEMPORAL = _requisito_salidas_transitorias 
+            self._salidas_transitorias_REQUISITO_TEMPORAL = _requisito_salidas_transitorias
             self._salidas_transitorias_27375_SITUACION = ST_COMPUTO_27375_SITUACION.ES_ANTERIOR_A_LEY_27375.value
         
         if  self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_27375.value:
+
+            self._CalcularRequisitoTemporal_PeriodoDePrueba()
+
             if self._fecha_ingreso_a_periodo_de_prueba == 'NULL':
                 # Si todavía no está en periodo de prueba:
                 # Calcula la fecha mínima, y el requisito temporal para poder ingresar al periodo de prueba
-                # Lo de que si luego falta un año, o 6 meses, lo va a indicar la función que maneje los string
-                self._CalcularRequisitoTemporal_PeriodoDePrueba()
+                # Lo de que si luego falta un año, o 6 meses, lo va a indicar la función que maneje los string                
 
                 print(f'DEBUG: Cómputo Salidas transitorias (periodo de prueba) sin restar otras detenciones = {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO_PERIODO_DE_PRUEBA)}')
                 self._salidas_transitorias_COMPUTO_PERIODO_DE_PRUEBA = self._RestarOtrasDetenciones(self._salidas_transitorias_COMPUTO_PERIODO_DE_PRUEBA, self._otras_detenciones)
@@ -438,34 +444,53 @@ class ComputoPenaTemporal(Computo):
                 self._salidas_transitorias_27375_SITUACION = ST_COMPUTO_27375_SITUACION.TODAVIA_NO_INGRESO_A_PERIODO_DE_PRUEBA.value
 
                 # Calcula el requisito temporal de las Salidas Transitorias en función del requisito temporal para ingresar la periodo de prueba
-                reqSTley27375=self._CalcularRequisitoTemporal_SalidasTransitorias_Ley27375()
-                self._salidas_transitorias_REQUISITO_TEMPORAL = MontoDePena()
-                self._salidas_transitorias_REQUISITO_TEMPORAL.años += reqSTley27375.años
-                self._salidas_transitorias_REQUISITO_TEMPORAL.meses += reqSTley27375.meses
-                self._salidas_transitorias_REQUISITO_TEMPORAL.dias += reqSTley27375.dias
+                self._salidas_transitorias_REQUISITO_TEMPORAL=self._CalcularRequisitoTemporal_SalidasTransitorias_Ley27375()                
+                self._salidas_transitorias_REQUISITO_TEMPORAL_INTEGRAL = deepcopy(self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA)
+                self._salidas_transitorias_REQUISITO_TEMPORAL_INTEGRAL.años += self._salidas_transitorias_REQUISITO_TEMPORAL.años
+                self._salidas_transitorias_REQUISITO_TEMPORAL_INTEGRAL.meses += self._salidas_transitorias_REQUISITO_TEMPORAL.meses
 
                 # Con el requisito temporal de las salidas transitorias, calcula el cómputo
-                self._salidas_transitorias_COMPUTO = self._SumarMontoDePena(self._fecha_de_detencion, self._salidas_transitorias_REQUISITO_TEMPORAL)                
+                self._salidas_transitorias_COMPUTO = self._SumarMontoDePena(self._fecha_de_detencion, self._salidas_transitorias_REQUISITO_TEMPORAL_INTEGRAL)                
 
                 # Calcula cuándo debe obtenerse la conducta ejemplar (resta un año al cómputo)
                 self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR = self._salidas_transitorias_COMPUTO
-                self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR += relativedelta(years=1)
+                self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR -= relativedelta(years=1)
 
                 # Calcula cuándo debe obtenerse la calificación "Bueno" para lograr los 2/3
+                self._CalcularSalidasTransitorias_RequisitoCalificacionBUENO()
 
             else:
                 # Si ya está en periodo de prueba:
-                # Calcula el cómputo (no aplica resta de otras detenciones ni aplicación de estímulo educativo porque ya
-                # habrían sido contempladas para calcular el ingreso al periodo de prueba)
-                reqSTley27375=self._CalcularRequisitoTemporal_SalidasTransitorias_Ley27375()                   
-                self._salidas_transitorias_REQUISITO_TEMPORAL = str(reqSTley27375) + ' ...luego de obtener el periodo de prueba.'
-                self._salidas_transitorias_COMPUTO_PERIODO_DE_PRUEBA = self._fecha_ingreso_a_periodo_de_prueba
-                self._salidas_transitorias_COMPUTO = self._SumarMontoDePena(self._fecha_ingreso_a_periodo_de_prueba, reqSTley27375)
-                self._salidas_transitorias_27375_SITUACION = ST_COMPUTO_27375_SITUACION.HAY_COMPUTO.value
-            
-            self._CalcularSalidasTransitorias_RequisitoConductaEJEMPLAR()
+                # Calcula el cómputo (guarda el cálculo sin restar otras detenciones ni aplicar estímulo educativo
+                # en otra variable, para que elija el usuario ya fue aplicado o no)
+                
+                # Calcula el requisito temporal del periodo de prueba
+                self._salidas_transitorias_REQUISITO_TEMPORAL = self._CalcularRequisitoTemporal_SalidasTransitorias_Ley27375()                
+
+                # Hace el cómputo de las salidas transitorias y lo guarda en la variable sin restar
+                self._salidas_transitorias_COMPUTO = self._fecha_ingreso_a_periodo_de_prueba
+                self._salidas_transitorias_COMPUTO += relativedelta(years=self._salidas_transitorias_REQUISITO_TEMPORAL.años)
+                self._salidas_transitorias_COMPUTO += relativedelta(months=self._salidas_transitorias_REQUISITO_TEMPORAL.meses)
+
+                if self._vuelve_a_restar_otras_detenciones_y_140_en_ST:
+                    # Resta otras detenciones
+                    self._salidas_transitorias_COMPUTO = self._RestarOtrasDetenciones(self._salidas_transitorias_COMPUTO, self._otras_detenciones)
+
+                    # Aplica estímulo educativo
+                    self._salidas_transitorias_COMPUTO = self._AplicarEstimuloEducativo(self._salidas_transitorias_COMPUTO, self._estimulo_educativo)
+
+                # Calcula cuándo debe obtenerse la conducta ejemplar (resta un año al cómputo)
+                self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR = self._salidas_transitorias_COMPUTO
+                self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR -= relativedelta(years=1)
+
+                # Calcula cuándo debe obtenerse la calificación "Bueno" para lograr los 2/3
+                self._CalcularSalidasTransitorias_RequisitoCalificacionBUENO()
+
+                self._salidas_transitorias_27375_SITUACION = ST_COMPUTO_27375_SITUACION.HAY_COMPUTO.value   
+
+        self._ImprimirSTRINGSalidasTransitorias()         
     
-    def _CalcularSalidasTransitorias_RequisitoCalificacion(self):
+    def _CalcularSalidasTransitorias_RequisitoCalificacionBUENO(self):
 
         # Guarda los resultados en:
             #   self._salidas_transitorias_REQUISITO_CALIFICACION_BUENO
@@ -492,8 +517,8 @@ class ComputoPenaTemporal(Computo):
             delta = relativedelta(_fechaST, _fechaInicioEjecucion)
             pena1_3=MontoDePena(_años=delta.years, _meses=delta.months, _dias=delta.days)
             pena1_3 = self._Calcular_un_tercio(pena1_3)            
-            self._libertad_condicional_REQUISITO_CALIF_BUENO = self._SumarMontoDePena(_fechaInicioEjecucion, pena1_3)
-            self._libertad_condicional_REQUISITO_CALIF_SITUACION = 2            
+            self._salidas_transitorias_REQUISITO_CALIF_BUENO = self._SumarMontoDePena(_fechaInicioEjecucion, pena1_3)
+            self._salidas_transitorias_REQUISITO_CALIF_SITUACION = 2            
             return
 
         elif _fechaInicioEjecucion != 'NULL' and _fechaCalificacionBueno != 'NULL':
@@ -501,12 +526,12 @@ class ComputoPenaTemporal(Computo):
             # SI SE ENCEUNTRA EJECUTANDO PENA Y TIENE REQUISITO DE CALIFICACIÓN "BUENO"
             # Determina la fecha desde la que se encontrará cumplido el requisito de calificación
 
-            self._libertad_condicional_REQUISITO_CALIF_SITUACION = 3            
+            self._salidas_transitorias_REQUISITO_CALIF_SITUACION = 3            
             delta = relativedelta(_fechaCalificacionBueno, _fechaInicioEjecucion)
             delta_TAMD = TiempoEn_Años_Meses_Dias(_años=delta.years, _meses=delta.months, _dias=delta.days)
             delta_x_3 = self._Multiplicar_Tiempo(delta_TAMD, 3)
-            self._libertad_condicional_REQUISITO_CALIF_BUENO = self._SumarMontoDePena(_fechaInicioEjecucion, delta_x_3)
-            self._libertad_condicional_REQUISITO_CALIF_SITUACION = 3            
+            self._salidas_transitorias_REQUISITO_CALIF_BUENO = self._SumarMontoDePena(_fechaInicioEjecucion, delta_x_3)
+            self._salidas_transitorias_REQUISITO_CALIF_SITUACION = 3            
             return
 
     def _CalcularRequisitoTemporal_PeriodoDePrueba(self):
@@ -569,8 +594,49 @@ class ComputoPenaTemporal(Computo):
         # SI SITUACIÓN ES 1 O 2, HAY QUE AVISAR QUE NO SE PUEDE CALCULAR EL REQUISITO INTEGRAL
         pass
 
-    def _ArmarSTRINGSalidasTransitorias(self):
-        pass
+    def _ImprimirSTRINGSalidasTransitorias(self):
+        print('')
+        print('SALIDAS TRANSITORIAS')
+        print('--------------------')
+
+        if self._regimen_normativo._regimen_ST == ST_REGIMENES._DecretoLey412_58.value or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_24660.value or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_25948.value:
+            print(f' - Las salidas transitorias se obtienen a los {self._salidas_transitorias_REQUISITO_TEMPORAL.años} año(s), {self._salidas_transitorias_REQUISITO_TEMPORAL.meses} mes(es) y {self._salidas_transitorias_REQUISITO_TEMPORAL.dias} día(s).')
+            print(f' - El requisito temporal para acceder a las salidas transitorias se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')
+            
+            if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_delitosExcluidos25948_KEY):
+                if self._monto_de_pena.delitosExcluidosLey25948:
+                    print(' - ADVERTENCIA: La salida transitoria no sería aplicable en función de que la condena es por uno de los delitos enumerados en el art. 56 bis, ley 24.660.')            
+        
+        if  self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_27375.value:            
+
+            if self._fecha_ingreso_a_periodo_de_prueba == 'NULL': # Caso en el que aún no se ingresó al periodo de prueba
+                # Indica el requisito para ingresar al periodo de prueba
+                print(f' - Para ingresar al periodo de prueba se requiere un tiempo mínimo de detención de {self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA.años} año(s), {self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA.meses} mes(es) y {self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA.dias} día(s).')
+                print(f' - El requisito temporal para ingresar al periodo de prueba se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO_PERIODO_DE_PRUEBA)}')
+
+                # Indica el requisito hipotético para las salidas transitorias
+                if self._salidas_transitorias_REQUISITO_TEMPORAL.años == 1:
+                    print(' - Como la pena es mayor a 10 años, las salidas transitorias podrían obtenerse luego de 1 año del ingreso al periodo de prueba.')
+                    print(f' - El requisito temporal para acceder a las salidas transitorias se cumpliría el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')
+                elif self._salidas_transitorias_REQUISITO_TEMPORAL.meses == 6:
+                    print(' - Como la pena es mayor a 5 años -y no llega a 10 años-, las salidas transitorias podrían obtenerse luego de 6 meses del ingreso al periodo de prueba.')
+                    print(f' - El requisito temporal para acceder a las salidas transitorias se cumpliría el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')
+                else:
+                    print(' - Como la pena no es mayor a 5 años, las salidas transitorias podrían obtenerse desde el ingreso al periodo de prueba.')
+                
+                # Indica el requisito de calificación "ejemplar"
+                print(f' - Para acceder a las salidas transitorias en esa fecha, la fecha límite para obtener conducta "Ejemplar" es el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR)}')
+                
+                # Indica el requisito de calificación "bueno"
+                if self._salidas_transitorias_REQUISITO_CALIF_SITUACION == 1:
+                    print(' - Como no se cuenta con la fecha en la que se inició la ejecución de la pena, no es posible calcular fechas en relación al requisito de calificación "bueno" del art. 28, ley 24.660.')
+                if self._salidas_transitorias_REQUISITO_CALIF_SITUACION == 2:
+                    print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}, para acceder a las salidas transitorias en la fecha indicada, la fecha límite para obtener el requisito de calificación "bueno" es {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_BUENO)}.')
+                if self._salidas_transitorias_REQUISITO_CALIF_SITUACION == 3:
+                    print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {self._salidas_transitorias_REQUISITO_CALIF_BUENO}.')                   
+
+                fecha_mayor = Comparar_fechas_y_devolver_la_mayor(self._salidas_transitorias_COMPUTO, self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR, self._fecha_calificacion_BUENO)                                
+                print(f' - En este contexto, y teniendo en cuenta las fechas de cada requisito, las salidas transitorias podrían obtenerse el día {Datetime_date_enFormatoXX_XX_XXXX(fecha_mayor)}.')
 
     def _ArmarSTRINGLibertadAsistida(self):
         pass
@@ -1336,12 +1402,13 @@ Libertad asistida: {}
 def _DEBUG_PENA_TEMPORAL():    
     fechaDelHecho = datetime.date(2018, 5, 26)
     fechaDeDetencionInput = datetime.date(2020, 1, 1)
-    montoDePena = MontoDePena(_años=6, _esPorDelitosExcluidosLey27375=True)
+    montoDePena = MontoDePena(_años=8, _esPorDelitosExcluidosLey27375=True, _esPorDelitosExcluidosLey25948=True)
     otrasDetenciones='NULL'
     estimuloEducativo=TiempoEn_Años_Meses_Dias()
-    fechaInicioEjecucion=datetime.date(2021, 1, 1)
-    fechaCalificacionBUENO=datetime.date(2022, 3, 10)
-    fechaIngresoPeriodoDePrueba='NULL'#datetime.date(2022, 12, 10)
+    fechaInicioEjecucion=datetime.date(2022, 6, 1)
+    fechaCalificacionBUENO='NULL'#datetime.date(2022, 3, 10)    
+    #fechaIngresoPeriodoDePrueba=datetime.date(2022, 12, 10)
+    fechaIngresoPeriodoDePrueba='NULL'
     
     computo = ComputoPenaTemporal(fechaDelHecho=fechaDelHecho,
     fechaDeDetencion=fechaDeDetencionInput,
@@ -1366,11 +1433,15 @@ def _DEBUG_PENA_TEMPORAL():
     print(f'Libertad condicional (fecha requisito calif. Situacion): {computo._libertad_condicional_REQUISITO_CALIF_SITUACION}')
     print(f'Libertad condicional (cómputo integral): {Datetime_date_enFormatoXX_XX_XXXX(computo._libertad_condicional_COMPUTO_INTEGRAL)}')    
     print('')
-    print(f'Requisito temporal Salidas Transitorias: {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_REQUISITO_TEMPORAL)}')
-    print(f'Salidas transitorias (cómputo): {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_COMPUTO)}')
-    print(f'Situación del cómputo por ley 27.375: {computo._salidas_transitorias_27375_SITUACION} ({ST_COMPUTO_27375_SITUACION(computo._salidas_transitorias_27375_SITUACION)})')
-    print(f'Salidas transitorias (cómputo del período de prueba): {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_COMPUTO_PERIODO_DE_PRUEBA)}')        
-    print(f'Requisito temporal Periodo de prueba: {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA)}')        
+    # print(f'Requisito temporal Salidas Transitorias: {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_REQUISITO_TEMPORAL)}')
+    # print(f'Salidas transitorias (cómputo): {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_COMPUTO)}')
+    # print(f'Situación del cómputo por ley 27.375: {computo._salidas_transitorias_27375_SITUACION} ({ST_COMPUTO_27375_SITUACION(computo._salidas_transitorias_27375_SITUACION)})')
+    # print(f'Salidas transitorias (cómputo del período de prueba): {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_COMPUTO_PERIODO_DE_PRUEBA)}')        
+    # print(f'Requisito temporal Periodo de prueba: {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA)}')
+    # print(f'Requisito temporal INTEGRAL: {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_REQUISITO_TEMPORAL_INTEGRAL)}')
+    # print(f'Salidas transitorias (fecha requisito calif. Ejemplar): {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR)}')
+    # print(f'Salidas transitorias (fecha requisito calif. Bueno): {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_REQUISITO_CALIF_BUENO)}')
+    # print(f'Salidas transitorias (fecha requisito calif. Situacion): {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_REQUISITO_CALIF_SITUACION)}')            
 
 if __name__ == '__main__':
     _DEBUG_PENA_TEMPORAL()

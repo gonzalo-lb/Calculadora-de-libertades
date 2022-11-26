@@ -25,13 +25,15 @@ class MontoDePena(TiempoEn_Años_Meses_Dias):
     _plazoControlMeses:int=0,
     _plazoControlDias:int=0,
     _esReincidente:bool=False,
-    _esPorDelitosExcluidosLey27375:bool=False):
+    _esPorDelitosExcluidosLey27375:bool=False,
+    _esPorDelitosExcluidosLey25948:bool=False):
         super().__init__(_años, _meses, _dias)
         self.reincidencia = _esReincidente
         self.perpetua = es_perpetua
         self.ejecucionCondicional = esDeEjecucionCondicional
         self.reclusionPorTiempoIndeterminado = hayReclusionIndetArt52CP
-        self.delitosExcluidosLey27375 = _esPorDelitosExcluidosLey27375        
+        self.delitosExcluidosLey27375 = _esPorDelitosExcluidosLey27375
+        self.delitosExcluidosLey25948 = _esPorDelitosExcluidosLey25948
         self.plazoControl_años = _plazoControlAños
         self.plazoControl_meses = _plazoControlMeses
         self.plazoControl_dias = _plazoControlDias
@@ -356,6 +358,22 @@ def FechaA_es_Igual_Que_FechaB(fecha_a:datetime.date, fecha_b:datetime.date):
         return True
     else:
         return False
+
+def Comparar_fechas_y_devolver_la_mayor(*fechas):
+    TRET = True
+    for fecha in fechas:
+        if type(fecha) is datetime.date:
+            TRET = fecha
+            break
+    if TRET == True:
+        print('Comparar_fechas_y_devolver_la_mayor: NINGUNA DE LOS PARÁMETROS INGRESADOS ES UNA FECHA. NO SE REALIZÓ LA COMPARACIÓN.')
+        return
+    
+    for fecha in fechas:
+        if type(fecha) is datetime.date:
+            if FechaA_es_Mayor_Que_FechaB(fecha, TRET):
+                TRET = fecha
+    return TRET
 
 def MontoDeTiempoA_es_Mayor_que_MontoDeTiempoB(tiempo_a:TiempoEn_Años_Meses_Dias, tiempo_b:TiempoEn_Años_Meses_Dias):
     if tiempo_a.años > tiempo_b.años:

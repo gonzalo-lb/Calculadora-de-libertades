@@ -1,9 +1,9 @@
 Lo que hice ahora: 
- - Hice el JSON con la información de las Unidades Fijas
- - Avancé con el cálculo de las salidas transitorias por ley 27.375. Hay que rearmarlo de cero.
+ - Armé las ST normales, y las de la ley 27375 (sin fecha de ingreso al periodo de prueba) completas, con la función que imprime incluida.
+ - Armé función que compara fechas y devuelve la mayor
 
-Con qué seguir: 
- - La función _CalcularSalidasTransitorias_RequisitoCalificacion quedó a medio hacer.
+Con qué seguir:
+ - Armar las otras situaciones de las ST por ley 27375, con el print incluido.
  - Probar las cuentas cuando hay fecha de ingreso a periodo de prueba; Calculos de requisitos de calificación para salidas transitorias (ley 27.375)
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
@@ -28,6 +28,9 @@ Funcionalidad a implementar:
  - Monto de las Unidades Fijas
 
  Hecho:
+ - Hice el JSON con la información de las Unidades Fijas
+ - Avancé con el cálculo de las salidas transitorias por ley 27.375. Hay que rearmarlo de cero.
+ - La función _CalcularSalidasTransitorias_RequisitoCalificacion quedó a medio hacer.
  - Hice las salidas transitorias y el cálculo del periodo de prueba para los casos de la ley 27.375 (no llegúe a probar cuando se ingresa fecha de ingreso a periodo de prueba)
  - Terminé la libertad condicional (incluídos los casos de ley 27.375) para penas temporales. La probé por arriba y funciona. Falta probar con casos reales.
  - Armé una class base con las funciones mínimas que necesita un cómputo.
