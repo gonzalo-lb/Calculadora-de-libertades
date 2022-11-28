@@ -1,8 +1,9 @@
 Lo que hice ahora: 
- - Armé las ST normales, y las de la ley 27375 (sin fecha de ingreso al periodo de prueba) completas, con la función que imprime incluida.
- - Armé función que compara fechas y devuelve la mayor
+ - Hice el print de la libertad condicional y del vencimiento de pena
+ - Hice parte del print de los datos generales.
 
 Con qué seguir:
+ - Terminar el print de los datos generales
  - Armar las otras situaciones de las ST por ley 27375, con el print incluido.
  - Probar las cuentas cuando hay fecha de ingreso a periodo de prueba; Calculos de requisitos de calificación para salidas transitorias (ley 27.375)
  - Lo del cómputo por LC revocada
@@ -28,6 +29,8 @@ Funcionalidad a implementar:
  - Monto de las Unidades Fijas
 
  Hecho:
+ - Armé las ST normales, y las de la ley 27375 (sin fecha de ingreso al periodo de prueba) completas, con la función que imprime incluida.
+ - Armé función que compara fechas y devuelve la mayor
  - Hice el JSON con la información de las Unidades Fijas
  - Avancé con el cálculo de las salidas transitorias por ley 27.375. Hay que rearmarlo de cero.
  - La función _CalcularSalidasTransitorias_RequisitoCalificacion quedó a medio hacer.

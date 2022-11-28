@@ -26,14 +26,16 @@ class MontoDePena(TiempoEn_Años_Meses_Dias):
     _plazoControlDias:int=0,
     _esReincidente:bool=False,
     _esPorDelitosExcluidosLey27375:bool=False,
+    _esPorDelitosExcluidosLey25892:bool=False,
     _esPorDelitosExcluidosLey25948:bool=False):
         super().__init__(_años, _meses, _dias)
         self.reincidencia = _esReincidente
         self.perpetua = es_perpetua
         self.ejecucionCondicional = esDeEjecucionCondicional
         self.reclusionPorTiempoIndeterminado = hayReclusionIndetArt52CP
-        self.delitosExcluidosLey27375 = _esPorDelitosExcluidosLey27375
         self.delitosExcluidosLey25948 = _esPorDelitosExcluidosLey25948
+        self.delitosExcluidosLey25892 = _esPorDelitosExcluidosLey25892
+        self.delitosExcluidosLey27375 = _esPorDelitosExcluidosLey27375        
         self.plazoControl_años = _plazoControlAños
         self.plazoControl_meses = _plazoControlMeses
         self.plazoControl_dias = _plazoControlDias
@@ -156,14 +158,17 @@ class RegimenNormativoAplicable():
     def REGIMEN_PREPARACION_LIBERTAD(self, ask:REGPREPLIB_KEYS):
         return self.__JSON_PREPLIB[self._regimen_PREPLIB][ask.value]
     
+    def _Imprimir(self):
+        print('')
+        print(self)
+
     def __str__(self):
         return '''REGIMEN LEGAL APLICABLE
 -----------------------
 Libertad condicional: {}
 Salidas transitorias: {}
 Libertad asistida: {}
-Régimen preparatorio para la liberación: {}
-'''.format(self._regimen_LA, self._regimen_ST, self._regimen_LA, self._regimen_PREPLIB)
+Régimen preparatorio para la liberación: {}'''.format(self._regimen_LA, self._regimen_ST, self._regimen_LA, self._regimen_PREPLIB)
 
 class SituacionProcesal():
     def __init__(self, _regimenNormativo:RegimenNormativoAplicable, _getInputPreguntas:bool=True):

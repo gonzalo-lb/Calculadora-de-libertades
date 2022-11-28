@@ -277,9 +277,13 @@ class ComputoPenaTemporal(Computo):
         self._CalcularVencimientoYCaducidadDePena()
         self._CalcularLibertadCondicional()
         self._CalcularSalidasTransitorias()
-
-        # Arma los string con el output
+        
         # Imprime los resultados
+        self._ImprimirSTRINGGeneral()
+        self._regimen_normativo._Imprimir()
+        self._ImprimirSTRINGVencimientoYCaducidadDePena()
+        self._ImprimirSTRINGLibertadCondicional()
+        self._ImprimirSTRINGSalidasTransitorias()
     
     def _ControlarParametros(self):
         if self._fecha_del_hecho == 'NULL':
@@ -306,7 +310,7 @@ class ComputoPenaTemporal(Computo):
         _caducidad_de_pena = _vencimiento_de_pena + relativedelta(years=10)
 
         self._vencimiento_de_pena = _vencimiento_de_pena
-        self._caducidad_de_pena = _caducidad_de_pena
+        self._caducidad_de_pena = _caducidad_de_pena        
     
     def _CalcularLibertadCondicional(self):
 
@@ -340,7 +344,7 @@ class ComputoPenaTemporal(Computo):
         # Si aplica la ley 27.375, calcula además el requisito de calificación, y el integral
         if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value:
             self._CalcularLibertadCondicional_RequisitoCalificacion()
-            self._CalcularLibertadCondicional_ComputoIntegral()
+            self._CalcularLibertadCondicional_ComputoIntegral()        
     
     def _CalcularLibertadCondicional_RequisitoCalificacion(self):
 
@@ -486,9 +490,7 @@ class ComputoPenaTemporal(Computo):
                 # Calcula cuándo debe obtenerse la calificación "Bueno" para lograr los 2/3
                 self._CalcularSalidasTransitorias_RequisitoCalificacionBUENO()
 
-                self._salidas_transitorias_27375_SITUACION = ST_COMPUTO_27375_SITUACION.HAY_COMPUTO.value   
-
-        self._ImprimirSTRINGSalidasTransitorias()         
+                self._salidas_transitorias_27375_SITUACION = ST_COMPUTO_27375_SITUACION.HAY_COMPUTO.value
     
     def _CalcularSalidasTransitorias_RequisitoCalificacionBUENO(self):
 
@@ -573,26 +575,66 @@ class ComputoPenaTemporal(Computo):
             self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR = self._fecha_calificacion_EJEMPLAR
             self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR += relativedelta(years=1)
 
-    def _ArmarSTRINGGeneral(self):
-        pass
-    
-    def _ArmarSTRINGVencimientoYCaducidadDePena(self):        
-        self._STRING_vencimiento_de_pena = f'Vencimiento de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}\n'\
-                f'Caducidad de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_pena)}'
-    
-    def _ArmarSTRINGLibertadCondicional(self):        
-        # self._libertad_condicional_STRING = f'Libertad condicional: {Datetime_date_enFormatoXX_XX_XXXX(TR_computo_libertad_condicional)}'        
-
-        # if _montoDePena.reincidencia:
-        #     advertencia = '\nADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque la pena incluye reincidencia.'
-        #     self._libertad_condicional_STRING += advertencia
+    def _ImprimirSTRINGGeneral(self):
+        print('')
+        print('DATOS INGRESADOS')
+        print('----------------')
+        print(f' - Fecha del hecho: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_del_hecho)}')
+        print(f' - Fecha de detención: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_detencion)}')
+        if self._monto_de_pena.perpetua:
+            print(' - Es una pena perpetua.')
+        else:
+            print(f' - La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s).')
+        if self._monto_de_pena.reincidencia:
+            print('    - Es reincidente.')
+        if self._monto_de_pena.ejecucionCondicional:
+            print('    - Es de ejecución condicional.')
+            print(f'    - El plazo de control es de {self._monto_de_pena.plazoControl_años} año(s), {self._monto_de_pena.plazoControl_meses} mes(es) y {self._monto_de_pena.plazoControl_dias} día(s).')
+        if self._monto_de_pena.reclusionPorTiempoIndeterminado:
+            print('    - Hay accesoria de reclusión por tiempo indeterminado.')
+        if self._monto_de_pena.delitosExcluidosLey25892:
+            print('    - La condena es por delitos enumerados en la ley 25.892.')
+        if self._monto_de_pena.delitosExcluidosLey25948:
+            print('    - La condena es por delitos enumerados en la ley 25.948.')
+        if self._monto_de_pena.delitosExcluidosLey27375:
+            print('    - La condena es por delitos enumerados en la ley 27.375.')
         
-        # if self._regimenNormativoAplicable._regimen_LC == LC_REGIMENES._Ley_27375.value and _montoDePena.delitosExcluidosLey27375:
-        #     advertencia = '\nADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque se condenó por alguno de los delitos excluídos, por art. 14 CP (según reforma de la ley 27.375).'
-        #     self._libertad_condicional_STRING += advertencia
-
-        # SI SITUACIÓN ES 1 O 2, HAY QUE AVISAR QUE NO SE PUEDE CALCULAR EL REQUISITO INTEGRAL
-        pass
+        # self._otras_detenciones = otrasDetenciones
+        # self._estimulo_educativo = estimuloEducativo
+        # self._fecha_inicio_ejecucion = fechaInicioEjecucion
+        # self._fecha_calificacion_BUENO = fechaCalificacionBUENO
+        # self._fecha_calificacion_EJEMPLAR = fechaCalificacionEJEMPLAR
+        # self._fecha_ingreso_a_periodo_de_prueba = fechaIngresoPeriodoDePrueba
+        # self._vuelve_a_restar_otras_detenciones_y_140_en_ST= vuelveARestarOtrasDetencionesyAplicar140enST
+    
+    def _ImprimirSTRINGVencimientoYCaducidadDePena(self):
+        print('')
+        print('VENCIMIENTO Y CADUCIDAD')
+        print('-----------------------')
+        print(f' - Vencimiento de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
+        print(f' - Caducidad de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_pena)}')
+    
+    def _ImprimirSTRINGLibertadCondicional(self):        
+        print('')
+        print('LIBERTAD CONDICIONAL')
+        print('--------------------')
+        print(f' - La libertad condicional se obtiene a los {self._libertad_condicional_REQUISITO_TEMPORAL.años} año(s), {self._libertad_condicional_REQUISITO_TEMPORAL.meses} mes(es) y {self._libertad_condicional_REQUISITO_TEMPORAL.dias} día(s).')
+        print(f' - El requisito temporal para acceder a la libertad condicional se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._libertad_condicional_COMPUTO)}')        
+        
+        # Imprime advertencias, si corresponde
+        if self._monto_de_pena.reincidencia:
+            print('ADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque la pena incluye reincidencia.')            
+        
+        if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value and self._monto_de_pena.delitosExcluidosLey27375:
+            print('ADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque se condenó por alguno de los delitos excluídos, por art. 14 CP (según reforma de la ley 27.375).')            
+        
+        if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value:
+            if self._libertad_condicional_REQUISITO_CALIF_SITUACION == 1:
+                print('Como no se cuenta con la fecha en la que se inició la ejecución de la pena, no es posible calcular el requisito temporal de calificación (art. 28, ley 24.660).')
+            if self._libertad_condicional_REQUISITO_CALIF_SITUACION == 2:
+                print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}, para acceder a la libertad condicional en la fecha indicada, la fecha límite para obtener el requisito de calificación "bueno" es {Datetime_date_enFormatoXX_XX_XXXX(self._libertad_condicional_REQUISITO_CALIF_BUENO)}.')
+            if self._libertad_condicional_REQUISITO_CALIF_SITUACION == 3:
+                print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {self._libertad_condicional_REQUISITO_CALIF_BUENO}.')
 
     def _ImprimirSTRINGSalidasTransitorias(self):
         print('')
@@ -1418,21 +1460,21 @@ def _DEBUG_PENA_TEMPORAL():
     fechaInicioEjecucion=fechaInicioEjecucion,
     fechaCalificacionBUENO=fechaCalificacionBUENO,
     fechaIngresoPeriodoDePrueba=fechaIngresoPeriodoDePrueba)
-    print('')
-    print(f'Fecha del hecho: {Datetime_date_enFormatoXX_XX_XXXX(computo._fecha_del_hecho)}')
-    print(f'Fecha de detención: {Datetime_date_enFormatoXX_XX_XXXX(computo._fecha_de_detencion)}')
-    print(f'Monto de pena: {Datetime_date_enFormatoXX_XX_XXXX(computo._monto_de_pena)}')
-    print('')
-    print(computo._regimen_normativo)
-    print(f'Vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(computo._vencimiento_de_pena)}')
-    print(f'Caducidad de pena: {Datetime_date_enFormatoXX_XX_XXXX(computo._caducidad_de_pena)}')
-    print('')
-    print(f'Requisito temporal Libertad Condicional: {Datetime_date_enFormatoXX_XX_XXXX(computo._libertad_condicional_REQUISITO_TEMPORAL)}')
-    print(f'Libertad condicional (cómputo): {Datetime_date_enFormatoXX_XX_XXXX(computo._libertad_condicional_COMPUTO)}')
-    print(f'Libertad condicional (fecha requisito calif. BUENO): {Datetime_date_enFormatoXX_XX_XXXX(computo._libertad_condicional_REQUISITO_CALIF_BUENO)}')
-    print(f'Libertad condicional (fecha requisito calif. Situacion): {computo._libertad_condicional_REQUISITO_CALIF_SITUACION}')
-    print(f'Libertad condicional (cómputo integral): {Datetime_date_enFormatoXX_XX_XXXX(computo._libertad_condicional_COMPUTO_INTEGRAL)}')    
-    print('')
+    # print('')
+    # print(f'Fecha del hecho: {Datetime_date_enFormatoXX_XX_XXXX(computo._fecha_del_hecho)}')
+    # print(f'Fecha de detención: {Datetime_date_enFormatoXX_XX_XXXX(computo._fecha_de_detencion)}')
+    # print(f'Monto de pena: {Datetime_date_enFormatoXX_XX_XXXX(computo._monto_de_pena)}')
+    # print('')
+    # print(computo._regimen_normativo)
+    # print(f'Vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(computo._vencimiento_de_pena)}')
+    # print(f'Caducidad de pena: {Datetime_date_enFormatoXX_XX_XXXX(computo._caducidad_de_pena)}')
+    # print('')
+    # print(f'Requisito temporal Libertad Condicional: {Datetime_date_enFormatoXX_XX_XXXX(computo._libertad_condicional_REQUISITO_TEMPORAL)}')
+    # print(f'Libertad condicional (cómputo): {Datetime_date_enFormatoXX_XX_XXXX(computo._libertad_condicional_COMPUTO)}')
+    # print(f'Libertad condicional (fecha requisito calif. BUENO): {Datetime_date_enFormatoXX_XX_XXXX(computo._libertad_condicional_REQUISITO_CALIF_BUENO)}')
+    # print(f'Libertad condicional (fecha requisito calif. Situacion): {computo._libertad_condicional_REQUISITO_CALIF_SITUACION}')
+    # print(f'Libertad condicional (cómputo integral): {Datetime_date_enFormatoXX_XX_XXXX(computo._libertad_condicional_COMPUTO_INTEGRAL)}')    
+    # print('')
     # print(f'Requisito temporal Salidas Transitorias: {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_REQUISITO_TEMPORAL)}')
     # print(f'Salidas transitorias (cómputo): {Datetime_date_enFormatoXX_XX_XXXX(computo._salidas_transitorias_COMPUTO)}')
     # print(f'Situación del cómputo por ley 27.375: {computo._salidas_transitorias_27375_SITUACION} ({ST_COMPUTO_27375_SITUACION(computo._salidas_transitorias_27375_SITUACION)})')
