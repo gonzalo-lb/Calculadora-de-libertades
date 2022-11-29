@@ -1,24 +1,21 @@
 Lo que hice ahora: 
- - Hice el print de la libertad condicional y del vencimiento de pena
- - Hice parte del print de los datos generales.
+ - Terminé el print de los datos generales.
+ - Terminé el print de las salidas transitorias.
+ - Terminé las salidas transitorias.
+ - Imprimir advertencias en ST y LA por delitos excluídos.
 
 Con qué seguir:
- - Terminar el print de los datos generales
- - Armar las otras situaciones de las ST por ley 27375, con el print incluido.
- - Probar las cuentas cuando hay fecha de ingreso a periodo de prueba; Calculos de requisitos de calificación para salidas transitorias (ley 27.375)
+ - Régimen de liberación anticipada (ley 27.375)
+ - Unidades fijas
+ - Interfaz para el usuario 
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
  - Terminar vencimiento y caducidad para el resto de las penas.
- - Reformar los cálculos de vencimiento y otros para la reclusión por tiempo indeterminado
- - Para los casos de LC en el régimen de la ley 27.375, habría que preguntar cuándo comenzó a ejecutar pena y cuando alcanzó la calificación "BUENO"
- - Implementar cálculos para casos de reclusión por tiempo indeterminado
- - Implementar cálculos para los requisitos de calificación en el régimen de la ley 27.375
- - Seguir desde def _ImprimirResultados en la parte que arma la libertad condicional [CUANDO ESTÉ TERMINADA LA PARTE DE LOS CÁLCULOS] 
+ - Reformar los cálculos de vencimiento y otros para la reclusión por tiempo indeterminado 
+ - Implementar cálculos para casos de reclusión por tiempo indeterminado  
  - Integrar las consultas a la devolución que se hace con el cómputo
- - EN ST y LC, agregar un else para los casos de que no sean ninguno de los regímenes (no debería suceder pero...) 
- - Cuando indique los regímenes de detención, que aclara las fechas de vigencia de las leyes que aplica
- - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación
- - Controlar cuando se restan detenciones y ya se está en condiciones de salir (podría comparar con la fecha de la pc y avisar que se está en condiciones de salir, o poner el texto de la consola de otro color)
+ - EN ST y LC, agregar un else para los casos de que no sean ninguno de los regímenes (no debería suceder pero...)  
+ - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación 
 
 Funcionalidad a implementar: 
  - Nuevo cómputo para libertad condicional revocada (no se contabiliza el tiempo que se estuvo en libertad) 
@@ -29,6 +26,8 @@ Funcionalidad a implementar:
  - Monto de las Unidades Fijas
 
  Hecho:
+ - Hice el print de la libertad condicional y del vencimiento de pena
+ - Hice parte del print de los datos generales. Falta terminar.
  - Armé las ST normales, y las de la ley 27375 (sin fecha de ingreso al periodo de prueba) completas, con la función que imprime incluida.
  - Armé función que compara fechas y devuelve la mayor
  - Hice el JSON con la información de las Unidades Fijas
