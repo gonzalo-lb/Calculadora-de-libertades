@@ -1,10 +1,10 @@
 Lo que hice ahora: 
- - Terminé el print de los datos generales.
- - Terminé el print de las salidas transitorias.
- - Terminé las salidas transitorias.
- - Imprimir advertencias en ST y LA por delitos excluídos.
+ - Hice parte del input del usuario. No lo terminé.
+ - Agregué información al Readme
 
 Con qué seguir:
+ - Terminar Preguntas_Input()
+      Seguir desde PREGUNTAR POR REQUISITO DE CALIFICACIÓN PARA ST (hacerlo igual que el anterior en el requisito de Calificación "BUENO")
  - Régimen de liberación anticipada (ley 27.375)
  - Unidades fijas
  - Interfaz para el usuario 
@@ -26,6 +26,11 @@ Funcionalidad a implementar:
  - Monto de las Unidades Fijas
 
  Hecho:
+ - Hice el régimen preparatorio para la libertad, y el print.
+ - Terminé el print de los datos generales.
+ - Terminé el print de las salidas transitorias.
+ - Terminé las salidas transitorias.
+ - Imprimir advertencias en ST y LA por delitos excluídos.
  - Hice el print de la libertad condicional y del vencimiento de pena
  - Hice parte del print de los datos generales. Falta terminar.
  - Armé las ST normales, y las de la ley 27375 (sin fecha de ingreso al periodo de prueba) completas, con la función que imprime incluida.

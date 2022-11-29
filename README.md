@@ -23,5 +23,10 @@ En ese caso determina la fecha en la que se obtendrán los 2/3 con ese requisito
 El cómputo integral es el mayor de esos dos valores.<br/>
 Si falta la fecha del requisito temporal de calificación, no se puede calcular este cómputo.
 
+## Régimen preparatorio para la liberación
+> Es la fecha de vencimiento, menos un año (resta aritmética).
+> No resta otras detenciones porque ya fueron restadas para calcular el vencimiento de pena.
+> Realiza la aplicación del estímulo educativo.
+
 ## Cálculos generales que se realizan en todos los casos
 > Siempre que se suma una fecha, al resultado final se le resta un día

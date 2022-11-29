@@ -808,7 +808,7 @@ class ComputoDePena_VIEJO():
     fechaFirmezaDeSentencia:datetime.date='NULL',
     fechaComienzoEjecucion:datetime.date='NULL',
     otrosTiemposDeDetencion='NULL',
-    situacionProcesal:SituacionProcesal=None,
+    situacionProcesal:Preguntas_Input=None,
     esComputoPorLCRevocada:bool=False,
     esComputoPorSTRevocada:bool=False,
     esComputoPorLARevocada:bool=False,

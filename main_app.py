@@ -9,5 +9,5 @@ if __name__ == '__main__':
     RNA = RegimenNormativoAplicable(fechaDelHecho)    
     
     fechaDeDetencionInput = GetConsoleInput_Fecha('Ingresar fecha de detención en formato día/mes/año (XX/XX/XXXX): ')
-    montoDePena = GetConsoleInput_MontoDePena()
+    montoDePena = GetConsoleInput_MontoDePena_temporal()
     otrasDetenciones = GetConsoleInput_OtrosTiemposDeDetencion()    

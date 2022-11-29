@@ -265,6 +265,8 @@ class ComputoPenaTemporal(Computo):
 
         self._libertad_asistida_COMPUTO = 'NULL'
 
+        self._regimen_preparacion_libertad_COMPUTO = 'NULL'
+
         # VARIABLES OUTPUT (STRING)
         self._STRING_vencimiento_de_pena = ''
         self._STRING_caducidad_de_pena = ''
@@ -280,6 +282,7 @@ class ComputoPenaTemporal(Computo):
         self._CalcularLibertadCondicional()
         self._CalcularSalidasTransitorias()
         self._CalcularLibertadAsistida()
+        self._CalcularRegimenPreparacionLibertad()
         
         # Imprime los resultados
         self._ImprimirSTRINGGeneral()
@@ -288,6 +291,7 @@ class ComputoPenaTemporal(Computo):
         self._ImprimirSTRINGLibertadCondicional()
         self._ImprimirSTRINGSalidasTransitorias()
         self._ImprimirSTRINGLibertadAsistida()
+        self._ImprimirSTRINGRegimenPreparatorioParaLaLiberacion()
     
     def _ControlarParametros(self):
         if self._fecha_del_hecho == 'NULL':
@@ -607,6 +611,25 @@ class ComputoPenaTemporal(Computo):
 
         # Guarda el dato en la variable correspondiente
         self._libertad_asistida_COMPUTO = _computo_libertad_asistida
+    
+    def _CalcularRegimenPreparacionLibertad(self):
+        
+        # Utiliza las siguientes variables:
+        # - _vencimientoDePena                        
+        
+        if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._Ley_27375.value:
+
+            _computo_regPrepLib = self._vencimiento_de_pena
+            _computo_regPrepLib += relativedelta(years=-1)            
+        
+            # No se resta acá las otras detenciones porque ya fueron restadas en el vencimiento de pena
+
+            print(f'DEBUG: Régimen de preparación para la libertad sin aplicar estímulo educativo = {Datetime_date_enFormatoXX_XX_XXXX(_computo_regPrepLib)}')
+            # Aplica el estímulo educativo, si hay
+            _computo_regPrepLib = self._AplicarEstimuloEducativo(_computo_regPrepLib, self._estimulo_educativo)        
+
+            # Guarda el dato en la variable correspondiente
+            self._regimen_preparacion_libertad_COMPUTO = _computo_regPrepLib
 
     def _ImprimirSTRINGGeneral(self):
         print('')
@@ -797,8 +820,12 @@ class ComputoPenaTemporal(Computo):
         if self._regimen_normativo._regimen_LA == LA_REGIMENES._Ley_27375.value and self._monto_de_pena.delitosExcluidosLey27375:
             print('ADVERTENCIA: No aplicaría el instituto de la Libertad Asistida porque se condenó por alguno de los delitos excluídos, por art. 56 bis, ley 24.660 (según reforma de la ley 27.375).')
 
-    def _ArmarSTRINGRegimenPreparatorioParaLaLiberacion(self):
-        pass
+    def _ImprimirSTRINGRegimenPreparatorioParaLaLiberacion(self):
+        if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._Ley_27375.value:
+            print('')
+            print('RÉGIMEN PREPARATORIO PARA LA LIBERTAD')
+            print('-------------------------------------')
+            print(f' - El régimen preparatorio para la libertad comienza el día {Datetime_date_enFormatoXX_XX_XXXX(self._regimen_preparacion_libertad_COMPUTO)}.')
 
 def _DEBUG_PENA_TEMPORAL():    
     fechaDelHecho = datetime.date(2018, 5, 26)
