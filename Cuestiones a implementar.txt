@@ -1,6 +1,5 @@
 Lo que hice ahora: 
- - Hice parte del input del usuario. No lo terminé.
- - Agregué información al Readme
+ - Continué con el input del usuario. No lo terminé.
 
 Con qué seguir:
  - Terminar Preguntas_Input()
@@ -26,6 +25,7 @@ Funcionalidad a implementar:
  - Monto de las Unidades Fijas
 
  Hecho:
+ - Agregué información al Readme
  - Hice el régimen preparatorio para la libertad, y el print.
  - Terminé el print de los datos generales.
  - Terminé el print de las salidas transitorias.

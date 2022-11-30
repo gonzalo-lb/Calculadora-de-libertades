@@ -179,15 +179,22 @@ class Preguntas_Input():
         self._estimulo_educativo = 'NULL'
 
         self._fecha_inicio_ejecucion = 'NULL'
+        self._esta_ejecutando_pena = False
+        self._fecha_ingreso_periodo_de_prueba = 'NULL'
         self._fecha_calificacion_BUENO = 'NULL'
-        self._fecha_calificacion_EJEMPLAR = 'NULL'
+        self._fecha_calificacion_EJEMPLAR = 'NULL'        
 
         self.GetConsoleInput_PreguntasSobreSituacionProcesal()
 
     def GetConsoleInput_PreguntasSobreSituacionProcesal(self):                  
 
+        print(Separadores._separadorComun)
         self._regimen_normativo = RegimenNormativoAplicable(GetConsoleInput_Fecha('Ingresar la fecha del hecho (XX/XX/XXXX): '))
+        
+        print(Separadores._separadorComun)
         self._fecha_de_detencion = GetConsoleInput_Fecha('Ingresar fecha de detención (XX/XX/XXXX): ')        
+        
+        print(Separadores._separadorComun)
         self._monto_de_pena = GetConsoleInput_MontoDePena_temporal()
 
         # PREGUNTAR SI ES REINCIDENTE        
@@ -295,47 +302,70 @@ class Preguntas_Input():
                     break
                 print('ERROR: Solo se puede responder con "s" o "n"')
 
-        # PREGUNTAR SI TIENE CONCEPTO BUENO DURANTE 2/3 DE LA EJECUCIÓN
-        if self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_2_3ConCalifBUENO_KEY):
+        # PREGUNTA FECHA DE INICIO DE EJECUCIÓN DE PENA
+        if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_27375.value:
             print(Separadores._separadorComun)
             while True:                
-                user_input = input('¿Alcanzó conducta y concepto "BUENO"? (S/N): ')
+                user_input = input('¿Se encuentra ejecutando pena, o en REAV? (S/N): ')
                 if user_input == "N" or user_input == "n" or user_input == '':
-                    self._fecha_calificacion_BUENO = 'NULL'
+                    self._fecha_inicio_ejecucion = 'NULL'
+                    self._esta_ejecutando_pena = False
                     break
                 if user_input == "S" or user_input == "s":
-                    self._fecha_calificacion_BUENO = GetConsoleInput_Fecha('Ingresar fecha en la que se alcanzó conducta y concepto "BUENO": ', ENTER_devuelve_NULL=True)
-                    if self._fecha_calificacion_BUENO == 'NULL':
+                    self._fecha_inicio_ejecucion = GetConsoleInput_Fecha('Ingresar fecha en la que comenzó la ejecución de pena (XX/XX/XXXX): ', ENTER_devuelve_NULL=True)
+                    self._esta_ejecutando_pena = True
+                    if self._fecha_inicio_ejecucion == 'NULL':
+                        self._esta_ejecutando_pena = False
                         print('Como no se ingresó una fecha válida, no se utilizará para el cómputo esta variable.')
                     break
                 print('ERROR: Solo se puede responder con "s" o "n"')
+        
+        # Si está ejecutando pena, hace las otras preguntas
+        if self._esta_ejecutando_pena == True:
+            # PREGUNTAR SI ESTA EN PERIODO DE PRUEBA, Y DESDE CUÁNDO
+            if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siEstaPeriodoDePruebaYDesdeCuando):
+                print(Separadores._separadorComun)
+                while True:                
+                    user_input = input('¿Ingresó al periodo de prueba? (S/N): ')
+                    if user_input == "N" or user_input == "n" or user_input == '':
+                        self._fecha_ingreso_periodo_de_prueba = 'NULL'
+                        break
+                    if user_input == "S" or user_input == "s":
+                        self._fecha_ingreso_periodo_de_prueba = GetConsoleInput_Fecha('Ingresar fecha en la que se ingresó al periodo de prueba (XX/XX/XXXX): ', ENTER_devuelve_NULL=True)
+                        if self._fecha_ingreso_periodo_de_prueba == 'NULL':
+                            print('Como no se ingresó una fecha válida, no se utilizará para el cómputo esta variable.')
+                        break
+                    print('ERROR: Solo se puede responder con "s" o "n"')
 
-        # PREGUNTAR POR REQUISITO DE CALIFICACIÓN PARA ST
-        if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_requisitoDeCalificacion):
-            print(Separadores._separadorComun)
-            while True:                
-                user_input = input('¿Logró alcanzar conducta "EJEMPLAR" (o el grado máximo de ser alcanzado durante el tiempo de ejecución) durante el último año de cumplimiento de pena? (S/N): ')
-                if user_input == "N" or user_input == "n" or user_input == '':
-                    self._RequisitoDeCalificacionDuranteElUltimoAño_ST = False
-                    break
-                if user_input == "S" or user_input == "s":
-                    self._RequisitoDeCalificacionDuranteElUltimoAño_ST = True
-                    break
-                print('ERROR: Solo se puede responder con "s" o "n"')
+            # PREGUNTAR SI TIENE CONCEPTO BUENO DURANTE 2/3 DE LA EJECUCIÓN
+            if self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_2_3ConCalifBUENO_KEY):
+                print(Separadores._separadorComun)
+                while True:                
+                    user_input = input('¿Alcanzó conducta y concepto "BUENO"? (S/N): ')
+                    if user_input == "N" or user_input == "n" or user_input == '':
+                        self._fecha_calificacion_BUENO = 'NULL'
+                        break
+                    if user_input == "S" or user_input == "s":
+                        self._fecha_calificacion_BUENO = GetConsoleInput_Fecha('Ingresar fecha en la que se alcanzó conducta y concepto "BUENO": ', ENTER_devuelve_NULL=True)
+                        if self._fecha_calificacion_BUENO == 'NULL':
+                            print('Como no se ingresó una fecha válida, no se utilizará para el cómputo esta variable.')
+                        break
+                    print('ERROR: Solo se puede responder con "s" o "n"')
 
-        # PREGUNTAR SI ESTA EN PERIODO DE PRUEBA, Y DESDE CUÁNDO
-        if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siEstaPeriodoDePruebaYDesdeCuando):
-            print(Separadores._separadorComun)
-            while True:                
-                user_input = input('¿Logró alcanzar el periodo de prueba? (S/N): ')
-                if user_input == "N" or user_input == "n" or user_input == '':
-                    self._EstaEnPeriodoDePrueba = False
-                    break
-                if user_input == "S" or user_input == "s":
-                    self._EstaEnPeriodoDePrueba = True
-                    self._EstaEnPeriodoDePruebaDesde = GetConsoleInput_Fecha('¿Desde cuándo? (Ingresar fecha en formato XX/XX/XXXX: ')
-                    break
-                print('ERROR: Solo se puede responder con "s" o "n"')
+            # PREGUNTAR POR REQUISITO DE CALIFICACIÓN PARA ST
+            if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_requisitoDeCalificacion):
+                print(Separadores._separadorComun)
+                while True:                
+                    user_input = input('¿Logró alcanzar conducta "EJEMPLAR" (S/N): ')
+                    if user_input == "N" or user_input == "n" or user_input == '':
+                        self._fecha_calificacion_EJEMPLAR = 'NULL'
+                        break
+                    if user_input == "S" or user_input == "s":
+                        self._fecha_calificacion_EJEMPLAR = GetConsoleInput_Fecha('Ingresar fecha en la que se alcanzó conducta "EJEMPLAR": ', ENTER_devuelve_NULL=True)
+                        if self._fecha_calificacion_EJEMPLAR == 'NULL':
+                            print('Como no se ingresó una fecha válida, no se utilizará para el cómputo esta variable.')
+                        break
+                    print('ERROR: Solo se puede responder con "s" o "n"')        
 
 class Separadores():
     _separadorComun = ''
@@ -410,7 +440,7 @@ def GetConsoleInput_Fecha(mensaje_para_el_usuario="Ingrese fecha en formato año
             fechaDeDetencionInput_dia = fechaDeDetencionInput[0:2]
             fechaDeDetencionInput_mes = fechaDeDetencionInput[3:5]
             fechaDeDetencionInput_año = fechaDeDetencionInput[6:10]
-            if fechaDeDetencionInput[2] != "/" or fechaDeDetencionInput[5]:
+            if fechaDeDetencionInput[2] != "/" or fechaDeDetencionInput[5] != "/":
                 raise Exception
             fechaDeDetencionInput = datetime.date(int(fechaDeDetencionInput_año), int(fechaDeDetencionInput_mes), int(fechaDeDetencionInput_dia))        
             return fechaDeDetencionInput
@@ -423,7 +453,7 @@ def GetConsoleInput_Fecha(mensaje_para_el_usuario="Ingrese fecha en formato año
                 fechaDeDetencionInput_dia = fechaDeDetencionInput[0:2]
                 fechaDeDetencionInput_mes = fechaDeDetencionInput[3:5]
                 fechaDeDetencionInput_año = fechaDeDetencionInput[6:10]
-                if fechaDeDetencionInput[2] != "/" or fechaDeDetencionInput[5]:
+                if fechaDeDetencionInput[2] != "/" or fechaDeDetencionInput[5] != "/":                    
                     raise Exception
                 fechaDeDetencionInput = datetime.date(int(fechaDeDetencionInput_año), int(fechaDeDetencionInput_mes), int(fechaDeDetencionInput_dia))        
                 return fechaDeDetencionInput
@@ -493,9 +523,7 @@ def GetConsoleInput_OtrosTiemposDeDetencion():
     OTDD = []
     seguir_preguntando = True
     init_query = input('Ingresar tiempos de detención a computar? (S/N): ')
-    if init_query == "N" or init_query == "n":
-        return "NULL"
-    else:
+    if init_query == "S" or init_query == "s":
         while seguir_preguntando:
             f_det = ''
             f_lib = ''
@@ -508,7 +536,9 @@ def GetConsoleInput_OtrosTiemposDeDetencion():
                 seguir_preguntando = True
             else:
                 seguir_preguntando = False        
-        return OTDD   
+        return OTDD         
+    else:
+        return "NULL"
 
 def GetConsoleInput_EstimuloEducativo():
     estimulo = TiempoEn_Años_Meses_Dias()
@@ -534,6 +564,5 @@ def RestarOtrasDetenciones(fecha_de_requisito_temporal:datetime.date, otras_dete
             toreturn += relativedelta(years=-otra_det._tiempoDeDetencion.años)
         return toreturn
 
-if __name__ == '__main__':
-    regnorm = RegimenNormativoAplicable(datetime.date(2018, 1, 20))
-    x = Preguntas_Input(regnorm)
+if __name__ == '__main__':    
+    x = Preguntas_Input()
