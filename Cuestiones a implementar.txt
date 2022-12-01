@@ -1,6 +1,5 @@
 Lo que hice ahora: 
- - Terminé el user input y lo puse en la Main App. Funciona.
- - Lo estuve probando y el Preguntas_Input() falla con las key cuando se fija si tiene que preguntar. Solucionarlo.
+ - Estoy reformando la función de input de fecha, para que acepte formato de pocos dígitos.
 
 Con qué seguir: 
  - Unidades fijas
@@ -23,6 +22,8 @@ Funcionalidad a implementar:
  - Monto de las Unidades Fijas
 
  Hecho:
+ - Terminé el user input y lo puse en la Main App. Funciona.
+ - Lo estuve probando y el Preguntas_Input() falla con las key cuando se fija si tiene que preguntar. Solucionarlo.
  - Agregué información al Readme
  - Hice el régimen preparatorio para la libertad, y el print.
  - Terminé el print de los datos generales.
