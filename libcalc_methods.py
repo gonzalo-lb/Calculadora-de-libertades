@@ -103,60 +103,60 @@ class RegimenNormativoAplicable():
         # CARGA LOS ARCHIVOS JSON EN VARIABLES
 
         with open('Regimenes/libertadCondicional.json') as reg_LC:
-            self.__JSON_LC = json.load(reg_LC)
+            self._JSON_LC = json.load(reg_LC)
 
         with open('Regimenes/salidasTransitorias.json') as reg_ST:
-            self.__JSON_ST = json.load(reg_ST)
+            self._JSON_ST = json.load(reg_ST)
         
         with open('Regimenes/libertadAsistida.json') as reg_LA:
-            self.__JSON_LA = json.load(reg_LA)
+            self._JSON_LA = json.load(reg_LA)
         
         with open('Regimenes/regimenPrepLib.json') as reg_PrepLib:
-            self.__JSON_PREPLIB = json.load(reg_PrepLib)
+            self._JSON_PREPLIB = json.load(reg_PrepLib)
 
         # DETERMINA RÉGIMEN DE LIBERTAD CONDICIONAL
 
         self._regimen_LC = 'No aplica'
-        for key in self.__JSON_LC:            
-            fecha_implementacion = datetime.date(self.__JSON_LC[key][LC_KEYS._fechaImplementacion_YEAR_KEY.value], self.__JSON_LC[key][LC_KEYS._fechaImplementacion_MONTH_KEY.value], self.__JSON_LC[key][LC_KEYS._fechaImplementacion_DAY_KEY.value])
+        for key in self._JSON_LC:            
+            fecha_implementacion = datetime.date(self._JSON_LC[key][LC_KEYS._fechaImplementacion_YEAR_KEY.value], self._JSON_LC[key][LC_KEYS._fechaImplementacion_MONTH_KEY.value], self._JSON_LC[key][LC_KEYS._fechaImplementacion_DAY_KEY.value])
             if FechaA_es_Mayor_O_Igual_Que_FechaB(_fechaDelHecho, fecha_implementacion):
                 self._regimen_LC = key        
 
         # DETERMINA RÉGIMEN DE SALIDAS TRANSITORIAS
 
         self._regimen_ST = 'No aplica'
-        for key in self.__JSON_ST:            
-            fecha_implementacion = datetime.date(self.__JSON_ST[key][ST_KEYS._fechaImplementacion_YEAR_KEY.value], self.__JSON_ST[key][ST_KEYS._fechaImplementacion_MONTH_KEY.value], self.__JSON_ST[key][ST_KEYS._fechaImplementacion_DAY_KEY.value])
+        for key in self._JSON_ST:            
+            fecha_implementacion = datetime.date(self._JSON_ST[key][ST_KEYS._fechaImplementacion_YEAR_KEY.value], self._JSON_ST[key][ST_KEYS._fechaImplementacion_MONTH_KEY.value], self._JSON_ST[key][ST_KEYS._fechaImplementacion_DAY_KEY.value])
             if FechaA_es_Mayor_O_Igual_Que_FechaB(_fechaDelHecho, fecha_implementacion):
                 self._regimen_ST = key        
 
         # DETERMINA RÉGIMEN DE LIBERTAD ASISTIDA
 
         self._regimen_LA = 'No aplica'
-        for key in self.__JSON_LA:            
-            fecha_implementacion = datetime.date(self.__JSON_LA[key][LA_KEYS._fechaImplementacion_YEAR_KEY.value], self.__JSON_LA[key][LA_KEYS._fechaImplementacion_MONTH_KEY.value], self.__JSON_LA[key][LA_KEYS._fechaImplementacion_DAY_KEY.value])
+        for key in self._JSON_LA:            
+            fecha_implementacion = datetime.date(self._JSON_LA[key][LA_KEYS._fechaImplementacion_YEAR_KEY.value], self._JSON_LA[key][LA_KEYS._fechaImplementacion_MONTH_KEY.value], self._JSON_LA[key][LA_KEYS._fechaImplementacion_DAY_KEY.value])
             if FechaA_es_Mayor_O_Igual_Que_FechaB(_fechaDelHecho, fecha_implementacion):
                 self._regimen_LA = key
         
         # DETERMINA RÉGIMEN DE PREPARACIÓN PARA LA LIBERTAD
 
         self._regimen_PREPLIB = 'No aplica'
-        for key in self.__JSON_PREPLIB:            
-            fecha_implementacion = datetime.date(self.__JSON_PREPLIB[key][REGPREPLIB_KEYS._fechaImplementacion_YEAR_KEY.value], self.__JSON_PREPLIB[key][REGPREPLIB_KEYS._fechaImplementacion_MONTH_KEY.value], self.__JSON_PREPLIB[key][REGPREPLIB_KEYS._fechaImplementacion_DAY_KEY.value])
+        for key in self._JSON_PREPLIB:            
+            fecha_implementacion = datetime.date(self._JSON_PREPLIB[key][REGPREPLIB_KEYS._fechaImplementacion_YEAR_KEY.value], self._JSON_PREPLIB[key][REGPREPLIB_KEYS._fechaImplementacion_MONTH_KEY.value], self._JSON_PREPLIB[key][REGPREPLIB_KEYS._fechaImplementacion_DAY_KEY.value])
             if FechaA_es_Mayor_O_Igual_Que_FechaB(_fechaDelHecho, fecha_implementacion):
                 self._regimen_PREPLIB = key    
     
     def LIBERTAD_CONDICIONAL(self, ask:LC_KEYS):
-        return self.__JSON_LC[self._regimen_LA][ask.value]
+        return self._JSON_LC[self._regimen_LC][ask.value]
     
     def SALIDAS_TRANSITORIAS(self, ask:ST_KEYS):
-        return self.__JSON_ST[self._regimen_ST][ask.value]
+        return self._JSON_ST[self._regimen_ST][ask.value]
     
     def LIBERTAD_ASISTIDA(self, ask:LA_KEYS):
-        return self.__JSON_LA[self._regimen_LA][ask.value]
+        return self._JSON_LA[self._regimen_LA][ask.value]
     
     def REGIMEN_PREPARACION_LIBERTAD(self, ask:REGPREPLIB_KEYS):
-        return self.__JSON_PREPLIB[self._regimen_PREPLIB][ask.value]
+        return self._JSON_PREPLIB[self._regimen_PREPLIB][ask.value]
     
     def _Imprimir(self):
         print('')
@@ -172,6 +172,7 @@ Régimen preparatorio para la liberación: {}'''.format(self._regimen_LA, self._
 
 class Preguntas_Input():
     def __init__(self):
+        self._fecha_del_hecho = 'NULL'
         self._regimen_normativo = 'NULL'
         self._fecha_de_detencion = 'NULL'
         self._monto_de_pena = 'NULL'
@@ -182,14 +183,16 @@ class Preguntas_Input():
         self._esta_ejecutando_pena = False
         self._fecha_ingreso_periodo_de_prueba = 'NULL'
         self._fecha_calificacion_BUENO = 'NULL'
-        self._fecha_calificacion_EJEMPLAR = 'NULL'        
+        self._fecha_calificacion_EJEMPLAR = 'NULL'
+        self._vuelve_a_restar_otras_detenciones_y_140_en_ST = False
 
         self.GetConsoleInput_PreguntasSobreSituacionProcesal()
 
     def GetConsoleInput_PreguntasSobreSituacionProcesal(self):                  
 
         print(Separadores._separadorComun)
-        self._regimen_normativo = RegimenNormativoAplicable(GetConsoleInput_Fecha('Ingresar la fecha del hecho (XX/XX/XXXX): '))
+        self._fecha_del_hecho = GetConsoleInput_Fecha('Ingresar la fecha del hecho (XX/XX/XXXX): ')
+        self._regimen_normativo = RegimenNormativoAplicable(self._fecha_del_hecho)
         
         print(Separadores._separadorComun)
         self._fecha_de_detencion = GetConsoleInput_Fecha('Ingresar fecha de detención (XX/XX/XXXX): ')        
@@ -210,7 +213,10 @@ class Preguntas_Input():
                     break
                 print('ERROR: Solo se puede responder con "s" o "n"')
 
+        print(Separadores._separadorComun)
         self._otras_detenciones = GetConsoleInput_OtrosTiemposDeDetencion()
+
+        print(Separadores._separadorComun)
         self._estimulo_educativo = GetConsoleInput_EstimuloEducativo()                    
         
         # PREGUNTAR SI HAY ACCESORIA DEL 52 CP        
@@ -305,67 +311,77 @@ class Preguntas_Input():
         # PREGUNTA FECHA DE INICIO DE EJECUCIÓN DE PENA
         if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_27375.value:
             print(Separadores._separadorComun)
-            while True:                
-                user_input = input('¿Se encuentra ejecutando pena, o en REAV? (S/N): ')
-                if user_input == "N" or user_input == "n" or user_input == '':
-                    self._fecha_inicio_ejecucion = 'NULL'
-                    self._esta_ejecutando_pena = False
-                    break
-                if user_input == "S" or user_input == "s":
-                    self._fecha_inicio_ejecucion = GetConsoleInput_Fecha('Ingresar fecha en la que comenzó la ejecución de pena (XX/XX/XXXX): ', ENTER_devuelve_NULL=True)
-                    self._esta_ejecutando_pena = True
-                    if self._fecha_inicio_ejecucion == 'NULL':
-                        self._esta_ejecutando_pena = False
-                        print('Como no se ingresó una fecha válida, no se utilizará para el cómputo esta variable.')
-                    break
-                print('ERROR: Solo se puede responder con "s" o "n"')
+            self._fecha_inicio_ejecucion = GetConsoleInput_Fecha('Fecha de inicio de ejecución o de ingreso a REAV (Formato: XX/XX/XXXX. Dejar en blanco si aún no ejecuta pena): ', ENTER_devuelve_NULL=True)
+            if self._fecha_inicio_ejecucion == 'NULL':
+                print(' - No se ingresó fecha de inicio de ejecución. No se utilizará esta variable en el cómputo.')
+                self._esta_ejecutando_pena = False
+            else:
+                print(f' - Fecha de inicio de ejecución: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}')
+                self._esta_ejecutando_pena = True
+            # while True:                
+            #     user_input = input('¿Se encuentra ejecutando pena, o en REAV? (S/N): ')
+            #     if user_input == "N" or user_input == "n" or user_input == '':
+            #         self._fecha_inicio_ejecucion = 'NULL'
+            #         self._esta_ejecutando_pena = False
+            #         break
+            #     if user_input == "S" or user_input == "s":
+            #         self._fecha_inicio_ejecucion = GetConsoleInput_Fecha('Ingresar fecha en la que comenzó la ejecución de pena (XX/XX/XXXX): ', ENTER_devuelve_NULL=True)
+            #         self._esta_ejecutando_pena = True
+            #         if self._fecha_inicio_ejecucion == 'NULL':
+            #             self._esta_ejecutando_pena = False
+            #             print('Como no se ingresó una fecha válida, no se utilizará para el cómputo esta variable.')
+            #         break
+            #     print('ERROR: Solo se puede responder con "s" o "n"')
         
         # Si está ejecutando pena, hace las otras preguntas
         if self._esta_ejecutando_pena == True:
             # PREGUNTAR SI ESTA EN PERIODO DE PRUEBA, Y DESDE CUÁNDO
             if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siEstaPeriodoDePruebaYDesdeCuando):
                 print(Separadores._separadorComun)
-                while True:                
-                    user_input = input('¿Ingresó al periodo de prueba? (S/N): ')
-                    if user_input == "N" or user_input == "n" or user_input == '':
-                        self._fecha_ingreso_periodo_de_prueba = 'NULL'
-                        break
-                    if user_input == "S" or user_input == "s":
-                        self._fecha_ingreso_periodo_de_prueba = GetConsoleInput_Fecha('Ingresar fecha en la que se ingresó al periodo de prueba (XX/XX/XXXX): ', ENTER_devuelve_NULL=True)
-                        if self._fecha_ingreso_periodo_de_prueba == 'NULL':
-                            print('Como no se ingresó una fecha válida, no se utilizará para el cómputo esta variable.')
-                        break
-                    print('ERROR: Solo se puede responder con "s" o "n"')
+                self._fecha_ingreso_periodo_de_prueba = GetConsoleInput_Fecha('Fecha de ingreso al periodo de prueba (Formato: XX/XX/XXXX. Dejar en blanco si aún no ingresó al periodo de prueba): ', ENTER_devuelve_NULL=True)
+                if self._fecha_ingreso_periodo_de_prueba == 'NULL':
+                    print(' - No se ingresó fecha de ingreso al periodo de prueba. No se utilizará esta variable en el cómputo.')                    
+                else:
+                    print(f' - Fecha de ingreso al periodo de prueba: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_ingreso_periodo_de_prueba)}')                
 
             # PREGUNTAR SI TIENE CONCEPTO BUENO DURANTE 2/3 DE LA EJECUCIÓN
             if self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_2_3ConCalifBUENO_KEY):
                 print(Separadores._separadorComun)
-                while True:                
-                    user_input = input('¿Alcanzó conducta y concepto "BUENO"? (S/N): ')
-                    if user_input == "N" or user_input == "n" or user_input == '':
-                        self._fecha_calificacion_BUENO = 'NULL'
-                        break
-                    if user_input == "S" or user_input == "s":
-                        self._fecha_calificacion_BUENO = GetConsoleInput_Fecha('Ingresar fecha en la que se alcanzó conducta y concepto "BUENO": ', ENTER_devuelve_NULL=True)
-                        if self._fecha_calificacion_BUENO == 'NULL':
-                            print('Como no se ingresó una fecha válida, no se utilizará para el cómputo esta variable.')
-                        break
-                    print('ERROR: Solo se puede responder con "s" o "n"')
+                self._fecha_calificacion_BUENO = GetConsoleInput_Fecha('Fecha en la que se obtuvo calificación "BUENO" (Formato: XX/XX/XXXX. Dejar en blanco si aún no se obtuvo): ', ENTER_devuelve_NULL=True)
+                if self._fecha_calificacion_BUENO == 'NULL':
+                    print(' - No se ingresó fecha en la que se obtuvo calificación "BUENO". No se utilizará esta variable en el cómputo.')                    
+                else:
+                    print(f' - Fecha en la que se obtuvo calificación "BUENO": {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}')
 
             # PREGUNTAR POR REQUISITO DE CALIFICACIÓN PARA ST
             if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_requisitoDeCalificacion):
                 print(Separadores._separadorComun)
-                while True:                
-                    user_input = input('¿Logró alcanzar conducta "EJEMPLAR" (S/N): ')
-                    if user_input == "N" or user_input == "n" or user_input == '':
-                        self._fecha_calificacion_EJEMPLAR = 'NULL'
+                self._fecha_calificacion_EJEMPLAR = GetConsoleInput_Fecha('Fecha en la que se obtuvo calificación "EJEMPLAR" (Formato: XX/XX/XXXX. Dejar en blanco si aún no se obtuvo): ', ENTER_devuelve_NULL=True)
+                if self._fecha_calificacion_EJEMPLAR == 'NULL':
+                    print(' - No se ingresó fecha en la que se obtuvo calificación "EJEMPLAR". No se utilizará esta variable en el cómputo.')                    
+                else:
+                    print(f' - Fecha en la que se obtuvo calificación "EJEMPLAR": {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_EJEMPLAR)}')
+            
+            # PREGUNTAR POR CRITERIO PARA APLICAR ESTÍMULO EDUCATIVO EN LAS SALIDAS TRANSITORIAS
+            hay_estimulo_educativo = self._estimulo_educativo.años + self._estimulo_educativo.meses + self._estimulo_educativo.dias            
+            if self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_27375.value and hay_estimulo_educativo > 0:
+                print(Separadores._separadorComun)
+                while True:
+                    print('Indicar el criterio para aplicar el estímulo educativo a las salidas transitorias')
+                    print(Separadores._separadorComun)
+                    print('1 --> Se aplica a los plazos para acceder al periodo de prueba.')
+                    print('2 --> Se aplica a los plazos para acceder al periodo de prueba, y al requisito temporal de las salidas transitorias.')                    
+                    print(Separadores._separadorComun)
+                    user_input = input('INDICAR OPCIÓN: ')
+                    if user_input == "1" or user_input == '':
+                        self._vuelve_a_restar_otras_detenciones_y_140_en_ST = False
+                        print(' - Se aplica la opción 1.')
                         break
-                    if user_input == "S" or user_input == "s":
-                        self._fecha_calificacion_EJEMPLAR = GetConsoleInput_Fecha('Ingresar fecha en la que se alcanzó conducta "EJEMPLAR": ', ENTER_devuelve_NULL=True)
-                        if self._fecha_calificacion_EJEMPLAR == 'NULL':
-                            print('Como no se ingresó una fecha válida, no se utilizará para el cómputo esta variable.')
-                        break
-                    print('ERROR: Solo se puede responder con "s" o "n"')        
+                    if user_input == "2":
+                        self._vuelve_a_restar_otras_detenciones_y_140_en_ST = True
+                        print(' - Se aplica la opción 2.')
+                        break                    
+                    print('ERROR: Solo se puede responder con números 1 ó 2.')
 
 class Separadores():
     _separadorComun = ''
@@ -522,12 +538,12 @@ def GetConsoleInput_MontoDePena_temporal():
 def GetConsoleInput_OtrosTiemposDeDetencion():
     OTDD = []
     seguir_preguntando = True
-    init_query = input('Ingresar tiempos de detención a computar? (S/N): ')
+    init_query = input('Ingresar otros tiempos de detención a computar? (S/N): ')
     if init_query == "S" or init_query == "s":
         while seguir_preguntando:
             f_det = ''
             f_lib = ''
-            f_det = GetConsoleInput_Fecha('Ingresar fecha de detención (XX/XX/XXXX): ')
+            f_det = GetConsoleInput_Fecha('Ingresar fecha de detención del otro tiempo a computar (XX/XX/XXXX): ')
             f_lib = GetConsoleInput_Fecha('Ingresar fecha de libertad (XX/XX/XXXX): ')
             este = OtraDetencion(f_det, f_lib)
             OTDD.append(este)

@@ -24,7 +24,7 @@ class ST_KEYS(Enum):
     _ask_siHayAccesoria52 = 'Preguntar si hay accesoria del 52 CP'
     _ask_esComputoPorEvasionDeST_KEY = 'Preguntar si es un computo por evasion de ST'
     _ask_delitosExcluidos25948_KEY = 'Preguntar por delitos excluidos por 56 bis ley 25.948'
-    _ask_delitosExcluidos27375_KEY = 'Preguntar por delitos excluidos ley 27.375'
+    _ask_delitosExcluidos27375_KEY = 'Preguntar por delitos excluidos por 56 bis ley 27.375'
     _ask_siEstaPeriodoDePruebaYDesdeCuando = 'Preguntar si se encuentra en periodo de prueba, y desde cuando'
     _ask_requisitoDeCalificacion = 'Preguntar por requisito de calificacion'   
 

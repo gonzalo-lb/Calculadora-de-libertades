@@ -1,10 +1,8 @@
 Lo que hice ahora: 
- - Continué con el input del usuario. No lo terminé.
+ - Terminé el user input y lo puse en la Main App. Funciona.
+ - Lo estuve probando y el Preguntas_Input() falla con las key cuando se fija si tiene que preguntar. Solucionarlo.
 
-Con qué seguir:
- - Terminar Preguntas_Input()
-      Seguir desde PREGUNTAR POR REQUISITO DE CALIFICACIÓN PARA ST (hacerlo igual que el anterior en el requisito de Calificación "BUENO")
- - Régimen de liberación anticipada (ley 27.375)
+Con qué seguir: 
  - Unidades fijas
  - Interfaz para el usuario 
  - Lo del cómputo por LC revocada

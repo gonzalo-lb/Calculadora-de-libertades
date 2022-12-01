@@ -292,6 +292,7 @@ class ComputoPenaTemporal(Computo):
         self._ImprimirSTRINGSalidasTransitorias()
         self._ImprimirSTRINGLibertadAsistida()
         self._ImprimirSTRINGRegimenPreparatorioParaLaLiberacion()
+        print('')
     
     def _ControlarParametros(self):
         if self._fecha_del_hecho == 'NULL':
