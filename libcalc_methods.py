@@ -190,15 +190,21 @@ class Preguntas_Input():
 
     def GetConsoleInput_PreguntasSobreSituacionProcesal(self):                  
 
+        # Fecha del hecho y cálculo del régimen normativo
         print(Separadores._separadorComun)
-        self._fecha_del_hecho = GetConsoleInput_Fecha('Ingresar la fecha del hecho (XX/XX/XXXX): ')
+        self._fecha_del_hecho = GetConsoleInput_Fecha('Ingresar la fecha del hecho: ')
         self._regimen_normativo = RegimenNormativoAplicable(self._fecha_del_hecho)
+        print(f' - Fecha ingresada: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_del_hecho)}')
         
+        # Fecha de detención
         print(Separadores._separadorComun)
-        self._fecha_de_detencion = GetConsoleInput_Fecha('Ingresar fecha de detención (XX/XX/XXXX): ')        
+        self._fecha_de_detencion = GetConsoleInput_Fecha('Ingresar fecha de detención: ')
+        print(f' - Fecha ingresada: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_detencion)}')
         
+        # Monto de pena
         print(Separadores._separadorComun)
         self._monto_de_pena = GetConsoleInput_MontoDePena_temporal()
+        print(f' - La pena ingresada es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es), {self._monto_de_pena.dias} día(s).')
 
         # PREGUNTAR SI ES REINCIDENTE        
         if self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_esReincidente_KEY):            
@@ -207,14 +213,18 @@ class Preguntas_Input():
                 user_input = input('¿Hay declaración de reincidencia? (S/N): ')
                 if user_input == "N" or user_input == "n" or user_input == '':
                     self._monto_de_pena.reincidencia = False
+                    print(' - No es reincidente.')
                     break
                 if user_input == "S" or user_input == "s":
                     self._monto_de_pena.reincidencia = True
+                    print(' - Es reincidente.')
                     break
                 print('ERROR: Solo se puede responder con "s" o "n"')
 
         print(Separadores._separadorComun)
         self._otras_detenciones = GetConsoleInput_OtrosTiemposDeDetencion()
+        if self._otras_detenciones == 'NULL':
+            print(' - No se ingresaron otras detenciones a computar.')
 
         print(Separadores._separadorComun)
         self._estimulo_educativo = GetConsoleInput_EstimuloEducativo()                    
@@ -311,27 +321,13 @@ class Preguntas_Input():
         # PREGUNTA FECHA DE INICIO DE EJECUCIÓN DE PENA
         if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_27375.value:
             print(Separadores._separadorComun)
-            self._fecha_inicio_ejecucion = GetConsoleInput_Fecha('Fecha de inicio de ejecución o de ingreso a REAV (Formato: XX/XX/XXXX. Dejar en blanco si aún no ejecuta pena): ', ENTER_devuelve_NULL=True)
+            self._fecha_inicio_ejecucion = GetConsoleInput_Fecha('Fecha de inicio de ejecución o de ingreso a REAV (Dejar en blanco si aún no ejecuta pena): ', ENTER_devuelve_NULL=True)
             if self._fecha_inicio_ejecucion == 'NULL':
                 print(' - No se ingresó fecha de inicio de ejecución. No se utilizará esta variable en el cómputo.')
                 self._esta_ejecutando_pena = False
             else:
                 print(f' - Fecha de inicio de ejecución: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}')
-                self._esta_ejecutando_pena = True
-            # while True:                
-            #     user_input = input('¿Se encuentra ejecutando pena, o en REAV? (S/N): ')
-            #     if user_input == "N" or user_input == "n" or user_input == '':
-            #         self._fecha_inicio_ejecucion = 'NULL'
-            #         self._esta_ejecutando_pena = False
-            #         break
-            #     if user_input == "S" or user_input == "s":
-            #         self._fecha_inicio_ejecucion = GetConsoleInput_Fecha('Ingresar fecha en la que comenzó la ejecución de pena (XX/XX/XXXX): ', ENTER_devuelve_NULL=True)
-            #         self._esta_ejecutando_pena = True
-            #         if self._fecha_inicio_ejecucion == 'NULL':
-            #             self._esta_ejecutando_pena = False
-            #             print('Como no se ingresó una fecha válida, no se utilizará para el cómputo esta variable.')
-            #         break
-            #     print('ERROR: Solo se puede responder con "s" o "n"')
+                self._esta_ejecutando_pena = True            
         
         # Si está ejecutando pena, hace las otras preguntas
         if self._esta_ejecutando_pena == True:
@@ -447,93 +443,138 @@ def MontoDeTiempoA_es_Mayor_que_MontoDeTiempoB(tiempo_a:TiempoEn_Años_Meses_Dia
 def es_multiplo(numero, multiplo):
     return numero % multiplo == 0
 
-def GetConsoleInput_Fecha(mensaje_para_el_usuario="Ingrese fecha en formato año-mes-día (XX/XX/XXXX): ", ENTER_devuelve_NULL:bool=False):
-    '''Hace ingresar por consola una fecha de detención en formato XX/XX/XXXX y la devuelve como un datetime.date\n
-    ENTER_devuelve_NULL: En True, si no se ingresa una fecha válida, devuelve "NULL"'''
-    if ENTER_devuelve_NULL:
-        try:        
-            fechaDeDetencionInput = input(mensaje_para_el_usuario)    
-            fechaDeDetencionInput_dia = fechaDeDetencionInput[0:2]
-            fechaDeDetencionInput_mes = fechaDeDetencionInput[3:5]
-            fechaDeDetencionInput_año = fechaDeDetencionInput[6:10]
-            if fechaDeDetencionInput[2] != "/" or fechaDeDetencionInput[5] != "/":
-                raise Exception
-            fechaDeDetencionInput = datetime.date(int(fechaDeDetencionInput_año), int(fechaDeDetencionInput_mes), int(fechaDeDetencionInput_dia))        
-            return fechaDeDetencionInput
-        except:
-            return 'NULL'
-    else:
-        while True:
-            try:        
-                fechaDeDetencionInput = input(mensaje_para_el_usuario)    
-                fechaDeDetencionInput_dia = fechaDeDetencionInput[0:2]
-                fechaDeDetencionInput_mes = fechaDeDetencionInput[3:5]
-                fechaDeDetencionInput_año = fechaDeDetencionInput[6:10]
-                if fechaDeDetencionInput[2] != "/" or fechaDeDetencionInput[5] != "/":                    
+def GetConsoleInput_Fecha(mensaje_para_el_usuario='Fecha: ', ENTER_devuelve_NULL=False):
+    '''Hace ingresar por consola una fecha (formatos XX/XX/XXXX ó X/X/XX) y la devuelve como un datetime.date\n    
+    ENTER_devuelve_NULL=True: Si no se ingresa una fecha válida, devuelve "NULL"\n
+    ENTER_devuelve_NULL=False: Si se ingresa una fecha inválida, la vuelve a solicitar'''
+    while True:
+        seImprimioError=False
+        try:
+            user_input = input(mensaje_para_el_usuario)
+            if len(user_input) < 6 or len(user_input) > 10:                
+                if ENTER_devuelve_NULL:
+                    return 'NULL'
+                else:
+                    print('ERROR: No se ingresó una fecha válida')
+                    seImprimioError=True
                     raise Exception
-                fechaDeDetencionInput = datetime.date(int(fechaDeDetencionInput_año), int(fechaDeDetencionInput_mes), int(fechaDeDetencionInput_dia))        
-                return fechaDeDetencionInput
-            except:
-                print('ERROR: Fecha en formato inválido. La fecha ingresada no tiene formato XX/XX/XXXX o no es una fecha válida.')
+
+            cursor = 0
+            number_start = 0
+            number_end = 0    
+            fecha = []
+
+            for x in range(2):
+                for y in range(3):
+                    if user_input[cursor] == "/":
+                        number_end = cursor - 1
+                        break
+                    else:
+                        cursor += 1
+                if number_start == number_end:
+                    fecha.append(int(user_input[number_start]))
+                else:
+                    fecha.append(int(user_input[number_start:number_end+1]))
+                
+                cursor += 1
+                number_start = cursor
+            
+            # Para el año, busca desde el fondo
+            number_end = cursor = len(user_input) - 1
+            for y in range(5):
+                if user_input[cursor] == "/":
+                    number_start = cursor + 1
+                    break
+                else:
+                    cursor -= 1
+            
+            # Revisa que los años tengan 2 dígitos o 4
+            year_digits = len(user_input[number_start:number_end+1])
+            if year_digits != 2 and year_digits != 4:
+                if ENTER_devuelve_NULL:
+                    return 'NULL'
+                else:
+                    print('ERROR: No se ingresó una fecha válida')
+                    seImprimioError=True
+                    raise Exception                
+            
+            year = int(user_input[number_start:number_end+1])
+
+            # Si el año ingresado es de dos dígitos, lo pasa a formato de 4 dígitos
+            if year_digits == 2:
+                if year <= 60:
+                    year += 2000
+                else:
+                    year += 1900
+
+            fecha.append(year)
+            return datetime.date(fecha[2], fecha[1], fecha[0])
+        except:
+            if ENTER_devuelve_NULL:
+                return 'NULL'
+            else:
+                if seImprimioError == False:
+                    print('ERROR: No se ingresó una fecha válida')
 
 def GetConsoleInput_MontoDePena_temporal():
-    '''Hace ingresar por consola un monto de pena temporal y la devuelve como un MontoDePena()'''    
+    '''Hace ingresar por consola un monto de pena temporal y la devuelve como un MontoDePena()\n
+    Por el momento solo pide el monto de tiempo. No consulta por reincidencia, accesoria del 52 CP, etc.'''    
     montoDePena = MontoDePena()    
     
-    # Ingresar monto de pena    
-    try:
-        montoDePena.años = int(input('Ingresar monto de pena (años): '))
-    except:
-        montoDePena.años = 0        
-    try:
-        montoDePena.meses = int(input('Ingresar monto de pena (meses): '))        
-    except:
-        montoDePena.meses = 0        
-    try:
-        montoDePena.dias = int(input('Ingresar monto de pena (días): '))        
-    except:
-        montoDePena.dias = 0    
+    # Intenta tomar monto de pena. Si se ingresa 0, 0, 0, vuelve a intentar
+    while True:
+        # Ingresar años
+        while True:
+            try:
+                _years = input('Ingresar monto de pena (años): ')
+                if _years == '':
+                    _years = 0
+                    break
+                _years = int(_years)
+                if _years >= 0 and _years <= 50:
+                    break
+                print(' - ERROR: El monto de pena en años debe ser un número entre 0 y 50.')
+            except:
+                print(' - ERROR: El monto de pena en años debe ser un número entre 0 y 50.')
+        
+        # Ingresar meses
+        while True:
+            try:
+                _months = input('Ingresar monto de pena (meses): ')
+                if _months == '':
+                    _months = 0
+                    break
+                _months = int(_months)
+                if _months >= 0 and _months <= 11:
+                    break
+                print(' - ERROR: El monto de pena en años debe ser un número entre 0 y 11.')
+            except:
+                print(' - ERROR: El monto de pena en años debe ser un número entre 0 y 11.')
+
+        # Ingresar días
+        while True:
+            try:
+                _days = input('Ingresar monto de pena (días): ')
+                if _days == '':
+                    _days = 0
+                    break
+                _days = int(_days)
+                if _days >= 0 and _days <= 30:
+                    break
+                print(' - ERROR: El monto de pena en años debe ser un número entre 0 y 30.')    
+            except:
+                print(' - ERROR: El monto de pena en años debe ser un número entre 0 y 30.')
+        
+        _total = _years + _months + _days
+        if _total != 0:
+            break
+        print(' - ERROR: Se ingresó una pena de 0 años, 0 meses y 0 días. Intente de nuevo.')
+
+    montoDePena.años = _years
+    montoDePena.meses = _months
+    montoDePena.dias = _days      
 
     return montoDePena
-
-# def GetConsoleInput_MontoDePena():
-#     '''Hace ingresar por consola un monto de pena temporal y la devuelve como un MontoDePena()'''
-#     clear = lambda: os.system('cls')
-#     montoDePena = MontoDePena()
-
-#     solicitar_tipo_de_pena_a_calcular = '''Indicar tipo de pena a calcular:
-# 1 --> Pena temporal
-# 2 --> Pena perpetua
-# '''
-#     print(solicitar_tipo_de_pena_a_calcular)
-#     opciones_validas = ['1', '2']
-#     opcion_elegida = input('Elegir opción: ')    
-
-#     while opcion_elegida not in opciones_validas:
-#         clear()
-#         print('La opción elegida no es válida. Intentar de nuevo.')
-#         print(solicitar_tipo_de_pena_a_calcular)
-#         opcion_elegida = input('Elegir opción: ')
-    
-#     if opcion_elegida == '1': # Pena temporal
-#         # Ingresar monto de pena    
-#         try:
-#             montoDePena.años = int(input('Ingresar monto de pena (años): '))
-#         except:
-#             montoDePena.años = 0        
-#         try:
-#             montoDePena.meses = int(input('Ingresar monto de pena (meses): '))        
-#         except:
-#             montoDePena.meses = 0        
-#         try:
-#             montoDePena.dias = int(input('Ingresar monto de pena (días): '))        
-#         except:
-#             montoDePena.dias = 0
-    
-#     elif opcion_elegida == '2': # Pena perpetua
-#         montoDePena.perpetua = True
-
-#     return montoDePena
 
 def GetConsoleInput_OtrosTiemposDeDetencion():
     OTDD = []
@@ -581,4 +622,5 @@ def RestarOtrasDetenciones(fecha_de_requisito_temporal:datetime.date, otras_dete
         return toreturn
 
 if __name__ == '__main__':    
-    x = Preguntas_Input()
+    x = GetConsoleInput_MontoDePena_temporal()
+    print(x)

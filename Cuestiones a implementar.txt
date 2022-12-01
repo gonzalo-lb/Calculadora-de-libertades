@@ -1,7 +1,10 @@
 Lo que hice ahora: 
- - Estoy reformando la función de input de fecha, para que acepte formato de pocos dígitos.
+ - Reformé la función que solicita fecha, para que acepte formato X/X/XX.
+ - Reformé la función que consigue el input del monto de pena, para limitar los datos que se ingresan.
+ - Estoy reformando el Preguntas_Input para que indique qué se ingresó. También voy reformando cada función a la que llama para conseguir los inputs, para limitarlas.
+    - Seguir desde la parte donde pregunta por otras detenciones.
 
-Con qué seguir: 
+Con qué seguir:
  - Unidades fijas
  - Interfaz para el usuario 
  - Lo del cómputo por LC revocada
