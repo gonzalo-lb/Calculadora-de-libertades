@@ -102,17 +102,23 @@ class RegimenNormativoAplicable():
         
         # CARGA LOS ARCHIVOS JSON EN VARIABLES
 
-        with open('Regimenes/libertadCondicional.json') as reg_LC:
+        with open('Regimenes/libertadCondicional.json', encoding='utf-8') as reg_LC:
             self._JSON_LC = json.load(reg_LC)
 
-        with open('Regimenes/salidasTransitorias.json') as reg_ST:
+        with open('Regimenes/salidasTransitorias.json', encoding='utf-8') as reg_ST:
             self._JSON_ST = json.load(reg_ST)
         
-        with open('Regimenes/libertadAsistida.json') as reg_LA:
+        with open('Regimenes/libertadAsistida.json', encoding='utf-8') as reg_LA:
             self._JSON_LA = json.load(reg_LA)
         
-        with open('Regimenes/regimenPrepLib.json') as reg_PrepLib:
+        with open('Regimenes/regimenPrepLib.json', encoding='utf-8') as reg_PrepLib:
             self._JSON_PREPLIB = json.load(reg_PrepLib)
+        
+        with open('Regimenes/unidadesFijas.json', encoding='utf-8') as reg_unidadesFijas:
+            self._JSON_UNIDADESFIJAS = json.load(reg_unidadesFijas)
+            # En este JSON, la información de vigencia de la Resolución MSEG 270/2016 corresponde a la de la
+            # ley 27.302, porque desde esa fecha aplica el régimen de las Unidades Fijas. Los formularios
+            # ya existían de antes
 
         # DETERMINA RÉGIMEN DE LIBERTAD CONDICIONAL
 
@@ -144,7 +150,15 @@ class RegimenNormativoAplicable():
         for key in self._JSON_PREPLIB:            
             fecha_implementacion = datetime.date(self._JSON_PREPLIB[key][REGPREPLIB_KEYS._fechaImplementacion_YEAR_KEY.value], self._JSON_PREPLIB[key][REGPREPLIB_KEYS._fechaImplementacion_MONTH_KEY.value], self._JSON_PREPLIB[key][REGPREPLIB_KEYS._fechaImplementacion_DAY_KEY.value])
             if FechaA_es_Mayor_O_Igual_Que_FechaB(_fechaDelHecho, fecha_implementacion):
-                self._regimen_PREPLIB = key    
+                self._regimen_PREPLIB = key
+        
+        # DETERMINA RÉGIMEN DE UNIDADES FIJAS
+
+        self._regimen_UNIDADESFIJAS = 'No aplica'
+        for key in self._JSON_UNIDADESFIJAS:            
+            fecha_implementacion = datetime.date(self._JSON_UNIDADESFIJAS[key][UNIDADESFIJAS_KEYS._fechaImplementacion_YEAR_KEY.value], self._JSON_UNIDADESFIJAS[key][UNIDADESFIJAS_KEYS._fechaImplementacion_MONTH_KEY.value], self._JSON_UNIDADESFIJAS[key][UNIDADESFIJAS_KEYS._fechaImplementacion_DAY_KEY.value])
+            if FechaA_es_Mayor_O_Igual_Que_FechaB(_fechaDelHecho, fecha_implementacion):
+                self._regimen_UNIDADESFIJAS = key        
     
     def LIBERTAD_CONDICIONAL(self, ask:LC_KEYS):
         return self._JSON_LC[self._regimen_LC][ask.value]
@@ -158,6 +172,9 @@ class RegimenNormativoAplicable():
     def REGIMEN_PREPARACION_LIBERTAD(self, ask:REGPREPLIB_KEYS):
         return self._JSON_PREPLIB[self._regimen_PREPLIB][ask.value]
     
+    def UNIDADES_FIJAS(self, ask:UNIDADESFIJAS_KEYS):
+        return self._JSON_UNIDADESFIJAS[self._regimen_UNIDADESFIJAS][ask.value]
+    
     def _Imprimir(self):
         print('')
         print(self)
@@ -168,7 +185,8 @@ class RegimenNormativoAplicable():
 Libertad condicional: {}
 Salidas transitorias: {}
 Libertad asistida: {}
-Régimen preparatorio para la liberación: {}'''.format(self._regimen_LC, self._regimen_ST, self._regimen_LA, self._regimen_PREPLIB)
+Régimen preparatorio para la liberación: {}
+Valor de las unidades fijas: {}'''.format(self._regimen_LC, self._regimen_ST, self._regimen_LA, self._regimen_PREPLIB, self.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._denominacion_KEY))
 
 class Preguntas_Input():
     def __init__(self):

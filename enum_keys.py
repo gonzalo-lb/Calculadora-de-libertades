@@ -67,3 +67,10 @@ class REGPREPLIB_KEYS(Enum):
 class REGPREPLIB_REGIMENES(Enum):    
     _No_aplica = 'No aplica'
     _Ley_27375 = 'Ley 27.375'
+
+class UNIDADESFIJAS_KEYS(Enum):    
+    _fechaImplementacion_YEAR_KEY = 'Fecha entrada en vigencia - year'
+    _fechaImplementacion_MONTH_KEY = 'Fecha entrada en vigencia - month'
+    _fechaImplementacion_DAY_KEY = 'Fecha entrada en vigencia - day'
+    _denominacion_KEY = 'Denominacion'
+    _valorDeLaUnidadFija = 'Valor del F01'

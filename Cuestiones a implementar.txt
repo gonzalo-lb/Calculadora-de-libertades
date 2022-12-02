@@ -1,8 +1,9 @@
 Lo que hice ahora: 
- - Reformé el Preguntas_Input para que vaya imprimiendo lo que se ingresó.
- - Corregí errores por normas fuera de plazo de implementación.
+ - Agregué la carga del JSON de unidades fijas.
+ - Por ahora no logré codificar los strings para que se muestren como corresponde.
 
 Con qué seguir:
+ - Codificar los strings del JSON
  - Unidades fijas 
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
@@ -21,6 +22,8 @@ Funcionalidad a implementar:
  - Monto de las Unidades Fijas
 
  Hecho:
+ - Reformé el Preguntas_Input para que vaya imprimiendo lo que se ingresó.
+ - Corregí errores por normas fuera de plazo de implementación.
  - Reformé la función que solicita fecha, para que acepte formato X/X/XX.
  - Reformé la función que consigue el input del monto de pena, para limitar los datos que se ingresan.
  - Estoy reformando el Preguntas_Input para que indique qué se ingresó. También voy reformando cada función a la que llama para conseguir los inputs, para limitarlas. 

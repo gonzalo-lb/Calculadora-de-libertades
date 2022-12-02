@@ -12,7 +12,8 @@
         "Fecha entrada en vigencia - year":1,
         "Fecha entrada en vigencia - month":1,
         "Fecha entrada en vigencia - day":1,
-        "Valor del F01":0
+        "Valor del F01":0,
+        "Observaciones":"la información de vigencia de la Resolución MSEG 270/2016 corresponde a la de la ley 27.302, porque desde esa fecha aplica el régimen de las Unidades Fijas. Los formularios ya existían de antes. La fecha real de entrada en vigencia de este formulario es: 12/07/2016."
     },
     "RES MSEG 270/2016":{
         "Denominacion":"Resolución MSEG 270/2016",
@@ -25,9 +26,10 @@
         "Indica entrada en vigencia":true,
         "Cuando entra en vigencia":"8 días luego de la publicación",
         "Fecha entrada en vigencia - year":2016,
-        "Fecha entrada en vigencia - month":7,
-        "Fecha entrada en vigencia - day":12,
-        "Valor del F01":1700        
+        "Fecha entrada en vigencia - month":11,
+        "Fecha entrada en vigencia - day":16,
+        "Valor del F01":1700,
+        "Observaciones":""        
     },
     "RES MSEG 145-E/2017":{
         "Denominacion":"Resolución MSEG 145-E/2017",
@@ -42,7 +44,8 @@
         "Fecha entrada en vigencia - year":2017,
         "Fecha entrada en vigencia - month":2,
         "Fecha entrada en vigencia - day":15,
-        "Valor del F01":2500
+        "Valor del F01":2500,
+        "Observaciones":""
     },
     "RES MSEG 71-E/2018":{
         "Denominacion":"Resolución MSEG 71-E/2018",
@@ -57,7 +60,8 @@
         "Fecha entrada en vigencia - year":2018,
         "Fecha entrada en vigencia - month":1,
         "Fecha entrada en vigencia - day":29,
-        "Valor del F01":3000
+        "Valor del F01":3000,
+        "Observaciones":""
     },
     "RES MSEG 123/2019":{
         "Denominacion":"Resolución MSEG /",
@@ -72,7 +76,8 @@
         "Fecha entrada en vigencia - year":2019,
         "Fecha entrada en vigencia - month":2,
         "Fecha entrada en vigencia - day":14,
-        "Valor del F01":3600
+        "Valor del F01":3600,
+        "Observaciones":""
     },
     "RES MSEG 13/2020":{
         "Denominacion":"Resolución MSEG 13/2020",
@@ -87,7 +92,8 @@
         "Fecha entrada en vigencia - year":2020,
         "Fecha entrada en vigencia - month":2,
         "Fecha entrada en vigencia - day":1,
-        "Valor del F01":5400
+        "Valor del F01":5400,
+        "Observaciones":""
     },
     "RES MSEG 85/2021":{
         "Denominacion":"Resolución MSEG 85/2021",
@@ -102,7 +108,8 @@
         "Fecha entrada en vigencia - year":2021,
         "Fecha entrada en vigencia - month":3,
         "Fecha entrada en vigencia - day":1,
-        "Valor del F01":7000
+        "Valor del F01":7000,
+        "Observaciones":""
     },
     "RES MSEG 647/2021":{
         "Denominacion":"Resolución MSEG 647/2021",
@@ -117,7 +124,8 @@
         "Fecha entrada en vigencia - year":2022,
         "Fecha entrada en vigencia - month":1,
         "Fecha entrada en vigencia - day":4,
-        "Valor del F01":9500
+        "Valor del F01":9500,
+        "Observaciones":""
     },
     "RES MSEG 486/2022":{
         "Denominacion":"Resolución MSEG 486/2022",
@@ -132,6 +140,7 @@
         "Fecha entrada en vigencia - year":2022,
         "Fecha entrada en vigencia - month":8,
         "Fecha entrada en vigencia - day":1,
-        "Valor del F01":13000
+        "Valor del F01":13000,
+        "Observaciones":""
     }
 }
