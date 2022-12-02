@@ -220,6 +220,7 @@ class ComputoPenaTemporal(Computo):
     fechaDelHecho:datetime.date='NULL',
     fechaDeDetencion:datetime.date='NULL',
     montoDePena:MontoDePena='NULL',
+    montoUnidadesFijas:Union[int,float]='NULL',
     otrasDetenciones:list[OtraDetencion]='NULL',
     estimuloEducativo:TiempoEn_Años_Meses_Dias=TiempoEn_Años_Meses_Dias(),
     fechaInicioEjecucion:datetime.date='NULL',
@@ -233,6 +234,7 @@ class ComputoPenaTemporal(Computo):
         self._fecha_del_hecho = fechaDelHecho
         self._fecha_de_detencion = fechaDeDetencion
         self._monto_de_pena = montoDePena
+        self._monto_multa_unidades_fijas = montoUnidadesFijas
         self._otras_detenciones = otrasDetenciones
         self._estimulo_educativo = estimuloEducativo
         self._fecha_inicio_ejecucion = fechaInicioEjecucion
@@ -267,6 +269,8 @@ class ComputoPenaTemporal(Computo):
 
         self._regimen_preparacion_libertad_COMPUTO = 'NULL'
 
+        self._multa_unidadesFijas_en_pesos = 'NULL'
+
         # VARIABLES OUTPUT (STRING)
         self._STRING_vencimiento_de_pena = ''
         self._STRING_caducidad_de_pena = ''
@@ -283,6 +287,7 @@ class ComputoPenaTemporal(Computo):
         self._CalcularSalidasTransitorias()
         self._CalcularLibertadAsistida()
         self._CalcularRegimenPreparacionLibertad()
+        self._CalcularUnidadesFijas()
         
         # Imprime los resultados
         self._ImprimirSTRINGGeneral()
@@ -292,6 +297,7 @@ class ComputoPenaTemporal(Computo):
         self._ImprimirSTRINGSalidasTransitorias()
         self._ImprimirSTRINGLibertadAsistida()
         self._ImprimirSTRINGRegimenPreparatorioParaLaLiberacion()
+        self._ImprimirSTRINGMultaUnidadesFijasEnPesos()
         print('')
     
     def _ControlarParametros(self):
@@ -645,7 +651,10 @@ class ComputoPenaTemporal(Computo):
             self._regimen_preparacion_libertad_COMPUTO = _computo_regPrepLib
 
     def _CalcularUnidadesFijas(self):
-        pass
+        if self._regimen_normativo._regimen_UNIDADESFIJAS == 'No aplica':
+            return
+        
+        self._multa_unidadesFijas_en_pesos = self._monto_multa_unidades_fijas * self._regimen_normativo.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._valorDeLaUnidadFija)
 
     def _ImprimirSTRINGGeneral(self):
         print('')
@@ -858,6 +867,16 @@ class ComputoPenaTemporal(Computo):
             print('RÉGIMEN PREPARATORIO PARA LA LIBERTAD')
             print('-------------------------------------')
             print(f' - El régimen preparatorio para la libertad comienza el día {Datetime_date_enFormatoXX_XX_XXXX(self._regimen_preparacion_libertad_COMPUTO)}.')
+
+    def _ImprimirSTRINGMultaUnidadesFijasEnPesos(self):
+        if self._regimen_normativo._regimen_UNIDADESFIJAS == 'No aplica':
+            return
+        
+        print('')
+        print('MULTA')
+        print('-----')
+        print(f' - Valor de la unidad fija: ${self._regimen_normativo.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._valorDeLaUnidadFija)}')
+        print(f' - Multa en pesos: ${self._multa_unidadesFijas_en_pesos}')
 
 def _DEBUG_PENA_TEMPORAL():    
     fechaDelHecho = datetime.date(2018, 5, 26)

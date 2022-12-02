@@ -1,4 +1,5 @@
 import os
+from typing import Union
 import datetime
 import json
 from dateutil.relativedelta import relativedelta
@@ -186,7 +187,7 @@ Libertad condicional: {}
 Salidas transitorias: {}
 Libertad asistida: {}
 Régimen preparatorio para la liberación: {}
-Valor de las unidades fijas: {}'''.format(self._regimen_LC, self._regimen_ST, self._regimen_LA, self._regimen_PREPLIB, self.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._denominacion_KEY))
+Unidades fijas: {}'''.format(self._regimen_LC, self._regimen_ST, self._regimen_LA, self._regimen_PREPLIB, self.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._denominacion_KEY))
 
 class Preguntas_Input():
     def __init__(self):
@@ -194,6 +195,7 @@ class Preguntas_Input():
         self._regimen_normativo = 'NULL'
         self._fecha_de_detencion = 'NULL'
         self._monto_de_pena = 'NULL'
+        self._monto_multa = 'NULL'
         self._otras_detenciones = 'NULL'
         self._estimulo_educativo = 'NULL'
 
@@ -225,6 +227,10 @@ class Preguntas_Input():
         print(f' - La pena ingresada es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es), {self._monto_de_pena.dias} día(s).')
 
         # Unidades Fijas
+        if self._regimen_normativo._regimen_UNIDADESFIJAS != 'No aplica':
+            print(Separadores._separadorComun)
+            self._monto_multa = GetConsoleInput_Multa_Unidades_Fijas('Monto de la multa (en Unidades Fijas): ')
+            print(f' - El monto ingresado es de {self._monto_multa} Unidades Fijas.')
 
         # PREGUNTAR SI ES REINCIDENTE        
         if self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_esReincidente_KEY):            
@@ -609,6 +615,21 @@ def GetConsoleInput_MontoDePena_temporal():
     montoDePena.dias = _days      
 
     return montoDePena
+
+def GetConsoleInput_Multa_Unidades_Fijas(mensaje_para_el_usuario:str='Ingresar monto de la multa: ') -> Union[int,float]:    
+    while True:
+        try:
+            _multa = input(mensaje_para_el_usuario)
+            if _multa == '':
+                _multa = 0
+                break
+            _multa = int(_multa)
+            if _multa >= 45 and _multa <= 900:
+                break
+            print(' - ERROR: El monto de la multa debe ser un número entre 45 y 900.')
+        except:
+            print(' - ERROR: El monto de la multa debe ser un número entre 45 y 900.')
+    return _multa
 
 def GetConsoleInput_OtrosTiemposDeDetencion() -> list[OtraDetencion]:
     OTDD = []
