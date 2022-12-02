@@ -1,18 +1,14 @@
 Lo que hice ahora: 
- - Reformé la función que solicita fecha, para que acepte formato X/X/XX.
- - Reformé la función que consigue el input del monto de pena, para limitar los datos que se ingresan.
- - Estoy reformando el Preguntas_Input para que indique qué se ingresó. También voy reformando cada función a la que llama para conseguir los inputs, para limitarlas.
-    - Seguir desde la parte donde pregunta por otras detenciones.
+ - Reformé el Preguntas_Input para que vaya imprimiendo lo que se ingresó.
+ - Corregí errores por normas fuera de plazo de implementación.
 
 Con qué seguir:
- - Unidades fijas
- - Interfaz para el usuario 
+ - Unidades fijas 
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
  - Terminar vencimiento y caducidad para el resto de las penas.
  - Reformar los cálculos de vencimiento y otros para la reclusión por tiempo indeterminado 
- - Implementar cálculos para casos de reclusión por tiempo indeterminado  
- - Integrar las consultas a la devolución que se hace con el cómputo
+ - Implementar cálculos para casos de reclusión por tiempo indeterminado   
  - EN ST y LC, agregar un else para los casos de que no sean ninguno de los regímenes (no debería suceder pero...)  
  - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación 
 
@@ -25,6 +21,9 @@ Funcionalidad a implementar:
  - Monto de las Unidades Fijas
 
  Hecho:
+ - Reformé la función que solicita fecha, para que acepte formato X/X/XX.
+ - Reformé la función que consigue el input del monto de pena, para limitar los datos que se ingresan.
+ - Estoy reformando el Preguntas_Input para que indique qué se ingresó. También voy reformando cada función a la que llama para conseguir los inputs, para limitarlas. 
  - Terminé el user input y lo puse en la Main App. Funciona.
  - Lo estuve probando y el Preguntas_Input() falla con las key cuando se fija si tiene que preguntar. Solucionarlo.
  - Agregué información al Readme

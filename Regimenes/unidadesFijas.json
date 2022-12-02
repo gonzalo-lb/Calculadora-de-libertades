@@ -1,4 +1,19 @@
 {
+    "No aplica":{
+        "Denominacion":"No aplica",
+        "Fecha del decreto - year":1,
+        "Fecha del decreto - month":1,
+        "Fecha del decreto - day":1,
+        "Fecha publicacion en Boletin Oficial - year":1,
+        "Fecha publicacion en Boletin Oficial - month":1,
+        "Fecha publicacion en Boletin Oficial - day":1,
+        "Indica entrada en vigencia":false,
+        "Cuando entra en vigencia":"",
+        "Fecha entrada en vigencia - year":1,
+        "Fecha entrada en vigencia - month":1,
+        "Fecha entrada en vigencia - day":1,
+        "Valor del F01":0
+    },
     "RES MSEG 270/2016":{
         "Denominacion":"Resolución MSEG 270/2016",
         "Fecha del decreto - year":2016,

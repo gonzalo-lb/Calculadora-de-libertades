@@ -323,6 +323,9 @@ class ComputoPenaTemporal(Computo):
     
     def _CalcularLibertadCondicional(self):
 
+        if self._regimen_normativo._regimen_LC == LC_REGIMENES._No_aplica.value:
+            return
+
         # Crea las variables temporales que va a necesitar para el output y les asigna los datos que van a usar
         _computo_libertad_condicional = self._fecha_de_detencion
         _requisito_temporal_libertad_condicional = TiempoEn_Años_Meses_Dias()
@@ -417,7 +420,10 @@ class ComputoPenaTemporal(Computo):
             else:
                 self._libertad_condicional_COMPUTO_INTEGRAL = self._libertad_condicional_REQUISITO_CALIF_BUENO
 
-    def _CalcularSalidasTransitorias(self):        
+    def _CalcularSalidasTransitorias(self):  
+
+        if self._regimen_normativo._regimen_ST == ST_REGIMENES._No_aplica.value:
+            return      
         
         _computo_salidas_transitorias = self._fecha_de_detencion        
         _requisito_salidas_transitorias = MontoDePena()        
@@ -592,6 +598,9 @@ class ComputoPenaTemporal(Computo):
         # Utiliza las siguientes variables:
         # - _vencimientoDePena
 
+        if self._regimen_normativo._regimen_LA == LA_REGIMENES._No_aplica.value:
+            return
+
         _computo_libertad_asistida = ''                
         
         if self._regimen_normativo._regimen_LA == LA_REGIMENES._Ley_24660.value or self._regimen_normativo._regimen_LA == LA_REGIMENES._Ley_25948.value:
@@ -616,7 +625,10 @@ class ComputoPenaTemporal(Computo):
     def _CalcularRegimenPreparacionLibertad(self):
         
         # Utiliza las siguientes variables:
-        # - _vencimientoDePena                        
+        # - _vencimientoDePena  
+
+        if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._No_aplica.value:
+            return                      
         
         if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._Ley_27375.value:
 
@@ -631,6 +643,9 @@ class ComputoPenaTemporal(Computo):
 
             # Guarda el dato en la variable correspondiente
             self._regimen_preparacion_libertad_COMPUTO = _computo_regPrepLib
+
+    def _CalcularUnidadesFijas(self):
+        pass
 
     def _ImprimirSTRINGGeneral(self):
         print('')
@@ -704,7 +719,11 @@ class ComputoPenaTemporal(Computo):
         print(f' - Vencimiento de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
         print(f' - Caducidad de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_pena)}')
     
-    def _ImprimirSTRINGLibertadCondicional(self):        
+    def _ImprimirSTRINGLibertadCondicional(self):  
+
+        if self._regimen_normativo._regimen_LC == LC_REGIMENES._No_aplica.value:
+            return
+
         print('')
         print('LIBERTAD CONDICIONAL')
         print('--------------------')
@@ -727,6 +746,10 @@ class ComputoPenaTemporal(Computo):
                 print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {self._libertad_condicional_REQUISITO_CALIF_BUENO}.')
 
     def _ImprimirSTRINGSalidasTransitorias(self):
+
+        if self._regimen_normativo._regimen_ST == ST_REGIMENES._No_aplica.value:
+            return
+
         print('')
         print('SALIDAS TRANSITORIAS')
         print('--------------------')
@@ -805,6 +828,10 @@ class ComputoPenaTemporal(Computo):
             print('ADVERTENCIA: No aplicaría el instituto de las Salidas Transitorias porque se condenó por alguno de los delitos excluídos, por art. 56 bis -17.III-, ley 24.660 (según reforma de la ley 27.375).')            
 
     def _ImprimirSTRINGLibertadAsistida(self):
+        
+        if self._regimen_normativo._regimen_LA == LA_REGIMENES._No_aplica.value:
+            return
+        
         print('')
         print('LIBERTAD ASISTIDA')
         print('-----------------')
@@ -822,6 +849,10 @@ class ComputoPenaTemporal(Computo):
             print('ADVERTENCIA: No aplicaría el instituto de la Libertad Asistida porque se condenó por alguno de los delitos excluídos, por art. 56 bis, ley 24.660 (según reforma de la ley 27.375).')
 
     def _ImprimirSTRINGRegimenPreparatorioParaLaLiberacion(self):
+
+        if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._No_aplica.value:
+            return
+        
         if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._Ley_27375.value:
             print('')
             print('RÉGIMEN PREPARATORIO PARA LA LIBERTAD')

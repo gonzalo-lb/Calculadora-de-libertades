@@ -1,8 +1,20 @@
 {
-    "Ley 11.179":{
+    "No aplica":{
         "Fecha de implementacion - year":1,
         "Fecha de implementacion - month":1,
         "Fecha de implementacion - day":1,        
+        "Requisito temporal pena perpetua":20,
+        "Preguntar si es reincidente":false,
+        "Preguntar si hay accesoria del 52 CP":false,        
+        "Preguntar si es un computo por LC revocada":false,
+        "Preguntar por delitos excluidos ley 25.892":false,
+        "Preguntar por delitos excluidos ley 27.375":false,
+        "Preguntar por 2/3 con calificacion BUENO":false
+    },    
+    "Ley 11.179":{
+        "Fecha de implementacion - year":1922,
+        "Fecha de implementacion - month":5,
+        "Fecha de implementacion - day":3,        
         "Requisito temporal pena perpetua":20,
         "Preguntar si es reincidente":true,
         "Preguntar si hay accesoria del 52 CP":true,        

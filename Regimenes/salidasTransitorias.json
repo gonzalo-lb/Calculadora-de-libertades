@@ -1,7 +1,18 @@
 {
-    "Decreto Ley 412/58":{        
+    "No aplica":{        
         "Fecha de implementacion - year":1,
         "Fecha de implementacion - month":1,
+        "Fecha de implementacion - day":1,
+        "Preguntar si hay accesoria del 52 CP":false,
+        "Preguntar si es un computo por evasion de ST":false,
+        "Preguntar por delitos excluidos por 56 bis ley 25.948":false,
+        "Preguntar por delitos excluidos por 56 bis ley 27.375":false,
+        "Preguntar si se encuentra en periodo de prueba, y desde cuando":false,
+        "Preguntar por requisito de calificacion":false
+    },
+    "Decreto Ley 412/58":{        
+        "Fecha de implementacion - year":1958,
+        "Fecha de implementacion - month":2,
         "Fecha de implementacion - day":1,
         "Preguntar si hay accesoria del 52 CP":true,
         "Preguntar si es un computo por evasion de ST":true,

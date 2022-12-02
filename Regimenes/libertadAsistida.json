@@ -1,4 +1,13 @@
 {
+    "No aplica":{
+        "Fecha de implementacion - year":1,
+        "Fecha de implementacion - month":1,
+        "Fecha de implementacion - day":1,
+        "Requisito temporal":6,
+        "Preguntar si es nuevo computo por libertad revocada":false,
+        "Preguntar por delitos excluidos por 56 bis ley 25.948":false,
+        "Preguntar por delitos excluidos por 56 bis ley 27.375":false
+    },
     "Ley 24.660":{
         "Fecha de implementacion - year":1996,
         "Fecha de implementacion - month":7,

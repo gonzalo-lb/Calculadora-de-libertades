@@ -168,7 +168,7 @@ class RegimenNormativoAplicable():
 Libertad condicional: {}
 Salidas transitorias: {}
 Libertad asistida: {}
-Régimen preparatorio para la liberación: {}'''.format(self._regimen_LA, self._regimen_ST, self._regimen_LA, self._regimen_PREPLIB)
+Régimen preparatorio para la liberación: {}'''.format(self._regimen_LC, self._regimen_ST, self._regimen_LA, self._regimen_PREPLIB)
 
 class Preguntas_Input():
     def __init__(self):
@@ -206,6 +206,8 @@ class Preguntas_Input():
         self._monto_de_pena = GetConsoleInput_MontoDePena_temporal()
         print(f' - La pena ingresada es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es), {self._monto_de_pena.dias} día(s).')
 
+        # Unidades Fijas
+
         # PREGUNTAR SI ES REINCIDENTE        
         if self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_esReincidente_KEY):            
             print(Separadores._separadorComun)
@@ -225,9 +227,17 @@ class Preguntas_Input():
         self._otras_detenciones = GetConsoleInput_OtrosTiemposDeDetencion()
         if self._otras_detenciones == 'NULL':
             print(' - No se ingresaron otras detenciones a computar.')
+        else:
+            print(' - Se van a computar las siguientes detenciones:')
+            for otra_det in self._otras_detenciones:                
+                print(f'    - "{otra_det._nombre}": {otra_det._tiempoDeDetencion.años} año(s), {otra_det._tiempoDeDetencion.meses} mes(es) y {otra_det._tiempoDeDetencion.dias} día(s).')
 
         print(Separadores._separadorComun)
-        self._estimulo_educativo = GetConsoleInput_EstimuloEducativo()                    
+        self._estimulo_educativo = GetConsoleInput_EstimuloEducativo()
+        if self._estimulo_educativo.años == 0 and self._estimulo_educativo.meses == 0 and self._estimulo_educativo.dias == 0:
+            print(' - No se aplica el estímulo educativo.')
+        else:
+            print(f' - El estímulo educativo es de {self._estimulo_educativo.años} año(s), {self._estimulo_educativo.meses} mes(es) y {self._estimulo_educativo.dias} día(s).')
         
         # PREGUNTAR SI HAY ACCESORIA DEL 52 CP        
         # if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siHayAccesoria52) or self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_siHayAccesoria52):
@@ -284,9 +294,11 @@ class Preguntas_Input():
                 user_input = input('¿La condena es por alguno de los delitos enumerados en la ley 25.892? (S/N): ')
                 if user_input == "N" or user_input == "n" or user_input == '':
                     self._monto_de_pena.delitosExcluidosLey25892 = False
+                    print(' - No')
                     break
                 if user_input == "S" or user_input == "s":
                     self._monto_de_pena.delitosExcluidosLey25892 = True
+                    print(' - Si')
                     break
                 print('ERROR: Solo se puede responder con "s" o "n"')
 
@@ -298,9 +310,11 @@ class Preguntas_Input():
                 user_input = input('¿La condena es por alguno de los delitos enumerados en la ley 25.948? (S/N): ')
                 if user_input == "N" or user_input == "n" or user_input == '':
                     self._monto_de_pena.delitosExcluidosLey25948 = False
+                    print(' - No')
                     break
                 if user_input == "S" or user_input == "s":
                     self._monto_de_pena.delitosExcluidosLey25948 = True
+                    print(' - Si')
                     break
                 print('ERROR: Solo se puede responder con "s" o "n"')
 
@@ -312,9 +326,11 @@ class Preguntas_Input():
                 user_input = input('¿La condena es por alguno de los delitos enumerados en la ley 27.375? (S/N): ')
                 if user_input == "N" or user_input == "n" or user_input == '':
                     self._monto_de_pena.delitosExcluidosLey27375 = False
+                    print(' - No')
                     break
                 if user_input == "S" or user_input == "s":
                     self._monto_de_pena.delitosExcluidosLey27375 = True
+                    print(' - Si')
                     break
                 print('ERROR: Solo se puede responder con "s" o "n"')
 
@@ -334,7 +350,7 @@ class Preguntas_Input():
             # PREGUNTAR SI ESTA EN PERIODO DE PRUEBA, Y DESDE CUÁNDO
             if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siEstaPeriodoDePruebaYDesdeCuando):
                 print(Separadores._separadorComun)
-                self._fecha_ingreso_periodo_de_prueba = GetConsoleInput_Fecha('Fecha de ingreso al periodo de prueba (Formato: XX/XX/XXXX. Dejar en blanco si aún no ingresó al periodo de prueba): ', ENTER_devuelve_NULL=True)
+                self._fecha_ingreso_periodo_de_prueba = GetConsoleInput_Fecha('Fecha de ingreso al periodo de prueba (Dejar en blanco si aún no ingresó al periodo de prueba): ', ENTER_devuelve_NULL=True)
                 if self._fecha_ingreso_periodo_de_prueba == 'NULL':
                     print(' - No se ingresó fecha de ingreso al periodo de prueba. No se utilizará esta variable en el cómputo.')                    
                 else:
@@ -343,7 +359,7 @@ class Preguntas_Input():
             # PREGUNTAR SI TIENE CONCEPTO BUENO DURANTE 2/3 DE LA EJECUCIÓN
             if self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_2_3ConCalifBUENO_KEY):
                 print(Separadores._separadorComun)
-                self._fecha_calificacion_BUENO = GetConsoleInput_Fecha('Fecha en la que se obtuvo calificación "BUENO" (Formato: XX/XX/XXXX. Dejar en blanco si aún no se obtuvo): ', ENTER_devuelve_NULL=True)
+                self._fecha_calificacion_BUENO = GetConsoleInput_Fecha('Fecha en la que se obtuvo calificación "BUENO" (Dejar en blanco si aún no se obtuvo): ', ENTER_devuelve_NULL=True)
                 if self._fecha_calificacion_BUENO == 'NULL':
                     print(' - No se ingresó fecha en la que se obtuvo calificación "BUENO". No se utilizará esta variable en el cómputo.')                    
                 else:
@@ -352,7 +368,7 @@ class Preguntas_Input():
             # PREGUNTAR POR REQUISITO DE CALIFICACIÓN PARA ST
             if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_requisitoDeCalificacion):
                 print(Separadores._separadorComun)
-                self._fecha_calificacion_EJEMPLAR = GetConsoleInput_Fecha('Fecha en la que se obtuvo calificación "EJEMPLAR" (Formato: XX/XX/XXXX. Dejar en blanco si aún no se obtuvo): ', ENTER_devuelve_NULL=True)
+                self._fecha_calificacion_EJEMPLAR = GetConsoleInput_Fecha('Fecha en la que se obtuvo calificación "EJEMPLAR" (Dejar en blanco si aún no se obtuvo): ', ENTER_devuelve_NULL=True)
                 if self._fecha_calificacion_EJEMPLAR == 'NULL':
                     print(' - No se ingresó fecha en la que se obtuvo calificación "EJEMPLAR". No se utilizará esta variable en el cómputo.')                    
                 else:
@@ -547,9 +563,9 @@ def GetConsoleInput_MontoDePena_temporal():
                 _months = int(_months)
                 if _months >= 0 and _months <= 11:
                     break
-                print(' - ERROR: El monto de pena en años debe ser un número entre 0 y 11.')
+                print(' - ERROR: El monto de pena en meses debe ser un número entre 0 y 11.')
             except:
-                print(' - ERROR: El monto de pena en años debe ser un número entre 0 y 11.')
+                print(' - ERROR: El monto de pena en meses debe ser un número entre 0 y 11.')
 
         # Ingresar días
         while True:
@@ -561,9 +577,9 @@ def GetConsoleInput_MontoDePena_temporal():
                 _days = int(_days)
                 if _days >= 0 and _days <= 30:
                     break
-                print(' - ERROR: El monto de pena en años debe ser un número entre 0 y 30.')    
+                print(' - ERROR: El monto de pena en días debe ser un número entre 0 y 30.')    
             except:
-                print(' - ERROR: El monto de pena en años debe ser un número entre 0 y 30.')
+                print(' - ERROR: El monto de pena en días debe ser un número entre 0 y 30.')
         
         _total = _years + _months + _days
         if _total != 0:
@@ -576,7 +592,7 @@ def GetConsoleInput_MontoDePena_temporal():
 
     return montoDePena
 
-def GetConsoleInput_OtrosTiemposDeDetencion():
+def GetConsoleInput_OtrosTiemposDeDetencion() -> list[OtraDetencion]:
     OTDD = []
     seguir_preguntando = True
     init_query = input('Ingresar otros tiempos de detención a computar? (S/N): ')
@@ -584,9 +600,12 @@ def GetConsoleInput_OtrosTiemposDeDetencion():
         while seguir_preguntando:
             f_det = ''
             f_lib = ''
-            f_det = GetConsoleInput_Fecha('Ingresar fecha de detención del otro tiempo a computar (XX/XX/XXXX): ')
-            f_lib = GetConsoleInput_Fecha('Ingresar fecha de libertad (XX/XX/XXXX): ')
-            este = OtraDetencion(f_det, f_lib)
+            f_nombre = input('Ingresar denominación o referencia para esta detención: ')
+            if f_nombre == '':
+                f_nombre = 'Sin nombre'
+            f_det = GetConsoleInput_Fecha('Ingresar fecha de detención del otro tiempo a computar: ')
+            f_lib = GetConsoleInput_Fecha('Ingresar fecha de libertad: ')
+            este = OtraDetencion(f_det, f_lib, nombre=f_nombre)
             OTDD.append(este)
             seguir = input('Necesita ingresar otro tiempo de detención? (S/N): ')
             if seguir == "S" or seguir == "s":
@@ -597,20 +616,70 @@ def GetConsoleInput_OtrosTiemposDeDetencion():
     else:
         return "NULL"
 
-def GetConsoleInput_EstimuloEducativo():
+def GetConsoleInput_EstimuloEducativo() -> TiempoEn_Años_Meses_Dias:
+    # estimulo = TiempoEn_Años_Meses_Dias()
+    # try:
+    #     estimulo.años = int(input('Ingresar estímulo educativo (años): '))
+    # except:
+    #     estimulo.años = 0        
+    # try:
+    #     estimulo.meses = int(input('Ingresar estímulo educativo (meses): '))        
+    # except:
+    #     estimulo.meses = 0        
+    # try:
+    #     estimulo.dias = int(input('Ingresar estímulo educativo (días): '))        
+    # except:
+    #     estimulo.dias = 0
+    # return estimulo
     estimulo = TiempoEn_Años_Meses_Dias()
-    try:
-        estimulo.años = int(input('Ingresar estímulo educativo (años): '))
-    except:
-        estimulo.años = 0        
-    try:
-        estimulo.meses = int(input('Ingresar estímulo educativo (meses): '))        
-    except:
-        estimulo.meses = 0        
-    try:
-        estimulo.dias = int(input('Ingresar estímulo educativo (días): '))        
-    except:
-        estimulo.dias = 0
+    
+    # Ingresar años
+    while True:
+        try:
+            _years = input('Ingresar estímulo educativo (años): ')
+            if _years == '':
+                _years = 0
+                break
+            _years = int(_years)
+            if _years >= 0 and _years <= 50:
+                break
+            print(' - ERROR: El monto en años debe ser un número entre 0 y 50.')
+        except:
+            print(' - ERROR: El monto en años debe ser un número entre 0 y 50.')
+    
+    # Ingresar meses
+    while True:
+        try:
+            _months = input('Ingresar estímulo educativo (meses): ')
+            if _months == '':
+                _months = 0
+                break
+            _months = int(_months)
+            if _months >= 0 and _months <= 11:
+                break
+            print(' - ERROR: El monto meses debe ser un número entre 0 y 11.')
+        except:
+            print(' - ERROR: El monto en meses debe ser un número entre 0 y 11.')
+
+    # Ingresar días
+    while True:
+        try:
+            _days = input('Ingresar estímulo educativo (días): ')
+            if _days == '':
+                _days = 0
+                break
+            _days = int(_days)
+            if _days >= 0 and _days <= 30:
+                break
+            print(' - ERROR: El monto en días debe ser un número entre 0 y 30.')    
+        except:
+            print(' - ERROR: El monto en días debe ser un número entre 0 y 30.')    
+    
+
+    estimulo.años = _years
+    estimulo.meses = _months
+    estimulo.dias = _days      
+
     return estimulo
 
 def RestarOtrasDetenciones(fecha_de_requisito_temporal:datetime.date, otras_detenciones:list[OtraDetencion]):
