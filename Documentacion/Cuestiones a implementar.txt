@@ -1,10 +1,11 @@
 Lo que hice ahora: 
- - Terminé la calculadora de multas.
- - Reformé las funciones de Get input para multa en unidades fijas. Agregué mínimo y máximo para ingresar.
- - Armé función para representar un float o int como un str con separador de miles.
- - Implementé esa función para imprimir la multa. 
+ - Reformé la pregunta por los delitos excluidos.
+ - Integré los regímenes de leyes 25892 y 25948, que enumeraban los mismos delitos.
+ - Armé el json con el texto de la norma de los delitos excluidos y lo implmenté a las preguntas.
+ - Reformé las advertencias en los print, que estaban mal en algunos casos.
 
 Con qué seguir: 
+ - Probar el funcionamiento antes de seguir con los otros tipos de cómputo.
  - Los otros tipos de cómputo. 
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
@@ -12,17 +13,18 @@ Con qué seguir:
  - Reformar los cálculos de vencimiento y otros para la reclusión por tiempo indeterminado 
  - Implementar cálculos para casos de reclusión por tiempo indeterminado   
  - EN ST y LC, agregar un else para los casos de que no sean ninguno de los regímenes (no debería suceder pero...)  
- - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación 
+ - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación
 
 Funcionalidad a implementar: 
- - Nuevo cómputo para libertad condicional revocada (no se contabiliza el tiempo que se estuvo en libertad) 
- - Alertas por reincidencia, delitos excluidos del régimen de libertades (por ley 27.375), libertades revocadas, etc. con indicación de la normativa específica.
- - Requisito temporal extra para la ST, de permanencia en periodo de prueba (art. 17, ley 24.660)
- - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)
- - Régimen de salida anticipada para los casos del 56 bis (1 año antes)
- - Monto de las Unidades Fijas
+ - Penas perpetuas
+ - Nuevo cómputo para libertad condicional revocada (no se contabiliza el tiempo que se estuvo en libertad)  
+ - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)  
 
  Hecho:
+ - Terminé la calculadora de multas.
+ - Reformé las funciones de Get input para multa en unidades fijas. Agregué mínimo y máximo para ingresar.
+ - Armé función para representar un float o int como un str con separador de miles.
+ - Implementé esa función para imprimir la multa.
  - Agregué funcionalidad para cálculo de unidades fijas, en la libcalc.
  - Agregué la carga del JSON de unidades fijas.
  - Codificar los strings del JSON.

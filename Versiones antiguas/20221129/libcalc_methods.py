@@ -159,7 +159,7 @@ class RegimenNormativoAplicable():
         return self.__JSON_PREPLIB[self._regimen_PREPLIB][ask.value]
     
     def _Imprimir(self):
-        print('')
+        print(Separadores._separadorComun)
         print(self)
 
     def __str__(self):

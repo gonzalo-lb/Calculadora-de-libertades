@@ -609,7 +609,7 @@ class ComputoPenaTemporal(Computo):
         self._libertad_asistida_COMPUTO = _computo_libertad_asistida
 
     def _ImprimirSTRINGGeneral(self):
-        print('')
+        print(Separadores._separadorComun)
         print('DATOS INGRESADOS')
         print('----------------')
         print(f' - Fecha del hecho: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_del_hecho)}')
@@ -674,14 +674,14 @@ class ComputoPenaTemporal(Computo):
                     print(' - Para el cálculo de las salidas transitorias se va a computar estímulo educativo y/o se van a restar las otras detenciones ingresadas, solamente para el requisito temporal del periodo de prueba.')
             
     def _ImprimirSTRINGVencimientoYCaducidadDePena(self):
-        print('')
+        print(Separadores._separadorComun)
         print('VENCIMIENTO Y CADUCIDAD')
         print('-----------------------')
         print(f' - Vencimiento de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
         print(f' - Caducidad de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_pena)}')
     
     def _ImprimirSTRINGLibertadCondicional(self):        
-        print('')
+        print(Separadores._separadorComun)
         print('LIBERTAD CONDICIONAL')
         print('--------------------')
         print(f' - La libertad condicional se obtiene a los {self._libertad_condicional_REQUISITO_TEMPORAL.años} año(s), {self._libertad_condicional_REQUISITO_TEMPORAL.meses} mes(es) y {self._libertad_condicional_REQUISITO_TEMPORAL.dias} día(s).')
@@ -703,7 +703,7 @@ class ComputoPenaTemporal(Computo):
                 print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {self._libertad_condicional_REQUISITO_CALIF_BUENO}.')
 
     def _ImprimirSTRINGSalidasTransitorias(self):
-        print('')
+        print(Separadores._separadorComun)
         print('SALIDAS TRANSITORIAS')
         print('--------------------')
 
@@ -781,7 +781,7 @@ class ComputoPenaTemporal(Computo):
             print('ADVERTENCIA: No aplicaría el instituto de las Salidas Transitorias porque se condenó por alguno de los delitos excluídos, por art. 56 bis -17.III-, ley 24.660 (según reforma de la ley 27.375).')            
 
     def _ImprimirSTRINGLibertadAsistida(self):
-        print('')
+        print(Separadores._separadorComun)
         print('LIBERTAD ASISTIDA')
         print('-----------------')
         if self._regimen_normativo._regimen_LA == LA_REGIMENES._Ley_27375.value:            
@@ -1461,7 +1461,7 @@ Libertad asistida: {}
                 f'La persona permaneció en libertad {self._tiempo_que_permanecio_en_libertad.años} año(s), {self._tiempo_que_permanecio_en_libertad.meses} mes(es) y {self._tiempo_que_permanecio_en_libertad.dias} día(s).'
             print(self._regimenNormativoAplicable)
             print(INFORMACION_SOBRE_EL_COMPUTO)
-            print('')
+            print(Separadores._separadorComun)
             print('NUEVO CÓMPUTO DE PENA')
             print('---------------------')
             print(self._vencimiento_y_caducidad_STRING)
@@ -1480,7 +1480,7 @@ Libertad asistida: {}
             print(self._regimenNormativoAplicable)
             print(INFORMACION_SOBRE_EL_COMPUTO)
 
-            print('')
+            print(Separadores._separadorComun)
             print('CÓMPUTO DE PENA')
             print('---------------')
             print(self._vencimiento_y_caducidad_STRING)
@@ -1506,7 +1506,7 @@ Libertad asistida: {}
                         print(f'Libertad condicional (integral): {Datetime_date_enFormatoXX_XX_XXXX(self._requisitoCalificacion_libertad_condicional)}')
             print(self._salidas_transitorias_STRING)
 
-            print('')
+            print(Separadores._separadorComun)
             print('CÓMPUTO DE PENA (SIN RESTAR OTRAS DETENCIONES)')
             print('---------------------------------------------)')
             print(self._vencimiento_y_caducidad_STRING_SROT)

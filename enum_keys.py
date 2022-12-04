@@ -68,6 +68,10 @@ class REGPREPLIB_REGIMENES(Enum):
     _No_aplica = 'No aplica'
     _Ley_27375 = 'Ley 27.375'
 
+class DELITOS_EXCLUIDOS_LIB_KEYS(Enum):    
+    _Ley_25892_y_25948_KEY = 'Ley 25892 y 25948'    
+    _Ley_27375_KEY = 'Ley 27375'
+
 class UNIDADESFIJAS_KEYS(Enum):    
     _fechaImplementacion_YEAR_KEY = 'Fecha entrada en vigencia - year'
     _fechaImplementacion_MONTH_KEY = 'Fecha entrada en vigencia - month'

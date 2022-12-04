@@ -291,14 +291,14 @@ class ComputoPenaTemporal(Computo):
         
         # Imprime los resultados
         self._ImprimirSTRINGGeneral()
-        self._regimen_normativo._Imprimir()
+        self._ImprimirSTRINGRegimenNormativo()
         self._ImprimirSTRINGVencimientoYCaducidadDePena()
         self._ImprimirSTRINGLibertadCondicional()
         self._ImprimirSTRINGSalidasTransitorias()
         self._ImprimirSTRINGLibertadAsistida()
         self._ImprimirSTRINGRegimenPreparatorioParaLaLiberacion()
         self._ImprimirSTRINGMultaUnidadesFijasEnPesos()
-        print('')
+        print(Separadores._separadorComun)
     
     def _ControlarParametros(self):
         if self._fecha_del_hecho == 'NULL':
@@ -657,29 +657,34 @@ class ComputoPenaTemporal(Computo):
         self._multa_unidadesFijas_en_pesos = self._monto_multa_unidades_fijas * self._regimen_normativo.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._valorDeLaUnidadFija)
 
     def _ImprimirSTRINGGeneral(self):
-        print('')
+        print(Separadores._separadorComun)
         print('DATOS INGRESADOS')
         print('----------------')
         print(f' - Fecha del hecho: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_del_hecho)}')
         print(f' - Fecha de detención: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_detencion)}')
         
-        if self._monto_de_pena.perpetua:
-            print(' - Es una pena perpetua.')
-        else:
-            print(f' - La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s).')
+        # if self._monto_de_pena.perpetua:
+        #     print(' - Es una pena perpetua.')
+        # else:
+
+        print(f' - La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s).')
+        
+        if self._monto_multa_unidades_fijas != 'NULL':
+            print(f'    - La multa es de {self._monto_multa_unidades_fijas} unidades fijas.')
+            
         if self._monto_de_pena.reincidencia:
             print('    - Es reincidente.')
-        if self._monto_de_pena.ejecucionCondicional:
-            print('    - Es de ejecución condicional.')
-            print(f'    - El plazo de control es de {self._monto_de_pena.plazoControl_años} año(s), {self._monto_de_pena.plazoControl_meses} mes(es) y {self._monto_de_pena.plazoControl_dias} día(s).')
-        if self._monto_de_pena.reclusionPorTiempoIndeterminado:
-            print('    - Hay accesoria de reclusión por tiempo indeterminado.')
+        # if self._monto_de_pena.ejecucionCondicional:
+        #     print('    - Es de ejecución condicional.')
+        #     print(f'    - El plazo de control es de {self._monto_de_pena.plazoControl_años} año(s), {self._monto_de_pena.plazoControl_meses} mes(es) y {self._monto_de_pena.plazoControl_dias} día(s).')
+        # if self._monto_de_pena.reclusionPorTiempoIndeterminado:
+        #     print('    - Hay accesoria de reclusión por tiempo indeterminado.')
         if self._monto_de_pena.delitosExcluidosLey25892:
             print('    - La condena es por delitos enumerados en la ley 25.892.')
         if self._monto_de_pena.delitosExcluidosLey25948:
             print('    - La condena es por delitos enumerados en la ley 25.948.')
         if self._monto_de_pena.delitosExcluidosLey27375:
-            print('    - La condena es por delitos enumerados en la ley 27.375.')
+            print('    - La condena es por delitos enumerados en la ley 27.375.')        
         
         if self._otras_detenciones == 'NULL':
             print(' - No se ingresaron otros tiempos de detención a computar.')
@@ -720,9 +725,15 @@ class ComputoPenaTemporal(Computo):
                     print(' - Para el cálculo de las salidas transitorias se va a computar estímulo educativo y/o se van a restar las otras detenciones ingresadas, tanto para el requisito temporal del periodo de prueba, como para el de las salidas transitorias.')
                 else:
                     print(' - Para el cálculo de las salidas transitorias se va a computar estímulo educativo y/o se van a restar las otras detenciones ingresadas, solamente para el requisito temporal del periodo de prueba.')
-            
+
+    def _ImprimirSTRINGRegimenNormativo(self):
+        if self._monto_multa_unidades_fijas == 'NULL':
+            self._regimen_normativo._Imprimir()
+        else:
+            self._regimen_normativo._Imprimir(imprimir_reg_unidadesFijas=True)
+
     def _ImprimirSTRINGVencimientoYCaducidadDePena(self):
-        print('')
+        print(Separadores._separadorComun)
         print('VENCIMIENTO Y CADUCIDAD')
         print('-----------------------')
         print(f' - Vencimiento de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
@@ -733,7 +744,7 @@ class ComputoPenaTemporal(Computo):
         if self._regimen_normativo._regimen_LC == LC_REGIMENES._No_aplica.value:
             return
 
-        print('')
+        print(Separadores._separadorComun)
         print('LIBERTAD CONDICIONAL')
         print('--------------------')
         print(f' - La libertad condicional se obtiene a los {self._libertad_condicional_REQUISITO_TEMPORAL.años} año(s), {self._libertad_condicional_REQUISITO_TEMPORAL.meses} mes(es) y {self._libertad_condicional_REQUISITO_TEMPORAL.dias} día(s).')
@@ -743,9 +754,13 @@ class ComputoPenaTemporal(Computo):
         if self._monto_de_pena.reincidencia:
             print('ADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque la pena incluye reincidencia.')            
         
-        if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value and self._monto_de_pena.delitosExcluidosLey27375:
-            print('ADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque se condenó por alguno de los delitos excluídos, por art. 14 CP (según reforma de la ley 27.375).')            
+        if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_25892.value and self._monto_de_pena.delitosExcluidosLey25892:
+            print('ADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque se condenó por alguno de los delitos excluídos, por art. 14 CP (según reforma de la ley 25.892).')
         
+        if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value and self._monto_de_pena.delitosExcluidosLey27375:
+            print('ADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque se condenó por alguno de los delitos excluídos, por art. 14 CP (según reforma de la ley 27.375).')
+        
+        # Imprime requisito de calificación, si corresponde
         if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value:
             if self._libertad_condicional_REQUISITO_CALIF_SITUACION == 1:
                 print('Como no se cuenta con la fecha en la que se inició la ejecución de la pena, no es posible calcular el requisito temporal de calificación (art. 28, ley 24.660).')
@@ -759,17 +774,13 @@ class ComputoPenaTemporal(Computo):
         if self._regimen_normativo._regimen_ST == ST_REGIMENES._No_aplica.value:
             return
 
-        print('')
+        print(Separadores._separadorComun)
         print('SALIDAS TRANSITORIAS')
         print('--------------------')
 
         if self._regimen_normativo._regimen_ST == ST_REGIMENES._DecretoLey412_58.value or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_24660.value or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_25948.value:
             print(f' - Las salidas transitorias se obtienen a los {self._salidas_transitorias_REQUISITO_TEMPORAL.años} año(s), {self._salidas_transitorias_REQUISITO_TEMPORAL.meses} mes(es) y {self._salidas_transitorias_REQUISITO_TEMPORAL.dias} día(s).')
-            print(f' - El requisito temporal para acceder a las salidas transitorias se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')
-            
-            if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_delitosExcluidos25948_KEY):
-                if self._monto_de_pena.delitosExcluidosLey25948:
-                    print(' - ADVERTENCIA: La salida transitoria no sería aplicable en función de que la condena es por uno de los delitos enumerados en el art. 56 bis, ley 24.660.')            
+            print(f' - El requisito temporal para acceder a las salidas transitorias se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')            
         
         if  self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_27375.value:            
 
@@ -841,7 +852,7 @@ class ComputoPenaTemporal(Computo):
         if self._regimen_normativo._regimen_LA == LA_REGIMENES._No_aplica.value:
             return
         
-        print('')
+        print(Separadores._separadorComun)
         print('LIBERTAD ASISTIDA')
         print('-----------------')
         if self._regimen_normativo._regimen_LA == LA_REGIMENES._Ley_27375.value:            
@@ -863,7 +874,7 @@ class ComputoPenaTemporal(Computo):
             return
         
         if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._Ley_27375.value:
-            print('')
+            print(Separadores._separadorComun)
             print('RÉGIMEN PREPARATORIO PARA LA LIBERTAD')
             print('-------------------------------------')
             print(f' - El régimen preparatorio para la libertad comienza el día {Datetime_date_enFormatoXX_XX_XXXX(self._regimen_preparacion_libertad_COMPUTO)}.')
@@ -872,11 +883,17 @@ class ComputoPenaTemporal(Computo):
         if self._regimen_normativo._regimen_UNIDADESFIJAS == 'No aplica':
             return
         
-        print('')
+        if self._monto_multa_unidades_fijas == 'NULL':
+            return
+        
+        print(Separadores._separadorComun)
         print('MULTA')
         print('-----')
         print(f' - Valor de la unidad fija: ${NumeroConSeparadorDeMiles(self._regimen_normativo.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._valorDeLaUnidadFija))}')
         print(f' - Multa en pesos: ${NumeroConSeparadorDeMiles(self._multa_unidadesFijas_en_pesos)}')
+
+class ComputoPenaPerpetua(Computo):
+    pass
 
 def _DEBUG_PENA_TEMPORAL():    
     fechaDelHecho = datetime.date(2018, 5, 26)
@@ -899,4 +916,5 @@ def _DEBUG_PENA_TEMPORAL():
     fechaIngresoPeriodoDePrueba=fechaIngresoPeriodoDePrueba)    
 
 if __name__ == '__main__':
-    _DEBUG_PENA_TEMPORAL()
+    print('')
+    print('HAY QUE CORRER ESTO DESDE MAIN_APP')

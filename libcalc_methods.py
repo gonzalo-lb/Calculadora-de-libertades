@@ -120,6 +120,9 @@ class RegimenNormativoAplicable():
             # En este JSON, la información de vigencia de la Resolución MSEG 270/2016 corresponde a la de la
             # ley 27.302, porque desde esa fecha aplica el régimen de las Unidades Fijas. Los formularios
             # ya existían de antes
+        
+        with open('Regimenes/delitosExcluidosLib.json', encoding='utf-8') as textoDelitosExcluidosLib:
+            self._JSON_DELITOSEXCLUIDOSLIB = json.load(textoDelitosExcluidosLib)
 
         # DETERMINA RÉGIMEN DE LIBERTAD CONDICIONAL
 
@@ -176,18 +179,19 @@ class RegimenNormativoAplicable():
     def UNIDADES_FIJAS(self, ask:UNIDADESFIJAS_KEYS):
         return self._JSON_UNIDADESFIJAS[self._regimen_UNIDADESFIJAS][ask.value]
     
-    def _Imprimir(self):
-        print('')
-        print(self)
-
-    def __str__(self):
-        return '''REGIMEN LEGAL APLICABLE
------------------------
-Libertad condicional: {}
-Salidas transitorias: {}
-Libertad asistida: {}
-Régimen preparatorio para la liberación: {}
-Unidades fijas: {}'''.format(self._regimen_LC, self._regimen_ST, self._regimen_LA, self._regimen_PREPLIB, self.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._denominacion_KEY))
+    def DELITOS_EXCLUIDOS_LIBERTAD(self, ask:DELITOS_EXCLUIDOS_LIB_KEYS):
+        return self._JSON_DELITOSEXCLUIDOSLIB[ask.value]
+    
+    def _Imprimir(self, imprimir_reg_unidadesFijas:bool=False):
+        print(Separadores._separadorComun)
+        print('REGIMEN LEGAL APLICABLE')
+        print('-----------------------')
+        print(f' - Libertad condicional: {self._regimen_LC}')
+        print(f' - Salidas transitorias: {self._regimen_ST}')
+        print(f' - Libertad asistida: {self._regimen_LA}')
+        print(f' - Régimen preparatorio para la liberación: {self._regimen_PREPLIB}')
+        if imprimir_reg_unidadesFijas:
+            print(f' - Unidades fijas: {self.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._denominacion_KEY)}')    
 
 class Preguntas_Input():
     def __init__(self):
@@ -230,9 +234,12 @@ class Preguntas_Input():
         if self._regimen_normativo._regimen_UNIDADESFIJAS != 'No aplica':
             print(Separadores._separadorComun)
             self._monto_multa = GetConsoleInput_Multa_Unidades_Fijas('Monto de la multa (en Unidades Fijas): ')
-            print(f' - El monto ingresado es de {self._monto_multa} Unidades Fijas.')
+            if self._monto_multa == 'NULL':
+                print(' - No se ingresó monto de multa.')
+            else:
+                print(f' - El monto ingresado es de {self._monto_multa} Unidades Fijas.')
 
-        # PREGUNTAR SI ES REINCIDENTE        
+        # Reincidencia
         if self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_esReincidente_KEY):            
             print(Separadores._separadorComun)
             while True:
@@ -247,6 +254,7 @@ class Preguntas_Input():
                     break
                 print('ERROR: Solo se puede responder con "s" o "n"')
 
+        # Otros tiempos de detención a computar
         print(Separadores._separadorComun)
         self._otras_detenciones = GetConsoleInput_OtrosTiemposDeDetencion()
         if self._otras_detenciones == 'NULL':
@@ -256,6 +264,7 @@ class Preguntas_Input():
             for otra_det in self._otras_detenciones:                
                 print(f'    - "{otra_det._nombre}": {otra_det._tiempoDeDetencion.años} año(s), {otra_det._tiempoDeDetencion.meses} mes(es) y {otra_det._tiempoDeDetencion.dias} día(s).')
 
+        # Estímulo educativo
         print(Separadores._separadorComun)
         self._estimulo_educativo = GetConsoleInput_EstimuloEducativo()
         if self._estimulo_educativo.años == 0 and self._estimulo_educativo.meses == 0 and self._estimulo_educativo.dias == 0:
@@ -309,35 +318,29 @@ class Preguntas_Input():
         #             self._EsComputoPorLARevocada = False
         #             break
         #         print('ERROR: Solo se puede responder con números del 1 al 4')
-
-        # PREGUNTAR SI ES POR DELITOS EXCLUIDOS LEY 25.892
-        if self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_delitosExcluidos25892_KEY):
+            
+        # PREGUNTAR SI ES POR DELITOS EXCLUIDOS LEY 25.892 o 25.948, según corresponda (son los mismos delitos)
+        if (self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_delitosExcluidos25892_KEY)
+            or self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_delitosExcluidos25948_KEY)
+            or self._regimen_normativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_delitosExcluidos25948_KEY)):
             print(Separadores._separadorComun)
             while True:
-                print('Delitos excluidos por la ley 25.892: ...')
-                user_input = input('¿La condena es por alguno de los delitos enumerados en la ley 25.892? (S/N): ')
+                print(self._regimen_normativo.DELITOS_EXCLUIDOS_LIBERTAD(DELITOS_EXCLUIDOS_LIB_KEYS._Ley_25892_y_25948_KEY))
+                user_input = input('¿La condena es por alguno de los siguientes delitos? (S/N): ')
                 if user_input == "N" or user_input == "n" or user_input == '':
-                    self._monto_de_pena.delitosExcluidosLey25892 = False
+                    if self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_delitosExcluidos25892_KEY):
+                        self._monto_de_pena.delitosExcluidosLey25892 = False
+                    if(self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_delitosExcluidos25948_KEY)
+                       or self._regimen_normativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_delitosExcluidos25948_KEY)):
+                        self._monto_de_pena.delitosExcluidosLey25948 = False
                     print(' - No')
                     break
                 if user_input == "S" or user_input == "s":
-                    self._monto_de_pena.delitosExcluidosLey25892 = True
-                    print(' - Si')
-                    break
-                print('ERROR: Solo se puede responder con "s" o "n"')
-
-        # PREGUNTAR SI ES POR DELITOS EXCLUIDOS LEY 25.948
-        if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_delitosExcluidos25948_KEY) or self._regimen_normativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_delitosExcluidos25948_KEY):
-            print(Separadores._separadorComun)
-            while True:
-                print('Delitos excluidos por la ley 25.948: ...')
-                user_input = input('¿La condena es por alguno de los delitos enumerados en la ley 25.948? (S/N): ')
-                if user_input == "N" or user_input == "n" or user_input == '':
-                    self._monto_de_pena.delitosExcluidosLey25948 = False
-                    print(' - No')
-                    break
-                if user_input == "S" or user_input == "s":
-                    self._monto_de_pena.delitosExcluidosLey25948 = True
+                    if self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_delitosExcluidos25892_KEY):
+                        self._monto_de_pena.delitosExcluidosLey25892 = True
+                    if(self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_delitosExcluidos25948_KEY)
+                       or self._regimen_normativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_delitosExcluidos25948_KEY)):
+                        self._monto_de_pena.delitosExcluidosLey25948 = True
                     print(' - Si')
                     break
                 print('ERROR: Solo se puede responder con "s" o "n"')
@@ -346,7 +349,7 @@ class Preguntas_Input():
         if self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_delitosExcluidos27375_KEY) or self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_delitosExcluidos27375_KEY) or self._regimen_normativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_delitosExcluidos27375_KEY) or self._regimen_normativo.REGIMEN_PREPARACION_LIBERTAD(REGPREPLIB_KEYS._ask_delitosExcluidos27375_KEY):
             print(Separadores._separadorComun)
             while True:
-                print('Delitos excluidos por la ley 27.375: ...')
+                print(self._regimen_normativo.DELITOS_EXCLUIDOS_LIBERTAD(DELITOS_EXCLUIDOS_LIB_KEYS._Ley_27375_KEY))
                 user_input = input('¿La condena es por alguno de los delitos enumerados en la ley 27.375? (S/N): ')
                 if user_input == "N" or user_input == "n" or user_input == '':
                     self._monto_de_pena.delitosExcluidosLey27375 = False
@@ -586,9 +589,9 @@ def GetConsoleInput_MontoDePena_temporal():
                 _years = int(_years)
                 if _years >= 0 and _years <= 50:
                     break
-                print(' - ERROR: El monto de pena en años debe ser un número entre 0 y 50.')
+                print(' - ERROR: El monto de pena en años debe ser un número entero entre 0 y 50.')
             except:
-                print(' - ERROR: El monto de pena en años debe ser un número entre 0 y 50.')
+                print(' - ERROR: El monto de pena en años debe ser un número entero entre 0 y 50.')
         
         # Ingresar meses
         while True:
@@ -600,9 +603,9 @@ def GetConsoleInput_MontoDePena_temporal():
                 _months = int(_months)
                 if _months >= 0 and _months <= 11:
                     break
-                print(' - ERROR: El monto de pena en meses debe ser un número entre 0 y 11.')
+                print(' - ERROR: El monto de pena en meses debe ser un número entero entre 0 y 11.')
             except:
-                print(' - ERROR: El monto de pena en meses debe ser un número entre 0 y 11.')
+                print(' - ERROR: El monto de pena en meses debe ser un número entero entre 0 y 11.')
 
         # Ingresar días
         while True:
@@ -614,14 +617,14 @@ def GetConsoleInput_MontoDePena_temporal():
                 _days = int(_days)
                 if _days >= 0 and _days <= 30:
                     break
-                print(' - ERROR: El monto de pena en días debe ser un número entre 0 y 30.')    
+                print(' - ERROR: El monto de pena en días debe ser un número entero entre 0 y 30.')    
             except:
-                print(' - ERROR: El monto de pena en días debe ser un número entre 0 y 30.')
+                print(' - ERROR: El monto de pena en días debe ser un número entero entre 0 y 30.')
         
         _total = _years + _months + _days
         if _total != 0:
             break
-        print(' - ERROR: Se ingresó una pena de 0 años, 0 meses y 0 días. Intente de nuevo.')
+        print(' - ERROR: No se ingresó ninguna pena. Intente de nuevo.')
 
     montoDePena.años = _years
     montoDePena.meses = _months
@@ -633,7 +636,8 @@ def GetConsoleInput_Multa_Unidades_Fijas(mensaje_para_el_usuario:str='Ingresar m
     '''_min=45 : Es el monto mínimo de multa que permite la función. Por defecto es 45.\n
        _max=900 : Es el monto máximo de multa que permite la función. Por defecto es 900.\n
        Si el mínimo ingresado es mayor al máximo, la función invierte los valores para que siempre el máximo sea mayor
-       o igual al mínimo.'''
+       o igual al mínimo.\n
+       Si se ingresa 0, o nada, devuelve str -> "NULL"'''
 
     if _min > _max:
         _newMax = _min
@@ -644,8 +648,8 @@ def GetConsoleInput_Multa_Unidades_Fijas(mensaje_para_el_usuario:str='Ingresar m
     while True:
         try:
             _multa = input(mensaje_para_el_usuario)
-            if _multa == '':
-                _multa = 0
+            if _multa == '' or _multa == 0:
+                _multa = 'NULL'
                 break
             _multa = int(_multa)
             if _multa >= _min and _multa <= _max:
