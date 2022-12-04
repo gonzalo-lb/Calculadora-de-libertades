@@ -875,8 +875,8 @@ class ComputoPenaTemporal(Computo):
         print('')
         print('MULTA')
         print('-----')
-        print(f' - Valor de la unidad fija: ${self._regimen_normativo.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._valorDeLaUnidadFija)}')
-        print(f' - Multa en pesos: ${self._multa_unidadesFijas_en_pesos}')
+        print(f' - Valor de la unidad fija: ${NumeroConSeparadorDeMiles(self._regimen_normativo.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._valorDeLaUnidadFija))}')
+        print(f' - Multa en pesos: ${NumeroConSeparadorDeMiles(self._multa_unidadesFijas_en_pesos)}')
 
 def _DEBUG_PENA_TEMPORAL():    
     fechaDelHecho = datetime.date(2018, 5, 26)

@@ -1,6 +1,16 @@
-import json
+from typing import Union
 
-with open('test.json', encoding='utf-8') as file:
-    data = json.load(file)
+def NumeroConSeparadorDeMiles(numero:Union[int, float]):
+    
+    if type(numero) is int:    
+        return f"{numero:,}".replace(',', '.')
+    
+    if type(numero) is float:
+        numero = f'{numero:,.2f}'.replace(',','h')
+        numero = f'{numero}'.replace('.',',')
+        numero = f'{numero}'.replace('h','.')
+        return numero
+    
+    print('def NumeroConSeparadorDeMiles: WARNING: El valor ingresao no es ni float ni int. La función no va a hacer nada.')
 
-print(data['Llave']['Denominacion'])
+print(NumeroConSeparadorDeMiles(25000.65))

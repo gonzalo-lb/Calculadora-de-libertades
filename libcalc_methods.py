@@ -429,6 +429,19 @@ def Datetime_date_enFormatoXX_XX_XXXX(_date:datetime.date):
     toRT = str(_date)
     return '{}/{}/{}'.format(toRT[8:10], toRT[5:7], toRT[0:4])
 
+def NumeroConSeparadorDeMiles(numero:Union[int, float]):
+    
+    if type(numero) is int:    
+        return f"{numero:,}".replace(',', '.')
+    
+    if type(numero) is float:
+        numero = f'{numero:,.2f}'.replace(',','h')
+        numero = f'{numero}'.replace('.',',')
+        numero = f'{numero}'.replace('h','.')
+        return numero
+    
+    print('def NumeroConSeparadorDeMiles: WARNING: El valor ingresao no es ni float ni int. La función no va a hacer nada.')
+
 def FechaA_es_Mayor_Que_FechaB(fecha_a:datetime.date, fecha_b:datetime.date):
     temp = fecha_a - fecha_b    
     if temp.days > 0:
@@ -483,7 +496,7 @@ def MontoDeTiempoA_es_Mayor_que_MontoDeTiempoB(tiempo_a:TiempoEn_Años_Meses_Dia
 def es_multiplo(numero, multiplo):
     return numero % multiplo == 0
 
-def GetConsoleInput_Fecha(mensaje_para_el_usuario='Fecha: ', ENTER_devuelve_NULL=False):
+def GetConsoleInput_Fecha(mensaje_para_el_usuario='Fecha: ', ENTER_devuelve_NULL=False) -> datetime.date:
     '''Hace ingresar por consola una fecha (formatos XX/XX/XXXX ó X/X/XX) y la devuelve como un datetime.date\n    
     ENTER_devuelve_NULL=True: Si no se ingresa una fecha válida, devuelve "NULL"\n
     ENTER_devuelve_NULL=False: Si se ingresa una fecha inválida, la vuelve a solicitar'''
@@ -534,7 +547,7 @@ def GetConsoleInput_Fecha(mensaje_para_el_usuario='Fecha: ', ENTER_devuelve_NULL
                 if ENTER_devuelve_NULL:
                     return 'NULL'
                 else:
-                    print('ERROR: No se ingresó una fecha válida')
+                    print('ERROR: Solo se aceptan los años en formato de dos o cuatro dígitos.')
                     seImprimioError=True
                     raise Exception                
             
@@ -616,7 +629,18 @@ def GetConsoleInput_MontoDePena_temporal():
 
     return montoDePena
 
-def GetConsoleInput_Multa_Unidades_Fijas(mensaje_para_el_usuario:str='Ingresar monto de la multa: ') -> Union[int,float]:    
+def GetConsoleInput_Multa_Unidades_Fijas(mensaje_para_el_usuario:str='Ingresar monto de la multa (en unidades fijas): ', _min:float=45, _max:float=900) -> Union[int,float]:    
+    '''_min=45 : Es el monto mínimo de multa que permite la función. Por defecto es 45.\n
+       _max=900 : Es el monto máximo de multa que permite la función. Por defecto es 900.\n
+       Si el mínimo ingresado es mayor al máximo, la función invierte los valores para que siempre el máximo sea mayor
+       o igual al mínimo.'''
+
+    if _min > _max:
+        _newMax = _min
+        _newMin = _max
+        _min = _newMin
+        _max = _newMax
+    
     while True:
         try:
             _multa = input(mensaje_para_el_usuario)
@@ -624,11 +648,11 @@ def GetConsoleInput_Multa_Unidades_Fijas(mensaje_para_el_usuario:str='Ingresar m
                 _multa = 0
                 break
             _multa = int(_multa)
-            if _multa >= 45 and _multa <= 900:
+            if _multa >= _min and _multa <= _max:
                 break
-            print(' - ERROR: El monto de la multa debe ser un número entre 45 y 900.')
+            print(f' - ERROR: El monto de la multa debe ser un número entre {_min} y {_max}.')
         except:
-            print(' - ERROR: El monto de la multa debe ser un número entre 45 y 900.')
+            print(f' - ERROR: El monto de la multa debe ser un número entre {_min} y {_max}.')
     return _multa
 
 def GetConsoleInput_OtrosTiemposDeDetencion() -> list[OtraDetencion]:

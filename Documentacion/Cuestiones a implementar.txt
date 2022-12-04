@@ -1,8 +1,10 @@
 Lo que hice ahora: 
- - Agregué funcionalidad para cálculo de unidades fijas, en la libcalc.
+ - Terminé la calculadora de multas.
+ - Reformé las funciones de Get input para multa en unidades fijas. Agregué mínimo y máximo para ingresar.
+ - Armé función para representar un float o int como un str con separador de miles.
+ - Implementé esa función para imprimir la multa. 
 
-Con qué seguir:
- - Terminar la calculadora de multas. Que indique bien todos los datos, como la libcalc.
+Con qué seguir: 
  - Los otros tipos de cómputo. 
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
@@ -21,6 +23,7 @@ Funcionalidad a implementar:
  - Monto de las Unidades Fijas
 
  Hecho:
+ - Agregué funcionalidad para cálculo de unidades fijas, en la libcalc.
  - Agregué la carga del JSON de unidades fijas.
  - Codificar los strings del JSON.
  - Por ahora no logré codificar los strings para que se muestren como corresponde.
