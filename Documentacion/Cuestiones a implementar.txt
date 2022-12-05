@@ -1,11 +1,12 @@
 Lo que hice ahora: 
- - Reformé la pregunta por los delitos excluidos.
- - Integré los regímenes de leyes 25892 y 25948, que enumeraban los mismos delitos.
- - Armé el json con el texto de la norma de los delitos excluidos y lo implmenté a las preguntas.
- - Reformé las advertencias en los print, que estaban mal en algunos casos.
+ - Reformé String datos generales para que imprima perpetua, si corresponde
+ - Reformé función que calcula vencimiento y caducidad, para perpetuas
+ - Reformé función que calcula libertad condicional, para perpetuas
+ - Reformé String de vencimiento y caducidad, para perpetuas
+ - Controlé String de libertad condicional, para perpetuas. Hasta testearlo y que falle, queda igual
 
 Con qué seguir: 
- - Probar el funcionamiento antes de seguir con los otros tipos de cómputo.
+ - Salidas transitorias para penas perpetuas.
  - Los otros tipos de cómputo. 
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
@@ -21,6 +22,10 @@ Funcionalidad a implementar:
  - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)  
 
  Hecho:
+ - Reformé la pregunta por los delitos excluidos.
+ - Integré los regímenes de leyes 25892 y 25948, que enumeraban los mismos delitos.
+ - Armé el json con el texto de la norma de los delitos excluidos y lo implmenté a las preguntas.
+ - Reformé las advertencias en los print, que estaban mal en algunos casos.
  - Terminé la calculadora de multas.
  - Reformé las funciones de Get input para multa en unidades fijas. Agregué mínimo y máximo para ingresar.
  - Armé función para representar un float o int como un str con separador de miles.

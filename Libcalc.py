@@ -284,20 +284,22 @@ class ComputoPenaTemporal(Computo):
         # Calcula el cómputo y lo guarda en las variables de datos
         self._CalcularVencimientoYCaducidadDePena()
         self._CalcularLibertadCondicional()
-        self._CalcularSalidasTransitorias()
-        self._CalcularLibertadAsistida()
-        self._CalcularRegimenPreparacionLibertad()
-        self._CalcularUnidadesFijas()
+        if self._monto_de_pena.perpetua == False:
+            self._CalcularSalidasTransitorias()
+            self._CalcularLibertadAsistida()
+            self._CalcularRegimenPreparacionLibertad()
+            self._CalcularUnidadesFijas()
         
         # Imprime los resultados
         self._ImprimirSTRINGGeneral()
         self._ImprimirSTRINGRegimenNormativo()
         self._ImprimirSTRINGVencimientoYCaducidadDePena()
         self._ImprimirSTRINGLibertadCondicional()
-        self._ImprimirSTRINGSalidasTransitorias()
-        self._ImprimirSTRINGLibertadAsistida()
-        self._ImprimirSTRINGRegimenPreparatorioParaLaLiberacion()
-        self._ImprimirSTRINGMultaUnidadesFijasEnPesos()
+        if self._monto_de_pena.perpetua == False:
+            self._ImprimirSTRINGSalidasTransitorias()
+            self._ImprimirSTRINGLibertadAsistida()
+            self._ImprimirSTRINGRegimenPreparatorioParaLaLiberacion()
+            self._ImprimirSTRINGMultaUnidadesFijasEnPesos()
         print(Separadores._separadorComun)
     
     def _ControlarParametros(self):
@@ -316,6 +318,12 @@ class ComputoPenaTemporal(Computo):
 
     def _CalcularVencimientoYCaducidadDePena(self):
         '''Determina "vencimiento de pena" y "caducidad de pena"'''
+        
+        # Si la pena es perpetua esta función no hace nada, porque aún no se cuenta con el cómputo de
+        # libertad condicional. El vencimiento y caducidad lo va a calcular la función de la condicional
+        if self._monto_de_pena.perpetua:
+            return
+        
         _vencimiento_de_pena = 0
         _caducidad_de_pena = 0
 
@@ -339,11 +347,18 @@ class ComputoPenaTemporal(Computo):
         # Si es reincidente, o por delitos excluídos, igual hace el cálculo, pero arroja advertencias
         # Las advertencias las manejan las funciones que arman los string
 
+        # Define el requisito temporal, y luego calcula el cómputo
         print(f'DEBUG: self._monto_de_pena es mayor a 3 años? --> {MontoDeTiempoA_es_Mayor_que_MontoDeTiempoB(self._monto_de_pena, TiempoEn_Años_Meses_Dias(_años=3))}')
-        if MontoDeTiempoA_es_Mayor_que_MontoDeTiempoB(self._monto_de_pena, TiempoEn_Años_Meses_Dias(_años=3)) != True:
+        if self._monto_de_pena.perpetua:
+        # Penas perpetuas
+            _requisito_temporal_libertad_condicional.años = self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._requisitoTemporalPenaPerpetua_KEY)
+            _computo_libertad_condicional = self._SumarMontoDePena(self._fecha_de_detencion, _requisito_temporal_libertad_condicional)
+        elif MontoDeTiempoA_es_Mayor_que_MontoDeTiempoB(self._monto_de_pena, TiempoEn_Años_Meses_Dias(_años=3)) != True:
+        # Penas temporales de hasta 3 años
             _requisito_temporal_libertad_condicional.meses = 8                
             _computo_libertad_condicional = self._SumarMontoDePena(self._fecha_de_detencion, _requisito_temporal_libertad_condicional)
         else:
+        # Penas temporales de más de 3 años
             _requisito_temporal_libertad_condicional = self._Calcular_dos_tercios(self._monto_de_pena)
             _computo_libertad_condicional = self._SumarMontoDePena(self._fecha_de_detencion, _requisito_temporal_libertad_condicional)                
 
@@ -358,6 +373,10 @@ class ComputoPenaTemporal(Computo):
         # Aplica la información obtenida a las variables de datos
         self._libertad_condicional_COMPUTO = _computo_libertad_condicional
         self._libertad_condicional_REQUISITO_TEMPORAL = _requisito_temporal_libertad_condicional
+
+        if self._monto_de_pena.perpetua: # Si es pena perpetua, calcula vencimiento y caducidad
+            self._vencimiento_de_pena = self._SumarMontoDePena(self._libertad_condicional_COMPUTO, TiempoEn_Años_Meses_Dias(_años=5))
+            self._caducidad_de_pena = self._vencimiento_de_pena + relativedelta(years=10)
 
         # Si aplica la ley 27.375, calcula además el requisito de calificación, y el integral
         if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value:
@@ -663,11 +682,10 @@ class ComputoPenaTemporal(Computo):
         print(f' - Fecha del hecho: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_del_hecho)}')
         print(f' - Fecha de detención: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_detencion)}')
         
-        # if self._monto_de_pena.perpetua:
-        #     print(' - Es una pena perpetua.')
-        # else:
-
-        print(f' - La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s).')
+        if self._monto_de_pena.perpetua:
+            print(' - Es una pena perpetua.')
+        else:
+            print(f' - La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s).')
         
         if self._monto_multa_unidades_fijas != 'NULL':
             print(f'    - La multa es de {self._monto_multa_unidades_fijas} unidades fijas.')
@@ -735,9 +753,11 @@ class ComputoPenaTemporal(Computo):
     def _ImprimirSTRINGVencimientoYCaducidadDePena(self):
         print(Separadores._separadorComun)
         print('VENCIMIENTO Y CADUCIDAD')
-        print('-----------------------')
+        print('-----------------------')        
         print(f' - Vencimiento de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
         print(f' - Caducidad de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_pena)}')
+        if self._monto_de_pena.perpetua:
+            print(' - Los cálculos están sujetos a obtener la libertad condicional en la fecha del cómputo.')
     
     def _ImprimirSTRINGLibertadCondicional(self):  
 
@@ -898,23 +918,32 @@ class ComputoPenaPerpetua(Computo):
 def _DEBUG_PENA_TEMPORAL():    
     fechaDelHecho = datetime.date(2018, 5, 26)
     fechaDeDetencionInput = datetime.date(2020, 1, 1)
-    montoDePena = MontoDePena(_años=8, _esPorDelitosExcluidosLey27375=True, _esPorDelitosExcluidosLey25948=True)
+    montoDePena = MontoDePena(es_perpetua=True, _esPorDelitosExcluidosLey27375=True, _esPorDelitosExcluidosLey25948=True)
+    montoUnidadesFijas='NULL'
     otrasDetenciones='NULL'
     estimuloEducativo=TiempoEn_Años_Meses_Dias()
     fechaInicioEjecucion=datetime.date(2022, 6, 1)
     fechaCalificacionBUENO='NULL'#datetime.date(2022, 3, 10)    
     fechaIngresoPeriodoDePrueba=datetime.date(2022, 12, 10)
     #fechaIngresoPeriodoDePrueba='NULL'
+    fechaCalificacionEJEMPLAR='NULL'    
+    vuelveARestarOtrasDetencionesyAplicar140enST=False
     
     computo = ComputoPenaTemporal(fechaDelHecho=fechaDelHecho,
-    fechaDeDetencion=fechaDeDetencionInput,
-    montoDePena=montoDePena,
-    otrasDetenciones=otrasDetenciones,
-    estimuloEducativo=estimuloEducativo,
-    fechaInicioEjecucion=fechaInicioEjecucion,
-    fechaCalificacionBUENO=fechaCalificacionBUENO,
-    fechaIngresoPeriodoDePrueba=fechaIngresoPeriodoDePrueba)    
+        fechaDeDetencion=fechaDeDetencionInput,
+        montoDePena=montoDePena,
+        montoUnidadesFijas=montoUnidadesFijas,
+        otrasDetenciones=otrasDetenciones,
+        estimuloEducativo=estimuloEducativo,
+        fechaInicioEjecucion=fechaInicioEjecucion,
+        fechaCalificacionBUENO=fechaCalificacionBUENO,
+        fechaIngresoPeriodoDePrueba=fechaIngresoPeriodoDePrueba,
+        fechaCalificacionEJEMPLAR=fechaCalificacionEJEMPLAR,
+        vuelveARestarOtrasDetencionesyAplicar140enST=vuelveARestarOtrasDetencionesyAplicar140enST)   
 
 if __name__ == '__main__':
+    
+    _DEBUG_PENA_TEMPORAL()
+
     print('')
     print('HAY QUE CORRER ESTO DESDE MAIN_APP')
