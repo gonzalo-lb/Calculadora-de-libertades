@@ -284,22 +284,20 @@ class ComputoPenaTemporal(Computo):
         # Calcula el cómputo y lo guarda en las variables de datos
         self._CalcularVencimientoYCaducidadDePena()
         self._CalcularLibertadCondicional()
-        if self._monto_de_pena.perpetua == False:
-            self._CalcularSalidasTransitorias()
-            self._CalcularLibertadAsistida()
-            self._CalcularRegimenPreparacionLibertad()
-            self._CalcularUnidadesFijas()
+        self._CalcularSalidasTransitorias()                    
+        self._CalcularLibertadAsistida()
+        self._CalcularRegimenPreparacionLibertad()
+        self._CalcularUnidadesFijas()
         
         # Imprime los resultados
         self._ImprimirSTRINGGeneral()
         self._ImprimirSTRINGRegimenNormativo()
         self._ImprimirSTRINGVencimientoYCaducidadDePena()
         self._ImprimirSTRINGLibertadCondicional()
-        if self._monto_de_pena.perpetua == False:
-            self._ImprimirSTRINGSalidasTransitorias()
-            self._ImprimirSTRINGLibertadAsistida()
-            self._ImprimirSTRINGRegimenPreparatorioParaLaLiberacion()
-            self._ImprimirSTRINGMultaUnidadesFijasEnPesos()
+        self._ImprimirSTRINGSalidasTransitorias()        
+        self._ImprimirSTRINGLibertadAsistida()
+        self._ImprimirSTRINGRegimenPreparatorioParaLaLiberacion()
+        self._ImprimirSTRINGMultaUnidadesFijasEnPesos()
         print(Separadores._separadorComun)
     
     def _ControlarParametros(self):
@@ -453,9 +451,15 @@ class ComputoPenaTemporal(Computo):
         _computo_salidas_transitorias = self._fecha_de_detencion        
         _requisito_salidas_transitorias = MontoDePena()        
 
-        if self._regimen_normativo._regimen_ST == ST_REGIMENES._DecretoLey412_58.value or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_24660.value or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_25948.value:            
+        if (self._regimen_normativo._regimen_ST == ST_REGIMENES._DecretoLey412_58.value
+            or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_24660.value
+            or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_25948.value):
             
-            _requisito_salidas_transitorias = self._Calcular_la_mitad(self._monto_de_pena)
+            # Calcula el requisito temporal
+            if self._monto_de_pena.perpetua:
+                _requisito_salidas_transitorias.años = 15
+            else:
+                _requisito_salidas_transitorias = self._Calcular_la_mitad(self._monto_de_pena)
             _computo_salidas_transitorias = self._SumarMontoDePena(_computo_salidas_transitorias, _requisito_salidas_transitorias)
 
             # Resta otras detenciones, si hay
@@ -551,7 +555,7 @@ class ComputoPenaTemporal(Computo):
             # SI TODAVÍA NO COMENZÓ LA EJECUCIÓN DE PENA
             # En este caso no es posible calcular el requisito
             
-            self._libertad_condicional_REQUISITO_CALIF_SITUACION = 1
+            self._salidas_transitorias_REQUISITO_CALIF_SITUACION = 1
             return
         
         elif _fechaInicioEjecucion != 'NULL' and _fechaCalificacionBueno == 'NULL':
@@ -580,15 +584,23 @@ class ComputoPenaTemporal(Computo):
             return
 
     def _CalcularRequisitoTemporal_PeriodoDePrueba(self):
-                
-        self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA = self._Calcular_la_mitad(self._monto_de_pena)
+
+        # Calcula el requisito temporal del periodo de prueba        
+        if self._monto_de_pena.perpetua:
+            self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA = MontoDePena(_años=15)
+        else:
+            self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA = self._Calcular_la_mitad(self._monto_de_pena)
+        
+        # Hace la cuenta (fecha de detención + requisito temporal)
         self._salidas_transitorias_COMPUTO_PERIODO_DE_PRUEBA = self._SumarMontoDePena(self._fecha_de_detencion, self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA)        
     
     def _CalcularRequisitoTemporal_SalidasTransitorias_Ley27375(self):
         '''DEVUELVE CUANTOS MESES O AÑOS HAY QUE SUMARLE AL PERIODO DE PRUEBA PARA OBTENER LAS SALIDAS TRANSITORIAS'''
-        reqASumar=TiempoEn_Años_Meses_Dias()                
-        if MontoDeTiempoA_es_Mayor_que_MontoDeTiempoB(self._monto_de_pena, TiempoEn_Años_Meses_Dias(_años=10)):
-            reqASumar.años = 1                    
+        reqASumar=TiempoEn_Años_Meses_Dias()
+        if self._monto_de_pena.perpetua:
+            reqASumar.años = 1
+        elif MontoDeTiempoA_es_Mayor_que_MontoDeTiempoB(self._monto_de_pena, TiempoEn_Años_Meses_Dias(_años=10)):
+            reqASumar.años = 1
         elif MontoDeTiempoA_es_Mayor_que_MontoDeTiempoB(self._monto_de_pena, TiempoEn_Años_Meses_Dias(_años=5)):
             reqASumar.meses = 6 
         return reqASumar
@@ -625,6 +637,9 @@ class ComputoPenaTemporal(Computo):
 
         if self._regimen_normativo._regimen_LA == LA_REGIMENES._No_aplica.value:
             return
+        
+        if self._monto_de_pena.perpetua:
+            return
 
         _computo_libertad_asistida = ''                
         
@@ -653,7 +668,10 @@ class ComputoPenaTemporal(Computo):
         # - _vencimientoDePena  
 
         if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._No_aplica.value:
-            return                      
+            return 
+
+        if self._monto_de_pena.perpetua:
+            return                     
         
         if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._Ley_27375.value:
 
@@ -866,10 +884,17 @@ class ComputoPenaTemporal(Computo):
         
         if self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_27375.value and self._monto_de_pena.delitosExcluidosLey27375:
             print('ADVERTENCIA: No aplicaría el instituto de las Salidas Transitorias porque se condenó por alguno de los delitos excluídos, por art. 56 bis -17.III-, ley 24.660 (según reforma de la ley 27.375).')            
+        
+        if (self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_27375.value
+            and self._monto_de_pena.perpetua):
+            print('ADVERTENCIA: Las salidas transitorias no estarían legalmente previstas para una pena perpetua (ver art. 17, ley 24.660, según ley 27.375).\nNo obstante, se realiza el cómputo mediante una interpretación amplia del art. 17.I.a de esa ley.')
 
     def _ImprimirSTRINGLibertadAsistida(self):
         
         if self._regimen_normativo._regimen_LA == LA_REGIMENES._No_aplica.value:
+            return
+        
+        if self._monto_de_pena.perpetua:
             return
         
         print(Separadores._separadorComun)
@@ -891,6 +916,9 @@ class ComputoPenaTemporal(Computo):
     def _ImprimirSTRINGRegimenPreparatorioParaLaLiberacion(self):
 
         if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._No_aplica.value:
+            return
+        
+        if self._monto_de_pena.perpetua:
             return
         
         if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._Ley_27375.value:
@@ -922,10 +950,11 @@ def _DEBUG_PENA_TEMPORAL():
     montoUnidadesFijas='NULL'
     otrasDetenciones='NULL'
     estimuloEducativo=TiempoEn_Años_Meses_Dias()
-    fechaInicioEjecucion=datetime.date(2022, 6, 1)
+    #fechaInicioEjecucion=datetime.date(2022, 6, 1)
+    fechaInicioEjecucion='NULL'
     fechaCalificacionBUENO='NULL'#datetime.date(2022, 3, 10)    
-    fechaIngresoPeriodoDePrueba=datetime.date(2022, 12, 10)
-    #fechaIngresoPeriodoDePrueba='NULL'
+    #fechaIngresoPeriodoDePrueba=datetime.date(2022, 12, 10)
+    fechaIngresoPeriodoDePrueba='NULL'
     fechaCalificacionEJEMPLAR='NULL'    
     vuelveARestarOtrasDetencionesyAplicar140enST=False
     

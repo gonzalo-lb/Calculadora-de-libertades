@@ -1,12 +1,8 @@
 Lo que hice ahora: 
- - Reformé String datos generales para que imprima perpetua, si corresponde
- - Reformé función que calcula vencimiento y caducidad, para perpetuas
- - Reformé función que calcula libertad condicional, para perpetuas
- - Reformé String de vencimiento y caducidad, para perpetuas
- - Controlé String de libertad condicional, para perpetuas. Hasta testearlo y que falle, queda igual
+ - Reformé funciones para calcular ST, LA y REGPREPLIB en penas perpetuas, y sus respectivas funciones para imprimir.
 
 Con qué seguir: 
- - Salidas transitorias para penas perpetuas.
+ - Input preguntas
  - Los otros tipos de cómputo. 
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
@@ -22,6 +18,11 @@ Funcionalidad a implementar:
  - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)  
 
  Hecho:
+ - Reformé String datos generales para que imprima perpetua, si corresponde
+ - Reformé función que calcula vencimiento y caducidad, para perpetuas
+ - Reformé función que calcula libertad condicional, para perpetuas
+ - Reformé String de vencimiento y caducidad, para perpetuas
+ - Controlé String de libertad condicional, para perpetuas. Hasta testearlo y que falle, queda igual
  - Reformé la pregunta por los delitos excluidos.
  - Integré los regímenes de leyes 25892 y 25948, que enumeraban los mismos delitos.
  - Armé el json con el texto de la norma de los delitos excluidos y lo implmenté a las preguntas.
