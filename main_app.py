@@ -4,19 +4,26 @@ from libcalc_methods import *
 def GetConsoleInput_ComputoDePena_o_CalculoDeMulta():
     '''DEVUELVE:\n
        1: Cómputo de pena temporal\n
-       2: Cálculo de unidades fijas'''
+       2: Cómputo de pena perpetua\n
+       3: Cálculo de unidades fijas'''
     
     print(Separadores._separadorComun)
     while True:        
         print('1 --> Cómputo de pena temporal')
-        print('2 --> Cálculo de unidades fijas (Ley 23.737)')        
+        print('2 --> Cómputo de pena perpetua')
+        print('3 --> Cálculo de unidades fijas (Ley 23.737)')        
         print(Separadores._separadorComun)
         user_input = input('INDICAR OPCIÓN: ')
         if user_input == "1" or user_input == '':
+            print(' - Cómputo de pena temporal')
             return 1
         if user_input == "2":
-            return 2        
-        print('ERROR: Solo se puede responder con números del 1 al 2')
+            print(' - Cómputo de pena perpetua')
+            return 2
+        if user_input == "3":
+            print(' - Cálculo de unidades fijas')
+            return 3
+        print('ERROR: Solo se puede responder con números del 1 al 3')
 
 def UnidadesFijas():
     
@@ -41,11 +48,16 @@ def MainApp():
 
     opcion_elegida = GetConsoleInput_ComputoDePena_o_CalculoDeMulta()
 
-    if opcion_elegida == 1:
+    if (opcion_elegida == 1 # Cómputo de pena temporal
+        or opcion_elegida == 2): # Cómputo de pena perpetua
 
         # SOLICITA AL USUARIO SE INDIQUE TIPO DE PENA A CALCULAR    
 
-        user_input = Preguntas_Input()
+        if opcion_elegida == 1:
+            user_input = Preguntas_Input()
+        
+        if opcion_elegida == 2:
+            user_input = Preguntas_Input(pena_perpetua=True)
         
         computo = ComputoPenaTemporal(fechaDelHecho=user_input._fecha_del_hecho, 
         fechaDeDetencion=user_input._fecha_de_detencion,
@@ -57,9 +69,9 @@ def MainApp():
         fechaCalificacionBUENO=user_input._fecha_calificacion_BUENO,
         fechaIngresoPeriodoDePrueba=user_input._fecha_ingreso_periodo_de_prueba,
         fechaCalificacionEJEMPLAR=user_input._fecha_calificacion_EJEMPLAR,
-        vuelveARestarOtrasDetencionesyAplicar140enST=user_input._vuelve_a_restar_otras_detenciones_y_140_en_ST)
+        vuelveARestarOtrasDetencionesyAplicar140enST=user_input._vuelve_a_restar_otras_detenciones_y_140_en_ST)    
     
-    if opcion_elegida == 2:
+    if opcion_elegida == 3:
 
         UnidadesFijas()
 

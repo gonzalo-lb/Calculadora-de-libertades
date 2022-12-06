@@ -194,7 +194,11 @@ class RegimenNormativoAplicable():
             print(f' - Unidades fijas: {self.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._denominacion_KEY)}')    
 
 class Preguntas_Input():
-    def __init__(self):
+    def __init__(self, pena_perpetua:bool=False):        
+        
+        # Argumentos
+        self._ARGUMENTOS_pena_perpetua = pena_perpetua
+
         self._fecha_del_hecho = 'NULL'
         self._regimen_normativo = 'NULL'
         self._fecha_de_detencion = 'NULL'
@@ -226,9 +230,12 @@ class Preguntas_Input():
         print(f' - Fecha ingresada: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_detencion)}')
         
         # Monto de pena
-        print(Separadores._separadorComun)
-        self._monto_de_pena = GetConsoleInput_MontoDePena_temporal()
-        print(f' - La pena ingresada es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es), {self._monto_de_pena.dias} día(s).')
+        if self._ARGUMENTOS_pena_perpetua:
+            self._monto_de_pena = MontoDePena(es_perpetua=True)
+        else:
+            print(Separadores._separadorComun)
+            self._monto_de_pena = GetConsoleInput_MontoDePena_temporal()
+            print(f' - La pena ingresada es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es), {self._monto_de_pena.dias} día(s).')
 
         # Unidades Fijas
         if self._regimen_normativo._regimen_UNIDADESFIJAS != 'No aplica':

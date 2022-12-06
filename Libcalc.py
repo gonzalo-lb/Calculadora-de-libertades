@@ -424,7 +424,7 @@ class ComputoPenaTemporal(Computo):
             self._libertad_condicional_REQUISITO_CALIF_BUENO = self._SumarMontoDePena(_fechaInicioEjecucion, delta_x_3)
             self._libertad_condicional_REQUISITO_CALIF_SITUACION = 3            
             return
-    
+
     def _CalcularLibertadCondicional_ComputoIntegral(self):
         '''Este cómputo solo aplicaría en la situación 3 (contar con requisito de calificación "BUENO")'''
         # Guarda el resultado en:
@@ -805,7 +805,7 @@ class ComputoPenaTemporal(Computo):
             if self._libertad_condicional_REQUISITO_CALIF_SITUACION == 2:
                 print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}, para acceder a la libertad condicional en la fecha indicada, la fecha límite para obtener el requisito de calificación "bueno" es {Datetime_date_enFormatoXX_XX_XXXX(self._libertad_condicional_REQUISITO_CALIF_BUENO)}.')
             if self._libertad_condicional_REQUISITO_CALIF_SITUACION == 3:
-                print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {self._libertad_condicional_REQUISITO_CALIF_BUENO}.')
+                print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {Datetime_date_enFormatoXX_XX_XXXX(self._libertad_condicional_REQUISITO_CALIF_BUENO)}.')
 
     def _ImprimirSTRINGSalidasTransitorias(self):
 
@@ -846,7 +846,7 @@ class ComputoPenaTemporal(Computo):
                 if self._salidas_transitorias_REQUISITO_CALIF_SITUACION == 2:
                     print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}, para acceder a las salidas transitorias en la fecha indicada, la fecha límite para obtener el requisito de calificación "bueno" es {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_BUENO)}.')
                 if self._salidas_transitorias_REQUISITO_CALIF_SITUACION == 3:
-                    print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {self._salidas_transitorias_REQUISITO_CALIF_BUENO}.')                   
+                    print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_BUENO)}.')
 
                 fecha_mayor = Comparar_fechas_y_devolver_la_mayor(self._salidas_transitorias_COMPUTO, self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR, self._fecha_calificacion_BUENO)                                
                 print(f' - En este contexto, y teniendo en cuenta las fechas de cada requisito, las salidas transitorias podrían obtenerse el día {Datetime_date_enFormatoXX_XX_XXXX(fecha_mayor)}.')

@@ -1,8 +1,10 @@
-import json
+def funcion1():
+    
+    
+    funcion2()
 
-with open('test.json', encoding='utf-8') as testfile:
-    test = json.load(testfile)
+    def funcion2():
+        print('ejemplo')
 
-tprint = test['keyy']
 
-print(tprint)
+funcion1()
