@@ -2,7 +2,8 @@ Lo que hice ahora:
  - Reformé el input de preguntas para las penas perpetuas
  - Terminé con el cálculo de las penas perpetuas
 
-Con qué seguir:  
+Con qué seguir:
+ - Ordenar el código -> Hacer nested functions para libertad condicional y salidas transitorias
  - Los otros tipos de cómputo. 
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
