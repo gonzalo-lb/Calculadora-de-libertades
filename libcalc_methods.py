@@ -193,7 +193,7 @@ class RegimenNormativoAplicable():
         if imprimir_reg_unidadesFijas:
             print(f' - Unidades fijas: {self.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._denominacion_KEY)}')    
 
-class Preguntas_Input():
+class Preguntas_Input_Pena_TemporalOPerpetua():
     def __init__(self, pena_perpetua:bool=False):        
         
         # Argumentos
@@ -214,9 +214,9 @@ class Preguntas_Input():
         self._fecha_calificacion_EJEMPLAR = 'NULL'
         self._vuelve_a_restar_otras_detenciones_y_140_en_ST = False
 
-        self.GetConsoleInput_PreguntasSobreSituacionProcesal()
+        self.GetConsoleInput_HacerPreguntas()
 
-    def GetConsoleInput_PreguntasSobreSituacionProcesal(self):                  
+    def GetConsoleInput_HacerPreguntas(self):                  
 
         # Fecha del hecho y cálculo del régimen normativo
         print(Separadores._separadorComun)
@@ -429,6 +429,33 @@ class Preguntas_Input():
                         break                    
                     print('ERROR: Solo se puede responder con números 1 ó 2.')
 
+class Preguntas_Input_Pena_EjecucionCondicional():
+    def __init__(self):        
+        
+        self._fecha_de_sentencia = 'NULL'
+        self._fecha_firmeza_de_sentencia = 'NULL'
+        self._monto_de_pena = 'NULL'
+
+        self.GetConsoleInput_HacerPreguntas()
+
+    def GetConsoleInput_HacerPreguntas(self):                  
+
+        # Fecha de la sentencia
+        print(Separadores._separadorComun)
+        self._fecha_de_sentencia = GetConsoleInput_Fecha('Ingresar la fecha de la sentencia: ')        
+        print(f' - Fecha ingresada: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_sentencia)}')
+
+        # Fecha de firmeza de la sentencia
+        print(Separadores._separadorComun)
+        self._fecha_firmeza_de_sentencia = GetConsoleInput_Fecha('Ingresar la fecha en la que la sentencia adquirió firmeza: ')        
+        print(f' - Fecha ingresada: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_firmeza_de_sentencia)}')
+
+        # Monto de pena
+        print(Separadores._separadorComun)
+        self._monto_de_pena = GetConsoleInput_MontoDePena_temporal(ejecucionCondicional=True)
+        print(f' - La pena ingresada es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es), {self._monto_de_pena.dias} día(s).')
+        print(f' - El plazo de control es de {self._monto_de_pena.plazoControl_años} año(s), {self._monto_de_pena.plazoControl_meses} mes(es), {self._monto_de_pena.plazoControl_dias} día(s).')
+
 class Separadores():
     _separadorComun = ''
 
@@ -579,10 +606,10 @@ def GetConsoleInput_Fecha(mensaje_para_el_usuario='Fecha: ', ENTER_devuelve_NULL
                 if seImprimioError == False:
                     print('ERROR: No se ingresó una fecha válida')
 
-def GetConsoleInput_MontoDePena_temporal():
+def GetConsoleInput_MontoDePena_temporal(ejecucionCondicional:bool=False):
     '''Hace ingresar por consola un monto de pena temporal y la devuelve como un MontoDePena()\n
     Por el momento solo pide el monto de tiempo. No consulta por reincidencia, accesoria del 52 CP, etc.'''    
-    montoDePena = MontoDePena()    
+    montoDePena = MontoDePena()
     
     # Intenta tomar monto de pena. Si se ingresa 0, 0, 0, vuelve a intentar
     while True:
@@ -632,10 +659,66 @@ def GetConsoleInput_MontoDePena_temporal():
         if _total != 0:
             break
         print(' - ERROR: No se ingresó ninguna pena. Intente de nuevo.')
+    
+    if ejecucionCondicional:
+        _plazoControl_years = 0
+        _PlazoControl_months = 0
+        _PlazoControl_days = 0
+        print(Separadores._separadorComun)
+        # Intenta tomar el plazo de control. Si se ingresa 0, 0, 0, vuelve a intentar
+        
+        # Ingresar años
+        while True:
+            try:
+                _plazoControl_years = input('Ingresar plazo de control (años): ')
+                if _plazoControl_years == '':
+                    _plazoControl_years = 2
+                    break
+                _plazoControl_years = int(_plazoControl_years)
+                if _plazoControl_years >= 2 and _plazoControl_years <= 4:
+                    break
+                print(' - ERROR: Solo se puede ingresar un número entero entre 2 y 4.')
+            except:
+                print(' - ERROR: Solo se puede ingresar un número entero entre 2 y 4.')
+        
+        if _plazoControl_years != 4:
+            # Ingresar meses
+            while True:
+                try:
+                    _PlazoControl_months = input('Ingresar plazo de control (meses): ')
+                    if _PlazoControl_months == '':
+                        _PlazoControl_months = 0
+                        break
+                    _PlazoControl_months = int(_PlazoControl_months)
+                    if _PlazoControl_months >= 0 and _PlazoControl_months <= 11:
+                        break
+                    print(' - ERROR: Solo se puede ingresar un número entero entre 0 y 11.')
+                except:
+                    print(' - ERROR: Solo se puede ingresar un número entero entre 0 y 11.')
 
+            # Ingresar días
+            while True:
+                try:
+                    _PlazoControl_days = input('Ingresar monto de pena (días): ')
+                    if _PlazoControl_days == '':
+                        _PlazoControl_days = 0
+                        break
+                    _PlazoControl_days = int(_PlazoControl_days)
+                    if _PlazoControl_days >= 0 and _PlazoControl_days <= 30:
+                        break
+                    print(' - ERROR: Solo se puede ingresar un número entero entre 0 y 30.')    
+                except:
+                    print(' - ERROR: Solo se puede ingresar un número entero entre 0 y 30.')                
+        
+        montoDePena.plazoControl_años = _plazoControl_years
+        montoDePena.plazoControl_meses = _PlazoControl_months
+        montoDePena.plazoControl_dias = _PlazoControl_days
+        montoDePena.ejecucionCondicional = True
+
+    # Arma lo que va a devolver
     montoDePena.años = _years
     montoDePena.meses = _months
-    montoDePena.dias = _days      
+    montoDePena.dias = _days    
 
     return montoDePena
 

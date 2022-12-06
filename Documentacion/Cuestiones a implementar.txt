@@ -1,5 +1,5 @@
 Lo que hice ahora:
- - Ordené el código. Armé "nested functions" para LC y ST, ya que recurrían a otras funciones
+ - Cálculo de pena de ejecución condicional
 
 Con qué seguir: 
  - Los otros tipos de cómputo. 
@@ -15,6 +15,7 @@ Funcionalidad a implementar:
  - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)  
 
  Hecho:
+ - Ordené el código. Armé "nested functions" para LC y ST, ya que recurrían a otras funciones
  - Reformé el input de preguntas para las penas perpetuas
  - Terminé con el cálculo de las penas perpetuas
  - Reformé funciones para calcular ST, LA y REGPREPLIB en penas perpetuas, y sus respectivas funciones para imprimir.

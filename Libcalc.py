@@ -215,7 +215,7 @@ class Computo():
         TR_fecha -= relativedelta(years=_tiempo.años)
         return TR_fecha
 
-class ComputoPenaTemporal(Computo):
+class ComputoPenaTemporalOPerpetua(Computo):
     def __init__(self,
     fechaDelHecho:datetime.date='NULL',
     fechaDeDetencion:datetime.date='NULL',
@@ -950,8 +950,53 @@ class ComputoPenaTemporal(Computo):
         print(f' - Valor de la unidad fija: ${NumeroConSeparadorDeMiles(self._regimen_normativo.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._valorDeLaUnidadFija))}')
         print(f' - Multa en pesos: ${NumeroConSeparadorDeMiles(self._multa_unidadesFijas_en_pesos)}')
 
-class ComputoPenaPerpetua(Computo):
-    pass
+class ComputPenaEjecucionCondicional(Computo):
+    def __init__(self,
+                 fechaDeSentencia:datetime.date='NULL',
+                 fechaFirmezaDeSentencia:datetime.date='NULL',
+                 montoDePena:MontoDePena='NULL') -> None:
+        
+        # DEFINE VARIABLES INTERNAS
+        self.requisito27CP = TiempoEn_Años_Meses_Dias(_años=4)
+        self.requisito51CP_EjecCond  = TiempoEn_Años_Meses_Dias(_años=10)
+
+        # VARIABLES CON EL INPUT
+        self._fecha_de_sentencia = fechaDeSentencia
+        self._fecha_firmeza_de_sentencia = fechaFirmezaDeSentencia
+        self._monto_de_pena = montoDePena
+
+        # VARIABLES CON LOS DATOS
+        self._vencimiento_de_pena = 'NULL'
+        self._caducidad_de_pena = 'NULL'
+        self._vencimiento_plazo_de_control = 'NULL'
+
+        self._CalcularVencimientoYCaducidad()
+
+        self._ImprimirDatosGenerales()
+        self._ImprimirVencimiento_y_Caducidad()
+
+    def _CalcularVencimientoYCaducidad(self):
+        
+        self._vencimiento_de_pena = self._SumarMontoDePena(self._fecha_de_sentencia, self.requisito27CP)
+        self._caducidad_de_pena = self._SumarMontoDePena(self._fecha_de_sentencia, self.requisito51CP_EjecCond)        
+        self._vencimiento_plazo_de_control = self._SumarMontoDePena(self._fecha_firmeza_de_sentencia, self._monto_de_pena, _sumarPlazoControl=True)
+    
+    def _ImprimirDatosGenerales(self):
+        print(Separadores._separadorComun)
+        print('DATOS INGRESADOS')
+        print('----------------')
+        print(f' - Fecha de sentencia: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_sentencia)}')
+        print(f' - Fecha de firmeza de la sentencia: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_firmeza_de_sentencia)}')
+        print(f' - La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s) de ejecución condicional.')                
+        print(f' - El plazo de control es de {self._monto_de_pena.plazoControl_años} año(s), {self._monto_de_pena.plazoControl_meses} mes(es) y {self._monto_de_pena.plazoControl_dias} día(s).')
+
+    def _ImprimirVencimiento_y_Caducidad(self):
+        print(Separadores._separadorComun)
+        print('COMPUTO DE PENA')
+        print('---------------')        
+        print(f' - La sentencia ee tiene por no pronunciada el día {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
+        print(f' - El plazo de control finaliza el {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_plazo_de_control)}')
+        print(f' - Caducidad: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_pena)}')
 
 def _DEBUG_PENA_TEMPORAL():    
     fechaDelHecho = datetime.date(2018, 5, 26)
@@ -969,7 +1014,7 @@ def _DEBUG_PENA_TEMPORAL():
     fechaCalificacionEJEMPLAR='NULL'
     vuelveARestarOtrasDetencionesyAplicar140enST=False
     
-    computo = ComputoPenaTemporal(fechaDelHecho=fechaDelHecho,
+    computo = ComputoPenaTemporalOPerpetua(fechaDelHecho=fechaDelHecho,
         fechaDeDetencion=fechaDeDetencionInput,
         montoDePena=montoDePena,
         montoUnidadesFijas=montoUnidadesFijas,
