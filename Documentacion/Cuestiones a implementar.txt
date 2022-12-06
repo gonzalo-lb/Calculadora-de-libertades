@@ -1,23 +1,22 @@
 Lo que hice ahora:
- - Reformé el input de preguntas para las penas perpetuas
- - Terminé con el cálculo de las penas perpetuas
+ - Ordené el código. Armé "nested functions" para LC y ST, ya que recurrían a otras funciones
 
-Con qué seguir:
- - Ordenar el código -> Hacer nested functions para libertad condicional y salidas transitorias
+Con qué seguir: 
  - Los otros tipos de cómputo. 
  - Lo del cómputo por LC revocada
  - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
  - Terminar vencimiento y caducidad para el resto de las penas.
  - Reformar los cálculos de vencimiento y otros para la reclusión por tiempo indeterminado 
- - Implementar cálculos para casos de reclusión por tiempo indeterminado   
- - EN ST y LC, agregar un else para los casos de que no sean ninguno de los regímenes (no debería suceder pero...)  
+ - Implementar cálculos para casos de reclusión por tiempo indeterminado 
  - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación
 
 Funcionalidad a implementar:  
  - Nuevo cómputo para libertades revocadadas (no se contabiliza el tiempo que se estuvo en libertad)
  - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)  
 
- Hecho: 
+ Hecho:
+ - Reformé el input de preguntas para las penas perpetuas
+ - Terminé con el cálculo de las penas perpetuas
  - Reformé funciones para calcular ST, LA y REGPREPLIB en penas perpetuas, y sus respectivas funciones para imprimir.
  - Reformé String datos generales para que imprima perpetua, si corresponde
  - Reformé función que calcula vencimiento y caducidad, para perpetuas
