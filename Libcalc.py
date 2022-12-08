@@ -301,18 +301,19 @@ class ComputoPenaTemporalOPerpetua(Computo):
         print(Separadores._separadorComun)
     
     def _ControlarParametros(self):
+        faltanParametros = False
+        
         if self._fecha_del_hecho == 'NULL':
             print('ERROR: LA FECHA DEL HECHO ES UN PARÁMETRO NECESARIO PARA REALIZAR EL CÓMPUTO.')
-            return True
+            faltanParametros = True
         if self._fecha_de_detencion == 'NULL':
             print('ERROR: LA FECHA DE DETENCION ES UN PARÁMETRO NECESARIO PARA REALIZAR EL CÓMPUTO.')
-            return True
+            faltanParametros = True
         if self._monto_de_pena == 'NULL':
             print('ERROR: LA PENA ES UN PARÁMETRO NECESARIO PARA REALIZAR EL CÓMPUTO.')
-            return True
-        if self._monto_de_pena.perpetua:
-            print('ADVERTENCIA: SE INGRESÓ UNA PENA PERPETUA. LA CLASS CALCULA COMPUTOS DE PENAS TEMPORALES.')
-            print('LOS RESULTADOS PODRÍAN NO SER ACERTADOS.')
+            faltanParametros = True
+        
+        return faltanParametros
 
     def _CalcularVencimientoYCaducidadDePena(self):
         '''Determina "vencimiento de pena" y "caducidad de pena"'''
@@ -994,9 +995,158 @@ class ComputPenaEjecucionCondicional(Computo):
         print(Separadores._separadorComun)
         print('COMPUTO DE PENA')
         print('---------------')        
-        print(f' - La sentencia ee tiene por no pronunciada el día {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
+        print(f' - La sentencia se tiene por no pronunciada el día {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
         print(f' - El plazo de control finaliza el {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_plazo_de_control)}')
         print(f' - Caducidad: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_pena)}')
+
+class ComputPenaLibertadRevocada(Computo):
+    def __init__(self,
+                 fechaDelHecho:datetime.date='NULL',
+                 fechaEgreso:datetime.date='NULL',
+                 fechaNuevaDetencion:datetime.date='NULL',
+                 fechaLibertadCondicional:datetime.date='NULL',
+                 fechaSalidasTransitorias:datetime.date='NULL',
+                 vencimientoDePena:datetime.date='NULL',
+                 libertadEvadida:LIBERTAD_EVADIDA='NULL') -> None:        
+
+        # VARIABLES CON EL INPUT
+        self._fecha_del_hecho = fechaDelHecho
+        self._fecha_de_egreso = fechaEgreso
+        self._fecha_nueva_detencion = fechaNuevaDetencion
+        self._fecha_libertad_condicional = fechaLibertadCondicional
+        self._fecha_salidas_transitorias = fechaSalidasTransitorias
+        self._vencimiento_de_pena = vencimientoDePena
+        self._libertad_evadida = libertadEvadida
+
+        # VARIABLES CON LOS DATOS
+        self._regimen_normativo = 'NULL'
+        self._tiempo_que_estuvo_en_libertad = 'NULL'
+        self._nuevo_computo_vencimiento_de_pena = 'NULL'
+        self._nuevo_computo_caducidad_de_pena = 'NULL'
+        self._nuevo_computo_libertad_condicional = 'NULL'
+        self._nuevo_computo_salidas_transitorias = 'NULL'
+        self._nuevo_computo_libertad_asistida = 'NULL'
+        self._nuevo_computo_regPrepLib = 'NULL'
+
+        if self._ControlarParametros():
+            return
+        
+        self._CalcularNuevoComputo()
+        self._ImprimirDatosGenerales()
+        self._ImprimirNuevoComputo()
+    
+    def _ControlarParametros(self):
+        faltanParametros = False
+        if self._fecha_del_hecho == 'NULL':
+            faltanParametros = True
+            print(f'self._fecha_del_hecho == {self._fecha_del_hecho}')
+            print('class ComputPenaLibertadRevocada: ERROR. No se ingresó fecha del hecho.')
+        
+        if self._fecha_de_egreso == 'NULL':
+            faltanParametros = True
+            print(f'self._fecha_de_egreso == {self._fecha_de_egreso}')
+            print('class ComputPenaLibertadRevocada: ERROR. No se ingresó fecha de egreso en libertad.')
+        
+        if self._fecha_nueva_detencion == 'NULL':
+            faltanParametros = True
+            print(f'self._fecha_nueva_detencion == {self._fecha_nueva_detencion}')
+            print('class ComputPenaLibertadRevocada: ERROR. No se ingresó fecha de la nueva detención.')
+        
+        if self._vencimiento_de_pena == 'NULL':
+            faltanParametros = True
+            print(f'self._vencimiento_de_pena == {self._vencimiento_de_pena}')
+            print('class ComputPenaLibertadRevocada: ERROR. No se ingresó el vencimiento de pena.')
+        
+        if self._libertad_evadida == 'NULL':
+            faltanParametros = True
+            print(f'self._libertad_evadida == {self._libertad_evadida}')
+            print('class ComputPenaLibertadRevocada: ERROR. No se indicó en qué circunstancias se obtuvo la libertad.')
+        
+        return faltanParametros
+    
+    def _CalcularNuevoComputo(self):
+        
+        # Calcula el régimen normativo a aplicar
+        self._regimen_normativo = RegimenNormativoAplicable(self._fecha_del_hecho)
+
+        # Calcula la diferencia de tiempo entre la fecha de egreso en libertad y la nueva detención
+        delta = relativedelta(self._fecha_nueva_detencion, self._fecha_de_egreso)
+        self._tiempo_que_estuvo_en_libertad = TiempoEn_Años_Meses_Dias(_años=delta.years, _meses=delta.months, _dias=delta.days)
+
+        # Aplica esa diferencia para obtener el nuevo cómputo y caducidad
+        self._nuevo_computo_vencimiento_de_pena = self._SumarMontoDePena(self._vencimiento_de_pena, self._tiempo_que_estuvo_en_libertad)
+        self._nuevo_computo_caducidad_de_pena = self._nuevo_computo_vencimiento_de_pena + relativedelta(years=10)
+        # Si se evadió de la transitoria, descuenta el día que estuvo en libertad pero haciendo uso de la transitoria
+        if self._libertad_evadida == LIBERTAD_EVADIDA._salidas_transitorias.value:
+            self._nuevo_computo_vencimiento_de_pena += relativedelta(days=-1)
+            self._nuevo_computo_caducidad_de_pena += relativedelta(days=-1)
+
+        if (self._libertad_evadida == LIBERTAD_EVADIDA._salidas_transitorias.value
+          and self._fecha_libertad_condicional != 'NULL'):
+            self._nuevo_computo_libertad_condicional = self._SumarMontoDePena(self._fecha_libertad_condicional, self._tiempo_que_estuvo_en_libertad)
+        
+        if (self._libertad_evadida == LIBERTAD_EVADIDA._fuga.value):
+            if self._fecha_libertad_condicional != 'NULL':
+                self._nuevo_computo_libertad_condicional = self._SumarMontoDePena(self._fecha_libertad_condicional, self._tiempo_que_estuvo_en_libertad)            
+            if self._fecha_salidas_transitorias != 'NULL':
+                self._nuevo_computo_salidas_transitorias = self._SumarMontoDePena(self._fecha_salidas_transitorias, self._tiempo_que_estuvo_en_libertad)
+        
+        # Si el motivo del egreso no es libertad asistida, la calcula
+        if self._libertad_evadida != LIBERTAD_EVADIDA._libertad_asistida.value:
+            if (self._regimen_normativo._regimen_LA == LA_REGIMENES._Ley_24660.value 
+            or self._regimen_normativo._regimen_LA == LA_REGIMENES._Ley_25948.value):
+
+                self._nuevo_computo_libertad_asistida = self._nuevo_computo_vencimiento_de_pena
+                self._nuevo_computo_libertad_asistida += relativedelta(months=-6)            
+            
+            if self._regimen_normativo._regimen_LA == LA_REGIMENES._Ley_27375.value:
+
+                self._nuevo_computo_libertad_asistida = self._nuevo_computo_vencimiento_de_pena
+                self._nuevo_computo_libertad_asistida += relativedelta(months=-3)
+            
+            # Calcula el nuevo régimen de preparación para la libertad
+            if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._Ley_27375.value:
+
+                self._nuevo_computo_regPrepLib = self._nuevo_computo_vencimiento_de_pena
+                self._nuevo_computo_regPrepLib += relativedelta(years=-1)   
+    
+    def _ImprimirDatosGenerales(self):
+        print(Separadores._separadorComun)
+        print('DATOS INGRESADOS')
+        print('----------------')        
+        print(f' - Fecha del hecho: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_del_hecho)}')
+        print(f' - Fecha de egreso: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_egreso)}')
+        print(f' - Fecha de la nueva detención: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_nueva_detencion)}')
+        print(f' - Fecha del vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
+        if self._fecha_libertad_condicional != 'NULL':
+            print(f' - Fecha de la libertad condicional: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_libertad_condicional)}')
+        if self._fecha_salidas_transitorias != 'NULL':
+            print(f' - Fecha de las salidas transitorias: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_salidas_transitorias)}')
+        if self._libertad_evadida == LIBERTAD_EVADIDA._fuga.value:
+            print(' - Motivo de la libertad: Fuga')
+        if self._libertad_evadida == LIBERTAD_EVADIDA._salidas_transitorias.value:
+            print(' - Motivo de la libertad: Egreso en salidas transitoras')
+        if self._libertad_evadida == LIBERTAD_EVADIDA._libertad_condicional.value:
+            print(' - Motivo de la libertad: Egreso en libertad condicional')
+        if self._libertad_evadida == LIBERTAD_EVADIDA._libertad_asistida.value:
+            print(' - Motivo de la libertad: Egreso en libertad asistida')
+
+    def _ImprimirNuevoComputo(self):        
+        self._regimen_normativo._Imprimir()
+        print(Separadores._separadorComun)
+        print('NUEVO COMPUTO DE PENA')
+        print('---------------------')                
+        print(f' - Tiempo que se permaneció en libertad: {self._tiempo_que_estuvo_en_libertad.años} año(s), {self._tiempo_que_estuvo_en_libertad.meses} mes(es) y {self._tiempo_que_estuvo_en_libertad.dias} día(s).')
+        print(f' - Vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_vencimiento_de_pena)}')
+        print(f' - Caducidad: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_caducidad_de_pena)}')
+        if self._nuevo_computo_salidas_transitorias != 'NULL':
+            print(f' - Salidas transitorias: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_salidas_transitorias)}')
+        if self._nuevo_computo_libertad_condicional != 'NULL':
+            print(f' - Libertad condicional: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_libertad_condicional)}')
+        if self._nuevo_computo_libertad_asistida != 'NULL':
+            print(f' - Libertad asistida: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_libertad_asistida)}')
+        if self._nuevo_computo_regPrepLib != 'NULL':
+            print(f' - Régimen preparatorio para la liberación: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_regPrepLib)}')
 
 def _DEBUG_PENA_TEMPORAL():    
     fechaDelHecho = datetime.date(2018, 5, 26)
@@ -1024,11 +1174,21 @@ def _DEBUG_PENA_TEMPORAL():
         fechaCalificacionBUENO=fechaCalificacionBUENO,
         fechaIngresoPeriodoDePrueba=fechaIngresoPeriodoDePrueba,
         fechaCalificacionEJEMPLAR=fechaCalificacionEJEMPLAR,
-        vuelveARestarOtrasDetencionesyAplicar140enST=vuelveARestarOtrasDetencionesyAplicar140enST)   
+        vuelveARestarOtrasDetencionesyAplicar140enST=vuelveARestarOtrasDetencionesyAplicar140enST)
+
+def _DEBUG_NUEVO_COMPUTO():
+    computo = ComputPenaLibertadRevocada(
+                 fechaDelHecho=datetime.date(2016,1,1),
+                 fechaEgreso=datetime.date(2018,5,23),
+                 fechaNuevaDetencion=datetime.date(2019,2,28),
+                 fechaLibertadCondicional='NULL',
+                 fechaSalidasTransitorias='NULL',
+                 vencimientoDePena=datetime.date(2024,6,12),
+                 libertadEvadida=LIBERTAD_EVADIDA._libertad_condicional.value)
 
 if __name__ == '__main__':
     
-    _DEBUG_PENA_TEMPORAL()
+    _DEBUG_NUEVO_COMPUTO()
 
     print('')
     print('HAY QUE CORRER ESTO DESDE MAIN_APP')

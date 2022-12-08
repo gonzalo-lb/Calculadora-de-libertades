@@ -1,20 +1,21 @@
 Lo que hice ahora:
- - Cálculo de pena de ejecución condicional
+ - Class para nuevo cómputo por libertad revocada (o fuga)
+    - Armé el funcionamiento de la Class
+    - Armé las funciones para imprimir
 
-Con qué seguir: 
- - Los otros tipos de cómputo. 
- - Lo del cómputo por LC revocada
- - Agregar en el __init__ de Computo() un chequeo para que se fije qué tipo de cálculo va a hacer (pena temporal, ejecución condicional, etc) y luego revise que se hayan ingresado los parámetros concreto de esa situación
- - Terminar vencimiento y caducidad para el resto de las penas.
- - Reformar los cálculos de vencimiento y otros para la reclusión por tiempo indeterminado 
- - Implementar cálculos para casos de reclusión por tiempo indeterminado 
+Con qué seguir:
+ - Cómputo por libertad revocada o fuga.
+    - Casos en los que se descuenta el tiempo en libertad.
+    - Input con preguntas.
+ - Cómputo en casos de reclusión por tiempo indeterminado
  - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación
 
-Funcionalidad a implementar:  
+Funcionalidad a implementar:
  - Nuevo cómputo para libertades revocadadas (no se contabiliza el tiempo que se estuvo en libertad)
- - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)  
+ - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)
 
  Hecho:
+ - Cálculo de pena de ejecución condicional
  - Ordené el código. Armé "nested functions" para LC y ST, ya que recurrían a otras funciones
  - Reformé el input de preguntas para las penas perpetuas
  - Terminé con el cálculo de las penas perpetuas

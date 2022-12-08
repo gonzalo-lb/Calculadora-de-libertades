@@ -78,3 +78,9 @@ class UNIDADESFIJAS_KEYS(Enum):
     _fechaImplementacion_DAY_KEY = 'Fecha entrada en vigencia - day'
     _denominacion_KEY = 'Denominacion'
     _valorDeLaUnidadFija = 'Valor del F01'
+
+class LIBERTAD_EVADIDA(Enum):    
+    _salidas_transitorias = 0
+    _libertad_condicional = 1
+    _libertad_asistida = 2
+    _fuga = 3
