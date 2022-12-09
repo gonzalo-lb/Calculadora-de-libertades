@@ -185,6 +185,15 @@ class Computo():
             TR_fecha += relativedelta(days=_montoDePena.dias)
             TR_fecha += relativedelta(days=-1)
         return TR_fecha
+    
+    def _RestarTiempo(self, _fecha:datetime.date, _tiempo:TiempoEn_Años_Meses_Dias):
+        TR_fecha = _fecha
+                    
+        TR_fecha += relativedelta(years=_tiempo.años)
+        TR_fecha += relativedelta(months=_tiempo.meses)
+        TR_fecha += relativedelta(days=_tiempo.dias)        
+
+        return TR_fecha
 
     def _Multiplicar_Tiempo(self, tiempo:TiempoEn_Años_Meses_Dias, factor:int):        
         
@@ -1007,7 +1016,8 @@ class ComputPenaLibertadRevocada(Computo):
                  fechaLibertadCondicional:datetime.date='NULL',
                  fechaSalidasTransitorias:datetime.date='NULL',
                  vencimientoDePena:datetime.date='NULL',
-                 libertadEvadida:LIBERTAD_EVADIDA='NULL') -> None:        
+                 libertadEvadida:LIBERTAD_EVADIDA='NULL',
+                 computaTiempoEnLibertad:bool='NULL') -> None:        
 
         # VARIABLES CON EL INPUT
         self._fecha_del_hecho = fechaDelHecho
@@ -1017,6 +1027,7 @@ class ComputPenaLibertadRevocada(Computo):
         self._fecha_salidas_transitorias = fechaSalidasTransitorias
         self._vencimiento_de_pena = vencimientoDePena
         self._libertad_evadida = libertadEvadida
+        self._computa_tiempo_en_libertad = computaTiempoEnLibertad
 
         # VARIABLES CON LOS DATOS
         self._regimen_normativo = 'NULL'
@@ -1080,6 +1091,14 @@ class ComputPenaLibertadRevocada(Computo):
         if self._libertad_evadida == LIBERTAD_EVADIDA._salidas_transitorias.value:
             self._nuevo_computo_vencimiento_de_pena += relativedelta(days=-1)
             self._nuevo_computo_caducidad_de_pena += relativedelta(days=-1)
+        
+        # Al vencimiento y caducidad, resta el tiempo que estuvo en libertad (si se ingresó esa opción como input,
+        # y solo para casos de nuevo cómputo por libertad asistida o condicional)
+        if (self._libertad_evadida == LIBERTAD_EVADIDA._libertad_condicional.value
+        or self._libertad_evadida == LIBERTAD_EVADIDA._libertad_asistida.value):
+            if self._computa_tiempo_en_libertad == True:
+                self._nuevo_computo_vencimiento_de_pena = self._RestarTiempo(self._nuevo_computo_vencimiento_de_pena, self._tiempo_que_estuvo_en_libertad)
+                self._nuevo_computo_caducidad_de_pena = self._RestarTiempo(self._nuevo_computo_caducidad_de_pena, self._tiempo_que_estuvo_en_libertad)
 
         if (self._libertad_evadida == LIBERTAD_EVADIDA._salidas_transitorias.value
           and self._fecha_libertad_condicional != 'NULL'):
@@ -1118,10 +1137,15 @@ class ComputPenaLibertadRevocada(Computo):
         print(f' - Fecha de egreso: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_egreso)}')
         print(f' - Fecha de la nueva detención: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_nueva_detencion)}')
         print(f' - Fecha del vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
+        
         if self._fecha_libertad_condicional != 'NULL':
             print(f' - Fecha de la libertad condicional: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_libertad_condicional)}')
         if self._fecha_salidas_transitorias != 'NULL':
             print(f' - Fecha de las salidas transitorias: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_salidas_transitorias)}')
+        
+        if self._computa_tiempo_en_libertad == True:
+            print(' - Se computa el tiempo que se permaneció en libertad, hasta que se revocó la libertad.')
+
         if self._libertad_evadida == LIBERTAD_EVADIDA._fuga.value:
             print(' - Motivo de la libertad: Fuga')
         if self._libertad_evadida == LIBERTAD_EVADIDA._salidas_transitorias.value:

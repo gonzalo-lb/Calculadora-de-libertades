@@ -456,6 +456,106 @@ class Preguntas_Input_Pena_EjecucionCondicional():
         print(f' - La pena ingresada es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es), {self._monto_de_pena.dias} día(s).')
         print(f' - El plazo de control es de {self._monto_de_pena.plazoControl_años} año(s), {self._monto_de_pena.plazoControl_meses} mes(es), {self._monto_de_pena.plazoControl_dias} día(s).')
 
+class Preguntas_Input_NuevoComputoPorLibertadRevocada():
+    def __init__(self):        
+        
+        self._fecha_del_hecho = 'NULL'
+        self._fecha_de_egreso = 'NULL'
+        self._fecha_nueva_detencion = 'NULL'
+        self._fecha_libertad_condicional = 'NULL'
+        self._fecha_salidas_transitorias = 'NULL'
+        self._vencimiento_de_pena = 'NULL'
+        self._libertad_evadida = 'NULL'
+        self._computa_tiempo_en_libertad = 'NULL'
+
+        self.GetConsoleInput_HacerPreguntas()
+
+    def GetConsoleInput_HacerPreguntas(self):
+
+        # Tipo de libertad
+        print(Separadores._separadorComun)
+        while True:
+            print('Indicar la circunstancia en la que se revocó la libertad:')
+            print(Separadores._separadorComun)
+            print('1 --> Se revocó la libertad condicional.')
+            print('2 --> Se revocó la libertad asistida.')
+            print('3 --> No retornó de una salida transitoria.')
+            print('4 --> Fuga del establecimiento penitenciario.')
+            print(Separadores._separadorComun)
+            user_input = input('INDICAR OPCIÓN: ')
+            if user_input == "1":
+                self._libertad_evadida = LIBERTAD_EVADIDA._libertad_condicional.value
+                print(' - Se aplica la opción 1.')
+                break
+            if user_input == "2":
+                self._libertad_evadida = LIBERTAD_EVADIDA._libertad_asistida.value
+                print(' - Se aplica la opción 2.')
+                break
+            if user_input == "3":
+                self._libertad_evadida = LIBERTAD_EVADIDA._salidas_transitorias.value
+                print(' - Se aplica la opción 3.')
+                break
+            if user_input == "4":
+                self._libertad_evadida = LIBERTAD_EVADIDA._fuga.value
+                print(' - Se aplica la opción 4.')
+                break
+            print('ERROR: Solo se puede responder con números 1 a 4.')
+
+        # Fecha del hecho
+        print(Separadores._separadorComun)
+        self._fecha_del_hecho = GetConsoleInput_Fecha('Ingresar la fecha del hecho: ')        
+        print(f' - Fecha ingresada: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_del_hecho)}')
+
+        # Fecha de egreso en libertad
+        print(Separadores._separadorComun)
+        self._fecha_de_egreso = GetConsoleInput_Fecha('Ingresar la fecha de egreso en libertad: ')        
+        print(f' - Fecha ingresada: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_egreso)}')
+
+        # Fecha de la nueva detención
+        print(Separadores._separadorComun)
+        self._fecha_nueva_detencion = GetConsoleInput_Fecha('Ingresar la fecha de la nueva detención: ')        
+        print(f' - Fecha ingresada: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_nueva_detencion)}')
+
+        # Fecha del vencimiento de pena
+        print(Separadores._separadorComun)
+        self._vencimiento_de_pena = GetConsoleInput_Fecha('Ingresar la fecha en la que correspondía el vencimiento de pena: ')
+        print(f' - Fecha ingresada: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
+        
+        # Pregunta si computa el tiempo en libertad (para casos de libertad condicional o asistida)
+        if (self._libertad_evadida == LIBERTAD_EVADIDA._libertad_condicional.value
+        or self._libertad_evadida == LIBERTAD_EVADIDA._libertad_asistida.value):
+            print(Separadores._separadorComun)
+            while True:
+                user_input = input('¿Se computa el tiempo que duró la libertad? (S/N): ')
+                if user_input == "N" or user_input == "n" or user_input == '':
+                    self._computa_tiempo_en_libertad = False
+                    print(' - No se computa el tiempo que duró la libertad.')
+                    break
+                if user_input == "S" or user_input == "s":
+                    self._computa_tiempo_en_libertad = True
+                    print(' - Se computa el tiempo que duró la libertad.')
+                    break
+                print('ERROR: Solo se puede responder con "s" o "n"')
+        
+        # Fecha de libertad condicional
+        if (self._libertad_evadida == LIBERTAD_EVADIDA._fuga.value
+        or self._libertad_evadida == LIBERTAD_EVADIDA._salidas_transitorias.value):
+            print(Separadores._separadorComun)
+            self._fecha_libertad_condicional = GetConsoleInput_Fecha('Ingresar la fecha en la que correspondía la libertad condicional (dejar en blanco si no se cuenta con esa fecha): ', ENTER_devuelve_NULL=True)        
+            if self._fecha_libertad_condicional == 'NULL':
+                print(' - No se ingresó fecha.')
+            else:
+                print(f' - Fecha ingresada: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_libertad_condicional)}')
+        
+        # Fecha de salidas transitorias
+        if self._libertad_evadida == LIBERTAD_EVADIDA._fuga.value:
+            print(Separadores._separadorComun)
+            self._fecha_salidas_transitorias = GetConsoleInput_Fecha('Ingresar la fecha en la que correspondían las salidas transitorias (dejar en blanco si no se cuenta con esa fecha): ', ENTER_devuelve_NULL=True)        
+            if self._fecha_salidas_transitorias == 'NULL':
+                print(' - No se ingresó fecha.')
+            else:
+                print(f' - Fecha ingresada: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_salidas_transitorias)}')
+
 class Separadores():
     _separadorComun = ''
 

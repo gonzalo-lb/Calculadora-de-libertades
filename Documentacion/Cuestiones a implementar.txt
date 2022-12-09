@@ -1,20 +1,17 @@
 Lo que hice ahora:
- - Class para nuevo cómputo por libertad revocada (o fuga)
-    - Armé el funcionamiento de la Class
-    - Armé las funciones para imprimir
+ - Terminé la class que calcula el nuevo cómputo por libertad revocada, y el user input
 
-Con qué seguir:
- - Cómputo por libertad revocada o fuga.
-    - Casos en los que se descuenta el tiempo en libertad.
-    - Input con preguntas.
+Con qué seguir: 
  - Cómputo en casos de reclusión por tiempo indeterminado
  - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación
 
-Funcionalidad a implementar:
- - Nuevo cómputo para libertades revocadadas (no se contabiliza el tiempo que se estuvo en libertad)
+Funcionalidad a implementar: 
  - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)
 
  Hecho:
+ - Class para nuevo cómputo por libertad revocada (o fuga)
+    - Armé el funcionamiento de la Class
+    - Armé las funciones para imprimir
  - Cálculo de pena de ejecución condicional
  - Ordené el código. Armé "nested functions" para LC y ST, ya que recurrían a otras funciones
  - Reformé el input de preguntas para las penas perpetuas
