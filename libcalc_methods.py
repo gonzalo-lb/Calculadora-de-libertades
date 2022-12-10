@@ -216,7 +216,20 @@ class Preguntas_Input_Pena_TemporalOPerpetua():
 
         self.GetConsoleInput_HacerPreguntas()
 
-    def GetConsoleInput_HacerPreguntas(self):                  
+    def GetConsoleInput_HacerPreguntas(self):
+
+        # Si es por una perpetua, primero pregunta por la accesoria de reclusión por tiempo indeterminado, ya que
+        # si se aplicó, las demás preguntas y cálculos no tendrían sentido
+        if self._ARGUMENTOS_pena_perpetua:            
+            print(Separadores._separadorComun)
+            user_input_52 = input('¿Se aplicó la accesoria del 52 CP (reclusión por tiempo indeterminado)? (S/N): ')
+            if user_input_52 == "S" or user_input_52 == "s":
+                self._monto_de_pena = MontoDePena(es_perpetua=True)
+                self._monto_de_pena.reclusionPorTiempoIndeterminado = True                
+                print(' - Se aplicó la accesoria de reclusión por tiempo indeterminado.')
+                return
+            else:
+                print(' - No hay accesoria de reclusión por tiempo indeterminado.')                
 
         # Fecha del hecho y cálculo del régimen normativo
         print(Separadores._separadorComun)
@@ -260,6 +273,22 @@ class Preguntas_Input_Pena_TemporalOPerpetua():
                     print(' - Es reincidente.')
                     break
                 print('ERROR: Solo se puede responder con "s" o "n"')
+        
+        # Si es pena temporal, pregunta si se aplicó la reclusión por tiempo indeterminado
+        if self._ARGUMENTOS_pena_perpetua == False:            
+            if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siHayAccesoria52) or self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_siHayAccesoria52):
+                print(Separadores._separadorComun)
+                while True:
+                    user_input = input('¿Se aplicó la accesoria del 52 CP (reclusión por tiempo indeterminado)? (S/N): ')
+                    if user_input == "N" or user_input == "n" or user_input == '':
+                        self._monto_de_pena.reclusionPorTiempoIndeterminado = False
+                        print(' - No hay accesoria de reclusión por tiempo indeterminado.')
+                        break
+                    if user_input == "S" or user_input == "s":
+                        self._monto_de_pena.reclusionPorTiempoIndeterminado = True
+                        print(' - Se aplicó la accesoria de reclusión por tiempo indeterminado.')
+                        break
+                    print('ERROR: Solo se puede responder con "s" o "n"')
 
         # Otros tiempos de detención a computar
         print(Separadores._separadorComun)
@@ -277,54 +306,7 @@ class Preguntas_Input_Pena_TemporalOPerpetua():
         if self._estimulo_educativo.años == 0 and self._estimulo_educativo.meses == 0 and self._estimulo_educativo.dias == 0:
             print(' - No se aplica el estímulo educativo.')
         else:
-            print(f' - El estímulo educativo es de {self._estimulo_educativo.años} año(s), {self._estimulo_educativo.meses} mes(es) y {self._estimulo_educativo.dias} día(s).')
-        
-        # PREGUNTAR SI HAY ACCESORIA DEL 52 CP        
-        # if self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_siHayAccesoria52) or self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_siHayAccesoria52):
-        #     print(Separadores._separadorComun)
-        #     while True:
-        #         user_input = input('¿Hay accesoria del 52 CP? (S/N): ')
-        #         if user_input == "N" or user_input == "n" or user_input == '':
-        #             self._HayAccesoriaDel52 = False
-        #             break
-        #         if user_input == "S" or user_input == "s":
-        #             self._HayAccesoriaDel52 = True
-        #             break
-        #         print('ERROR: Solo se puede responder con "s" o "n"')  
-
-        #PREGUNTAR SI ES POR LIBERTAD REVOCADA        
-        # if self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_esComputoPorLCRevocada_KEY) or self._regimen_normativo.LIBERTAD_ASISTIDA(LA_KEYS._ask_nuevoComputoLArevoc_KEY) or self._regimen_normativo.SALIDAS_TRANSITORIAS(ST_KEYS._ask_esComputoPorEvasionDeST_KEY):
-        #     print(Separadores._separadorComun)
-        #     while True:
-        #         print('¿Este cómputo es por una libertad revocada?')
-        #         print(Separadores._separadorComun)
-        #         print('1 --> No. Es un cómputo común')
-        #         print('2 --> Si es por libertad condicional revocada')
-        #         print('3 --> Si es por libertad asistida revocada')
-        #         print('4 --> Si es por evasión estando en salidas transitorias')
-        #         print(Separadores._separadorComun)
-        #         user_input = input('INDICAR OPCIÓN: ')
-        #         if user_input == "1" or user_input == '':
-        #             self._EsComputoPorLCRevocada = False
-        #             self._EsComputoPorSTRevocada = False
-        #             self._EsComputoPorLARevocada = False
-        #             break
-        #         if user_input == "2":
-        #             self._EsComputoPorLCRevocada = True
-        #             self._EsComputoPorSTRevocada = False
-        #             self._EsComputoPorLARevocada = False
-        #             break
-        #         if user_input == "3":
-        #             self._EsComputoPorLCRevocada = False
-        #             self._EsComputoPorSTRevocada = False
-        #             self._EsComputoPorLARevocada = True
-        #             break
-        #         if user_input == "4":
-        #             self._EsComputoPorLCRevocada = False
-        #             self._EsComputoPorSTRevocada = True
-        #             self._EsComputoPorLARevocada = False
-        #             break
-        #         print('ERROR: Solo se puede responder con números del 1 al 4')
+            print(f' - El estímulo educativo es de {self._estimulo_educativo.años} año(s), {self._estimulo_educativo.meses} mes(es) y {self._estimulo_educativo.dias} día(s).')                
             
         # PREGUNTAR SI ES POR DELITOS EXCLUIDOS LEY 25.892 o 25.948, según corresponda (son los mismos delitos)
         if (self._regimen_normativo.LIBERTAD_CONDICIONAL(LC_KEYS._ask_delitosExcluidos25892_KEY)
