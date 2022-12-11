@@ -337,11 +337,12 @@ class ComputoPenaTemporalOPerpetua(Computo):
     def _CalcularVencimientoYCaducidadDePena(self):
         '''Determina "vencimiento de pena" y "caducidad de pena"'''
         
-        # Si la pena es perpetua esta función no hace nada, porque aún no se cuenta con el cómputo de
-        # libertad condicional. El vencimiento y caducidad lo va a calcular la función de la condicional
+        # Si la pena es perpetua, o de reclusión por tiempo indeterminado esta función no hace nada, porque
+        # aún no se cuenta con el cómputo de libertad condicional. El vencimiento y caducidad lo va a calcular
+        # la función de la condicional.
         # Si hay reclusión por tiempo indeterminado pero no es perpetua, calcula el vencimiento
-        if self._monto_de_pena.perpetua:
-            return        
+        if self._monto_de_pena.perpetua or self._monto_de_pena.reclusionPorTiempoIndeterminado:
+            return
         
         _vencimiento_de_pena = 0
         _caducidad_de_pena = 0
@@ -377,7 +378,10 @@ class ComputoPenaTemporalOPerpetua(Computo):
                 _computo_libertad_condicional = self._SumarMontoDePena(self._fecha_de_detencion, _requisito_temporal_libertad_condicional)
             elif self._monto_de_pena.perpetua == False and self._monto_de_pena.reclusionPorTiempoIndeterminado == True:
             # Penas temporales de más de 3 años, con reclusión por tiempo indeterminado
-                pass
+                _requisito_temporal_libertad_condicional.años = 5
+                _vencimiento_provisorio = self._SumarMontoDePena(self._fecha_de_detencion, self._monto_de_pena)        
+                _vencimiento_provisorio = self._RestarOtrasDetenciones(_vencimiento_provisorio, self._otras_detenciones)
+                _computo_libertad_condicional = self._SumarMontoDePena(_vencimiento_provisorio, _requisito_temporal_libertad_condicional)
             else:
                 print('class ComputoPenaTemporalOPerpetua(Computo): -->')
                 print('   def _CalcularLibertadCondicional(self): -->')
@@ -474,9 +478,11 @@ class ComputoPenaTemporalOPerpetua(Computo):
         self._libertad_condicional_COMPUTO = _computo_libertad_condicional
         self._libertad_condicional_REQUISITO_TEMPORAL = _requisito_temporal_libertad_condicional
 
-        if self._monto_de_pena.perpetua: # Si es pena perpetua, calcula vencimiento y caducidad
+        # Si es pena perpetua o reclusión por tiempo indeterminado, calcula vencimiento y caducidad
+        if (self._monto_de_pena.perpetua
+        or self._monto_de_pena.reclusionPorTiempoIndeterminado):        
             self._vencimiento_de_pena = self._SumarMontoDePena(self._libertad_condicional_COMPUTO, TiempoEn_Años_Meses_Dias(_años=5))
-            self._caducidad_de_pena = self._vencimiento_de_pena + relativedelta(years=10)
+            self._caducidad_de_pena = self._vencimiento_de_pena + relativedelta(years=10)        
 
         # Si aplica la ley 27.375, calcula además el requisito de calificación, y el integral
         if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value:
@@ -594,10 +600,13 @@ class ComputoPenaTemporalOPerpetua(Computo):
             or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_25948.value):
             
             # Calcula el requisito temporal
-            if self._monto_de_pena.perpetua:
+            if (self._monto_de_pena.perpetua == True
+            and self._monto_de_pena.reclusionPorTiempoIndeterminado == False):
                 _requisito_salidas_transitorias.años = 15
-            else:
+            elif (self._monto_de_pena.perpetua == False
+            and self._monto_de_pena.reclusionPorTiempoIndeterminado == False):
                 _requisito_salidas_transitorias = self._Calcular_la_mitad(self._monto_de_pena)
+            
             _computo_salidas_transitorias = self._SumarMontoDePena(_computo_salidas_transitorias, _requisito_salidas_transitorias)
 
             # Resta otras detenciones, si hay
@@ -817,10 +826,9 @@ class ComputoPenaTemporalOPerpetua(Computo):
         print('-----------------------')
         print(f' - Vencimiento de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
         print(f' - Caducidad de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_pena)}')
-        if self._monto_de_pena.perpetua:
-            print(' - Los cálculos están sujetos a obtener la libertad condicional en la fecha del cómputo.')
-        if self._monto_de_pena.reclusionPorTiempoIndeterminado:
-            print(' - El vencimiento no implica libertad porque la pena tiene accesoria de reclusión por tiempo indeterminado.')
+        if (self._monto_de_pena.perpetua
+        or self._monto_de_pena.reclusionPorTiempoIndeterminado):
+            print(' - Los cálculos están sujetos a obtener la libertad condicional en la fecha del cómputo.')        
     
     def _ImprimirSTRINGLibertadCondicional(self):  
 
@@ -830,7 +838,10 @@ class ComputoPenaTemporalOPerpetua(Computo):
         print(Separadores._separadorComun)
         print('LIBERTAD CONDICIONAL')
         print('--------------------')
-        print(f' - La libertad condicional se obtiene a los {self._libertad_condicional_REQUISITO_TEMPORAL.años} año(s), {self._libertad_condicional_REQUISITO_TEMPORAL.meses} mes(es) y {self._libertad_condicional_REQUISITO_TEMPORAL.dias} día(s).')
+        if self._monto_de_pena.reclusionPorTiempoIndeterminado == True and self._monto_de_pena.perpetua == False:
+            print(f' - La libertad condicional se obtiene a los 5 años, luego de transcurrido el cumplimiento de la reclusión accesoria.')
+        else:
+            print(f' - La libertad condicional se obtiene a los {self._libertad_condicional_REQUISITO_TEMPORAL.años} año(s), {self._libertad_condicional_REQUISITO_TEMPORAL.meses} mes(es) y {self._libertad_condicional_REQUISITO_TEMPORAL.dias} día(s).')
         print(f' - El requisito temporal para acceder a la libertad condicional se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._libertad_condicional_COMPUTO)}')        
         
         # Imprime advertencias, si corresponde

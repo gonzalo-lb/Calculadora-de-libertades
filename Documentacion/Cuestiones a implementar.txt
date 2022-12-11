@@ -1,11 +1,9 @@
 Lo que hice ahora:
- - Reclusión por tiempo indeterminado: Agregué la pregunta al input
- - Reclusión por tiempo indeterminado: Si es perpetua con accesoria del 52, no hace los cálculos, e indica que no se puede salir en libertad
- - Reclusión por tiempo indeterminado: Armé el vencimiento de pena y caducidad, con su print
- - LibCalc: En el cálculo de libertad condicional, hice una nested function para calcular el requisito temporal y el cómputo
+ - Reclusión por tiempo indeterminado: Reformé el cálculo del vencimiento de pena, porque estaba mal hecho.
+ - Reclusión por tiempo indeterminado: Armé la libertad condicional, con su print.
 
 Con qué seguir:
- - Reclusión por tiempo indeterminado: Seguir con el requisito temporal y cómputo en la libertad condicional; luego su print; luego el de las demás libertades.
+ - Reclusión por tiempo indeterminado: Seguir con el requisito temporal y cómputo en las salidas transitorias y su print (seguir con el cálculo del requisito temporal); luego el de las demás libertades.
  - Cómputo en casos de reclusión por tiempo indeterminado
  - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación
  - Armar funciones para input s/n
@@ -15,6 +13,10 @@ Funcionalidad a implementar:
  - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)
 
  Hecho:
+ - Reclusión por tiempo indeterminado: Agregué la pregunta al input
+ - Reclusión por tiempo indeterminado: Si es perpetua con accesoria del 52, no hace los cálculos, e indica que no se puede salir en libertad
+ - Reclusión por tiempo indeterminado: Armé el vencimiento de pena y caducidad, con su print
+ - LibCalc: En el cálculo de libertad condicional, hice una nested function para calcular el requisito temporal y el cómputo
  - Terminé la class que calcula el nuevo cómputo por libertad revocada, y el user input
  - Class para nuevo cómputo por libertad revocada (o fuga)
     - Armé el funcionamiento de la Class
