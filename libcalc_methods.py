@@ -182,7 +182,7 @@ class RegimenNormativoAplicable():
     def DELITOS_EXCLUIDOS_LIBERTAD(self, ask:DELITOS_EXCLUIDOS_LIB_KEYS):
         return self._JSON_DELITOSEXCLUIDOSLIB[ask.value]
     
-    def _Imprimir(self, imprimir_reg_unidadesFijas:bool=False):
+    def _ArmarSTRING(self, imprimir_reg_unidadesFijas:bool=False):
         print(Separadores._separadorComun)
         print('REGIMEN LEGAL APLICABLE')
         print('-----------------------')
@@ -192,6 +192,19 @@ class RegimenNormativoAplicable():
         print(f' - Régimen preparatorio para la liberación: {self._regimen_PREPLIB}')
         if imprimir_reg_unidadesFijas:
             print(f' - Unidades fijas: {self.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._denominacion_KEY)}')    
+    
+    def _ArmarSTRING(self, imprimir_reg_unidadesFijas:bool=False):
+        treturn = []
+        treturn.append(Separadores._separadorComun)
+        treturn.append('REGIMEN LEGAL APLICABLE')
+        treturn.append('-----------------------')
+        treturn.append(f' - Libertad condicional: {self._regimen_LC}')
+        treturn.append(f' - Salidas transitorias: {self._regimen_ST}')
+        treturn.append(f' - Libertad asistida: {self._regimen_LA}')
+        treturn.append(f' - Régimen preparatorio para la liberación: {self._regimen_PREPLIB}')
+        if imprimir_reg_unidadesFijas:
+            treturn.append(f' - Unidades fijas: {self.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._denominacion_KEY)}')
+        return treturn
 
 class Preguntas_Input_Pena_TemporalOPerpetua():
     def __init__(self, pena_perpetua:bool=False):        

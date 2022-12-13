@@ -281,8 +281,14 @@ class ComputoPenaTemporalOPerpetua(Computo):
         self._multa_unidadesFijas_en_pesos = 'NULL'
 
         # VARIABLES OUTPUT (STRING)
-        self._STRING_vencimiento_de_pena = ''
-        self._STRING_caducidad_de_pena = ''
+        self._STRING_General = []
+        self._STRING_RegimenNormativo = []
+        self._STRING_VencimientoYCaducidadDePena = []
+        self._STRING_LibertadCondicional = []
+        self._STRING_SalidasTransitorias = []
+        self._STRING_LibertadAsistida = []
+        self._STRING_RegimenPreparatorioParaLaLiberacion = []
+        self._STRING_MultaUnidadesFijasEnPesos = []
 
         if self._ControlarParametros():
             return
@@ -298,15 +304,22 @@ class ComputoPenaTemporalOPerpetua(Computo):
         self._CalcularRegimenPreparacionLibertad()
         self._CalcularUnidadesFijas()
         
-        # Imprime los resultados
-        self._ImprimirSTRINGGeneral()
-        self._ImprimirSTRINGRegimenNormativo()
+        # Arma los string con los resultados
+        self._ArmarSTRINGGeneral()       
+        self._ImprimirSTRING(self._STRING_General)
+
+        self._ArmarSTRINGRegimenNormativo()
+        self._ImprimirSTRING(self._STRING_RegimenNormativo)
+        # self._ImprimirSTRINGRegimenNormativo()
         self._ImprimirSTRINGVencimientoYCaducidadDePena()
         self._ImprimirSTRINGLibertadCondicional()
         self._ImprimirSTRINGSalidasTransitorias()        
         self._ImprimirSTRINGLibertadAsistida()
         self._ImprimirSTRINGRegimenPreparatorioParaLaLiberacion()
         self._ImprimirSTRINGMultaUnidadesFijasEnPesos()
+
+        # Imprime los resultados
+        
         print(Separadores._separadorComun)
     
     def _ControlarParametros(self):
@@ -722,7 +735,7 @@ class ComputoPenaTemporalOPerpetua(Computo):
         if self._regimen_normativo._regimen_LA == LA_REGIMENES._No_aplica.value:
             return
         
-        if self._monto_de_pena.perpetua:
+        if self._monto_de_pena.perpetua == True or self._monto_de_pena.reclusionPorTiempoIndeterminado == True:
             return        
 
         _computo_libertad_asistida = ''                
@@ -777,79 +790,86 @@ class ComputoPenaTemporalOPerpetua(Computo):
         
         self._multa_unidadesFijas_en_pesos = self._monto_multa_unidades_fijas * self._regimen_normativo.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._valorDeLaUnidadFija)
 
-    def _ImprimirSTRINGGeneral(self):
-        print(Separadores._separadorComun)
-        print('DATOS INGRESADOS')
-        print('----------------')
-        print(f' - Fecha del hecho: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_del_hecho)}')
-        print(f' - Fecha de detención: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_detencion)}')
+    def _ArmarSTRINGGeneral(self):
+        self._STRING_General = []
+        self._STRING_General.append(Separadores._separadorComun)
+        self._STRING_General.append('DATOS INGRESADOS')
+        self._STRING_General.append('----------------')
+        self._STRING_General.append(f' - Fecha del hecho: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_del_hecho)}')
+        self._STRING_General.append(f' - Fecha de detención: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_detencion)}')
         
         if self._monto_de_pena.perpetua:
-            print(' - Es una pena perpetua.')
+            self._STRING_General.append(' - Es una pena perpetua.')
         else:
-            print(f' - La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s).')
+            self._STRING_General.append(f' - La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s).')
         
         if self._monto_multa_unidades_fijas != 'NULL':
-            print(f'    - La multa es de {self._monto_multa_unidades_fijas} unidades fijas.')
+            self._STRING_General.append(f'    - La multa es de {self._monto_multa_unidades_fijas} unidades fijas.')
             
         if self._monto_de_pena.reincidencia:
-            print('    - Es reincidente.')
+            self._STRING_General.append('    - Es reincidente.')
         
         if self._monto_de_pena.reclusionPorTiempoIndeterminado:
-            print('    - Hay accesoria de reclusión por tiempo indeterminado.')
+            self._STRING_General.append('    - Hay accesoria de reclusión por tiempo indeterminado.')
 
         if self._monto_de_pena.delitosExcluidosLey25892:
-            print('    - La condena es por delitos enumerados en la ley 25.892.')
+            self._STRING_General.append('    - La condena es por delitos enumerados en la ley 25.892.')
         if self._monto_de_pena.delitosExcluidosLey25948:
-            print('    - La condena es por delitos enumerados en la ley 25.948.')
+            self._STRING_General.append('    - La condena es por delitos enumerados en la ley 25.948.')
         if self._monto_de_pena.delitosExcluidosLey27375:
-            print('    - La condena es por delitos enumerados en la ley 27.375.')        
+            self._STRING_General.append('    - La condena es por delitos enumerados en la ley 27.375.')        
         
         if self._otras_detenciones == 'NULL':
-            print(' - No se ingresaron otros tiempos de detención a computar.')
+            self._STRING_General.append(' - No se ingresaron otros tiempos de detención a computar.')
         else:
-            print(' - Otras detenciones a computar:')
+            self._STRING_General.append(' - Otras detenciones a computar:')
             for detencion in self._otras_detenciones:
-                print(f'    - "{detencion._nombre}": {detencion._tiempoDeDetencion.años} año(s), {detencion._tiempoDeDetencion.meses} mes(es) y {detencion._tiempoDeDetencion.dias} día(s).')
+                self._STRING_General.append(f'    - "{detencion._nombre}": {detencion._tiempoDeDetencion.años} año(s), {detencion._tiempoDeDetencion.meses} mes(es) y {detencion._tiempoDeDetencion.dias} día(s).')
 
         estimulo_educativo = self._estimulo_educativo.años + self._estimulo_educativo.meses + self._estimulo_educativo.dias
         if estimulo_educativo == 0:
-            print(' - No se ingresó tiempo a descontar por aplicación del estímulo educativo.')
+            self._STRING_General.append(' - No se ingresó tiempo a descontar por aplicación del estímulo educativo.')
         else:
-            print(f' - El estímulo educativo a descontar es de {self._estimulo_educativo.años} año(s), {self._estimulo_educativo.meses} mes(es) y {self._estimulo_educativo.dias} día(s).')
+            self._STRING_General.append(f' - El estímulo educativo a descontar es de {self._estimulo_educativo.años} año(s), {self._estimulo_educativo.meses} mes(es) y {self._estimulo_educativo.dias} día(s).')
         
         if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_27375.value:
             if self._fecha_inicio_ejecucion == 'NULL':
-                print(' - No se ingresó fecha de inicio de ejecución (o de REAV).')
+                self._STRING_General.append(' - No se ingresó fecha de inicio de ejecución (o de REAV).')
             else:
-                print(f' - Fecha de inicio de ejecución (o de REAV): {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}')
+                self._STRING_General.append(f' - Fecha de inicio de ejecución (o de REAV): {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}')
             
             if self._fecha_calificacion_BUENO == 'NULL':
-                print(' - No se ingresó fecha en la que se adquirió la calificación "BUENO".')
+                self._STRING_General.append(' - No se ingresó fecha en la que se adquirió la calificación "BUENO".')
             else:
-                print(f' - Fecha en la que se adquirió la calificación "BUENO": {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}')
+                self._STRING_General.append(f' - Fecha en la que se adquirió la calificación "BUENO": {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}')
             
             if self._fecha_calificacion_EJEMPLAR == 'NULL':
-                print(' - No se ingresó fecha en la que se adquirió la calificación "EJEMPLAR".')
+                self._STRING_General.append(' - No se ingresó fecha en la que se adquirió la calificación "EJEMPLAR".')
             else:
-                print(f' - Fecha en la que se adquirió la calificación "EJEMPLAR": {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_EJEMPLAR)}')
+                self._STRING_General.append(f' - Fecha en la que se adquirió la calificación "EJEMPLAR": {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_EJEMPLAR)}')
             
             if self._fecha_ingreso_a_periodo_de_prueba == 'NULL':
-                print(' - No se ingresó fecha en la que se ingresó al periodo de prueba.')
+                self._STRING_General.append(' - No se ingresó fecha en la que se ingresó al periodo de prueba.')
             else:
-                print(f' - Fecha en la que se ingresó al periodo de prueba: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_ingreso_a_periodo_de_prueba)}')
+                self._STRING_General.append(f' - Fecha en la que se ingresó al periodo de prueba: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_ingreso_a_periodo_de_prueba)}')
 
             if self._otras_detenciones != 'NULL' or estimulo_educativo != 0:
                 if self._vuelve_a_restar_otras_detenciones_y_140_en_ST == True:
-                    print(' - Para el cálculo de las salidas transitorias se va a computar estímulo educativo y/o se van a restar las otras detenciones ingresadas, tanto para el requisito temporal del periodo de prueba, como para el de las salidas transitorias.')
+                    self._STRING_General.append(' - Para el cálculo de las salidas transitorias se va a computar estímulo educativo y/o se van a restar las otras detenciones ingresadas, tanto para el requisito temporal del periodo de prueba, como para el de las salidas transitorias.')
                 else:
-                    print(' - Para el cálculo de las salidas transitorias se va a computar estímulo educativo y/o se van a restar las otras detenciones ingresadas, solamente para el requisito temporal del periodo de prueba.')
+                    self._STRING_General.append(' - Para el cálculo de las salidas transitorias se va a computar estímulo educativo y/o se van a restar las otras detenciones ingresadas, solamente para el requisito temporal del periodo de prueba.')
+    
+    def _ArmarSTRINGRegimenNormativo(self):
+        if self._monto_multa_unidades_fijas == 'NULL':
+            self._STRING_RegimenNormativo = self._regimen_normativo._ArmarSTRING()
+        else:
+            self._STRING_RegimenNormativo = self._regimen_normativo._ArmarSTRING(imprimir_reg_unidadesFijas=True)
 
     def _ImprimirSTRINGRegimenNormativo(self):        
         if self._monto_multa_unidades_fijas == 'NULL':
-            self._regimen_normativo._Imprimir()
+            self._regimen_normativo._ArmarSTRING()
         else:
-            self._regimen_normativo._Imprimir(imprimir_reg_unidadesFijas=True)
+            self._regimen_normativo._ArmarSTRING(imprimir_reg_unidadesFijas=True)
 
     def _ImprimirSTRINGVencimientoYCaducidadDePena(self):        
         print(Separadores._separadorComun)
@@ -987,7 +1007,7 @@ class ComputoPenaTemporalOPerpetua(Computo):
         if self._regimen_normativo._regimen_LA == LA_REGIMENES._No_aplica.value:
             return
         
-        if self._monto_de_pena.perpetua:
+        if self._monto_de_pena.perpetua == True or self._monto_de_pena.reclusionPorTiempoIndeterminado == True:
             return        
         
         print(Separadores._separadorComun)
@@ -1032,6 +1052,10 @@ class ComputoPenaTemporalOPerpetua(Computo):
         print('-----')
         print(f' - Valor de la unidad fija: ${NumeroConSeparadorDeMiles(self._regimen_normativo.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._valorDeLaUnidadFija))}')
         print(f' - Multa en pesos: ${NumeroConSeparadorDeMiles(self._multa_unidadesFijas_en_pesos)}')
+
+    def _ImprimirSTRING(self, string:list[str]):
+        for text in string:
+            print(text)
 
 class ComputPenaEjecucionCondicional(Computo):
     def __init__(self,
@@ -1229,7 +1253,7 @@ class ComputPenaLibertadRevocada(Computo):
             print(' - Motivo de la libertad: Egreso en libertad asistida')
 
     def _ImprimirNuevoComputo(self):        
-        self._regimen_normativo._Imprimir()
+        self._regimen_normativo._ArmarSTRING()
         print(Separadores._separadorComun)
         print('NUEVO COMPUTO DE PENA')
         print('---------------------')                

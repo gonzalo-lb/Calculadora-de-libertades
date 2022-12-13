@@ -1,19 +1,21 @@
 Lo que hice ahora:
-- Reclusión por tiempo indeterminado: Armé el cálculo de la ST.
-- Reclusión por tiempo indeterminado: Armé el print.
-- ST: Solucioné error en penas menores a 5 años (ley 27.375)
+ - Reclusión por tiempo indeterminado: Saqué la LA. No se calcula.
+ - Reclusión por tiempo indeterminado: Reg. Prep. Lib. queda igual.
+ - Imprimir Strings: Comencé a reformar el sistema para que primero arme list con strings, y que por otro lado los imprima.
 
 Con qué seguir: 
- - Reclusión por tiempo indeterminado: Seguir con libertad asistida; luego las demás libertades.
- - Cómputo en casos de reclusión por tiempo indeterminado
+ - Reformar el sistema para imprimir el output, para que por un lado arme list de string y que por otro, los imprima
  - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación
  - Armar funciones para input s/n
  - Armar funciones para input opciones con número
 
 Funcionalidad a implementar: 
- - Cálculos para la reclusión por tiempo indeterminado (art. 52 CP)
+ - 
 
  Hecho:
+ - Reclusión por tiempo indeterminado: Armé el cálculo de la ST.
+ - Reclusión por tiempo indeterminado: Armé el print.
+ - ST: Solucioné error en penas menores a 5 años (ley 27.375)
  - Reclusión por tiempo indeterminado: Reformé el cálculo del vencimiento de pena, porque estaba mal hecho.
  - Reclusión por tiempo indeterminado: Armé la libertad condicional, con su print.
  - Reclusión por tiempo indeterminado: Agregué la pregunta al input

@@ -283,7 +283,7 @@ class ComputoPenaTemporal(Computo):
         
         # Imprime los resultados
         self._ImprimirSTRINGGeneral()
-        self._regimen_normativo._Imprimir()
+        self._regimen_normativo._ArmarSTRING()
         self._ImprimirSTRINGVencimientoYCaducidadDePena()
         self._ImprimirSTRINGLibertadCondicional()
         self._ImprimirSTRINGSalidasTransitorias()
