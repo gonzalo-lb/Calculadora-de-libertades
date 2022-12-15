@@ -182,7 +182,7 @@ class RegimenNormativoAplicable():
     def DELITOS_EXCLUIDOS_LIBERTAD(self, ask:DELITOS_EXCLUIDOS_LIB_KEYS):
         return self._JSON_DELITOSEXCLUIDOSLIB[ask.value]
     
-    def _ArmarSTRING(self, imprimir_reg_unidadesFijas:bool=False):
+    def _ImprimirOutput(self, imprimir_reg_unidadesFijas:bool=False):
         print(Separadores._separadorComun)
         print('REGIMEN LEGAL APLICABLE')
         print('-----------------------')

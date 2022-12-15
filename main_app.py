@@ -78,7 +78,8 @@ def MainApp():
             fechaCalificacionBUENO=user_input._fecha_calificacion_BUENO,
             fechaIngresoPeriodoDePrueba=user_input._fecha_ingreso_periodo_de_prueba,
             fechaCalificacionEJEMPLAR=user_input._fecha_calificacion_EJEMPLAR,
-            vuelveARestarOtrasDetencionesyAplicar140enST=user_input._vuelve_a_restar_otras_detenciones_y_140_en_ST)    
+            vuelveARestarOtrasDetencionesyAplicar140enST=user_input._vuelve_a_restar_otras_detenciones_y_140_en_ST,
+            imprimirComputoEnConsola=True)    
         
         if opcion_elegida == 3: # Cómputo de pena de ejecución condicional
 
@@ -87,7 +88,8 @@ def MainApp():
             computo = ComputPenaEjecucionCondicional(
                 fechaDeSentencia=user_input._fecha_de_sentencia,
                 fechaFirmezaDeSentencia=user_input._fecha_firmeza_de_sentencia,
-                montoDePena=user_input._monto_de_pena
+                montoDePena=user_input._monto_de_pena,
+                imprimirComputoEnConsola=True
             )
         
         if opcion_elegida == 4: # Nuevo cómputo por libertad revocada
@@ -102,7 +104,8 @@ def MainApp():
                 fechaSalidasTransitorias=user_input._fecha_salidas_transitorias,
                 vencimientoDePena=user_input._vencimiento_de_pena,
                 libertadEvadida=user_input._libertad_evadida,
-                computaTiempoEnLibertad=user_input._computa_tiempo_en_libertad
+                computaTiempoEnLibertad=user_input._computa_tiempo_en_libertad,
+                imprimirEnConsola=True
             )
 
         if opcion_elegida == 5: # Cálculo de unidades fijas

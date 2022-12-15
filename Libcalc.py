@@ -4,7 +4,7 @@ from dateutil import relativedelta
 from libcalc_methods import *
 from copy import deepcopy
 
-class Computo():
+class ComputoBase():
     def _Calcular_un_tercio(self, _montoDePena:MontoDePena):
         if _montoDePena.perpetua:
             print('def Calcular_un_tercio: ERROR: No se puede calcular un tercio de una perpetua.')
@@ -223,8 +223,13 @@ class Computo():
         TR_fecha -= relativedelta(months=_tiempo.meses)
         TR_fecha -= relativedelta(years=_tiempo.años)
         return TR_fecha
+    
+    def _ImprimirSTRING(self, *string:list[str]):
+        for esteString in string:
+            for text in esteString:
+                print(text)
 
-class ComputoPenaTemporalOPerpetua(Computo):
+class ComputoPenaTemporalOPerpetua(ComputoBase):
     def __init__(self,
     fechaDelHecho:datetime.date='NULL',
     fechaDeDetencion:datetime.date='NULL',
@@ -236,7 +241,8 @@ class ComputoPenaTemporalOPerpetua(Computo):
     fechaCalificacionBUENO:datetime.date='NULL',
     fechaIngresoPeriodoDePrueba:datetime.date='NULL',
     fechaCalificacionEJEMPLAR:datetime.date='NULL',
-    vuelveARestarOtrasDetencionesyAplicar140enST=False) -> None:
+    vuelveARestarOtrasDetencionesyAplicar140enST=False,
+    imprimirComputoEnConsola:bool=False) -> None:
         super().__init__()
         
         # INPUT
@@ -289,38 +295,9 @@ class ComputoPenaTemporalOPerpetua(Computo):
         self._STRING_LibertadAsistida = []
         self._STRING_RegimenPreparatorioParaLaLiberacion = []
         self._STRING_MultaUnidadesFijasEnPesos = []
+        self._STRING_Output = []
 
-        if self._ControlarParametros():
-            return
-        
-        # Determina el régimen normativo a utilizar
-        self._regimen_normativo = RegimenNormativoAplicable(self._fecha_del_hecho)
-
-        # Calcula el cómputo y lo guarda en las variables de datos
-        self._CalcularVencimientoYCaducidadDePena()
-        self._CalcularLibertadCondicional()
-        self._CalcularSalidasTransitorias()                    
-        self._CalcularLibertadAsistida()
-        self._CalcularRegimenPreparacionLibertad()
-        self._CalcularUnidadesFijas()
-        
-        # Arma los string con los resultados
-        self._ArmarSTRINGGeneral()       
-        self._ImprimirSTRING(self._STRING_General)
-
-        self._ArmarSTRINGRegimenNormativo()
-        self._ImprimirSTRING(self._STRING_RegimenNormativo)
-        # self._ImprimirSTRINGRegimenNormativo()
-        self._ImprimirSTRINGVencimientoYCaducidadDePena()
-        self._ImprimirSTRINGLibertadCondicional()
-        self._ImprimirSTRINGSalidasTransitorias()        
-        self._ImprimirSTRINGLibertadAsistida()
-        self._ImprimirSTRINGRegimenPreparatorioParaLaLiberacion()
-        self._ImprimirSTRINGMultaUnidadesFijasEnPesos()
-
-        # Imprime los resultados
-        
-        print(Separadores._separadorComun)
+        self._HacerComputo(imprimirEnConsola=imprimirComputoEnConsola)
     
     def _ControlarParametros(self):
         faltanParametros = False
@@ -865,203 +842,273 @@ class ComputoPenaTemporalOPerpetua(Computo):
         else:
             self._STRING_RegimenNormativo = self._regimen_normativo._ArmarSTRING(imprimir_reg_unidadesFijas=True)
 
-    def _ImprimirSTRINGRegimenNormativo(self):        
-        if self._monto_multa_unidades_fijas == 'NULL':
-            self._regimen_normativo._ArmarSTRING()
-        else:
-            self._regimen_normativo._ArmarSTRING(imprimir_reg_unidadesFijas=True)
-
-    def _ImprimirSTRINGVencimientoYCaducidadDePena(self):        
-        print(Separadores._separadorComun)
-        print('VENCIMIENTO Y CADUCIDAD')
-        print('-----------------------')
-        print(f' - Vencimiento de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
-        print(f' - Caducidad de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_pena)}')
+    def _ArmarSTRINGVencimientoYCaducidadDePena(self):
+        self._STRING_VencimientoYCaducidadDePena = []
+        self._STRING_VencimientoYCaducidadDePena.append(Separadores._separadorComun)
+        self._STRING_VencimientoYCaducidadDePena.append('VENCIMIENTO Y CADUCIDAD')
+        self._STRING_VencimientoYCaducidadDePena.append('-----------------------')
+        self._STRING_VencimientoYCaducidadDePena.append(f' - Vencimiento de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
+        self._STRING_VencimientoYCaducidadDePena.append(f' - Caducidad de la pena: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_pena)}')
         if (self._monto_de_pena.perpetua
         or self._monto_de_pena.reclusionPorTiempoIndeterminado):
-            print(' - Los cálculos están sujetos a obtener la libertad condicional en la fecha del cómputo.')        
+            self._STRING_VencimientoYCaducidadDePena.append(' - Los cálculos están sujetos a obtener la libertad condicional en la fecha del cómputo.')        
     
-    def _ImprimirSTRINGLibertadCondicional(self):  
+    def _ArmarSTRINGLibertadCondicional(self):
+
+        self._STRING_LibertadCondicional = []
 
         if self._regimen_normativo._regimen_LC == LC_REGIMENES._No_aplica.value:
+            self._STRING_LibertadCondicional = 'NULL'
             return        
 
-        print(Separadores._separadorComun)
-        print('LIBERTAD CONDICIONAL')
-        print('--------------------')
+        self._STRING_LibertadCondicional.append(Separadores._separadorComun)
+        self._STRING_LibertadCondicional.append('LIBERTAD CONDICIONAL')
+        self._STRING_LibertadCondicional.append('--------------------')
         if self._monto_de_pena.reclusionPorTiempoIndeterminado == True and self._monto_de_pena.perpetua == False:
-            print(f' - La libertad condicional se obtiene a los 5 años, luego de transcurrido el cumplimiento de la reclusión accesoria.')
+            self._STRING_LibertadCondicional.append(f' - La libertad condicional se obtiene a los 5 años, luego de transcurrido el cumplimiento de la reclusión accesoria.')
         else:
-            print(f' - La libertad condicional se obtiene a los {self._libertad_condicional_REQUISITO_TEMPORAL.años} año(s), {self._libertad_condicional_REQUISITO_TEMPORAL.meses} mes(es) y {self._libertad_condicional_REQUISITO_TEMPORAL.dias} día(s).')
-        print(f' - El requisito temporal para acceder a la libertad condicional se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._libertad_condicional_COMPUTO)}')        
+            self._STRING_LibertadCondicional.append(f' - La libertad condicional se obtiene a los {self._libertad_condicional_REQUISITO_TEMPORAL.años} año(s), {self._libertad_condicional_REQUISITO_TEMPORAL.meses} mes(es) y {self._libertad_condicional_REQUISITO_TEMPORAL.dias} día(s).')
+        self._STRING_LibertadCondicional.append(f' - El requisito temporal para acceder a la libertad condicional se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._libertad_condicional_COMPUTO)}')        
         
         # Imprime advertencias, si corresponde
         if self._monto_de_pena.reincidencia:
-            print('ADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque la pena incluye reincidencia.')            
+            self._STRING_LibertadCondicional.append('ADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque la pena incluye reincidencia.')            
         
         if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_25892.value and self._monto_de_pena.delitosExcluidosLey25892:
-            print('ADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque se condenó por alguno de los delitos excluídos, por art. 14 CP (según reforma de la ley 25.892).')
+            self._STRING_LibertadCondicional.append('ADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque se condenó por alguno de los delitos excluídos, por art. 14 CP (según reforma de la ley 25.892).')
         
         if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value and self._monto_de_pena.delitosExcluidosLey27375:
-            print('ADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque se condenó por alguno de los delitos excluídos, por art. 14 CP (según reforma de la ley 27.375).')
+            self._STRING_LibertadCondicional.append('ADVERTENCIA: No aplicaría el instituto de la Libertad Condicional porque se condenó por alguno de los delitos excluídos, por art. 14 CP (según reforma de la ley 27.375).')
         
         # Imprime requisito de calificación, si corresponde
         if self._regimen_normativo._regimen_LC == LC_REGIMENES._Ley_27375.value:
             if self._libertad_condicional_REQUISITO_CALIF_SITUACION == 1:
-                print('Como no se cuenta con la fecha en la que se inició la ejecución de la pena, no es posible calcular el requisito temporal de calificación (art. 28, ley 24.660).')
+                self._STRING_LibertadCondicional.append('Como no se cuenta con la fecha en la que se inició la ejecución de la pena, no es posible calcular el requisito temporal de calificación (art. 28, ley 24.660).')
             if self._libertad_condicional_REQUISITO_CALIF_SITUACION == 2:
-                print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}, para acceder a la libertad condicional en la fecha indicada, la fecha límite para obtener el requisito de calificación "bueno" es {Datetime_date_enFormatoXX_XX_XXXX(self._libertad_condicional_REQUISITO_CALIF_BUENO)}.')
+                self._STRING_LibertadCondicional.append(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}, para acceder a la libertad condicional en la fecha indicada, la fecha límite para obtener el requisito de calificación "bueno" es {Datetime_date_enFormatoXX_XX_XXXX(self._libertad_condicional_REQUISITO_CALIF_BUENO)}.')
             if self._libertad_condicional_REQUISITO_CALIF_SITUACION == 3:
-                print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {Datetime_date_enFormatoXX_XX_XXXX(self._libertad_condicional_REQUISITO_CALIF_BUENO)}.')
+                self._STRING_LibertadCondicional.append(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {Datetime_date_enFormatoXX_XX_XXXX(self._libertad_condicional_REQUISITO_CALIF_BUENO)}.')
 
-    def _ImprimirSTRINGSalidasTransitorias(self):
+    def _ArmarSTRINGSalidasTransitorias(self):
+
+        self._STRING_SalidasTransitorias = []
 
         if self._regimen_normativo._regimen_ST == ST_REGIMENES._No_aplica.value:
+            self._STRING_SalidasTransitorias = 'NULL'
             return        
 
-        print(Separadores._separadorComun)
-        print('SALIDAS TRANSITORIAS')
-        print('--------------------')
+        self._STRING_SalidasTransitorias.append(Separadores._separadorComun)
+        self._STRING_SalidasTransitorias.append('SALIDAS TRANSITORIAS')
+        self._STRING_SalidasTransitorias.append('--------------------')
 
         if self._regimen_normativo._regimen_ST == ST_REGIMENES._DecretoLey412_58.value or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_24660.value or self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_25948.value:
             if self._monto_de_pena.reclusionPorTiempoIndeterminado == True:
-                print(f' - Las salidas transitorias se obtienen a los 3 años, luego de transcurrido el cumplimiento de la reclusión accesoria.')
+                self._STRING_SalidasTransitorias.append(f' - Las salidas transitorias se obtienen a los 3 años, luego de transcurrido el cumplimiento de la reclusión accesoria.')
             else:
-                print(f' - Las salidas transitorias se obtienen a los {self._salidas_transitorias_REQUISITO_TEMPORAL.años} año(s), {self._salidas_transitorias_REQUISITO_TEMPORAL.meses} mes(es) y {self._salidas_transitorias_REQUISITO_TEMPORAL.dias} día(s).')
-            print(f' - El requisito temporal para acceder a las salidas transitorias se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')            
+                self._STRING_SalidasTransitorias.append(f' - Las salidas transitorias se obtienen a los {self._salidas_transitorias_REQUISITO_TEMPORAL.años} año(s), {self._salidas_transitorias_REQUISITO_TEMPORAL.meses} mes(es) y {self._salidas_transitorias_REQUISITO_TEMPORAL.dias} día(s).')
+            self._STRING_SalidasTransitorias.append(f' - El requisito temporal para acceder a las salidas transitorias se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')            
         
         if  self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_27375.value:            
 
             if self._fecha_ingreso_a_periodo_de_prueba == 'NULL': # Caso en el que aún no se ingresó al periodo de prueba
                 # Indica el requisito para ingresar al periodo de prueba
                 if self._monto_de_pena.reclusionPorTiempoIndeterminado == True:
-                    print(f' - El requisito temporal para ingresar al periodo de prueba se obtiene a los 3 años, luego de transcurrido el cumplimiento de la reclusión accesoria.')
+                    self._STRING_SalidasTransitorias.append(f' - El requisito temporal para ingresar al periodo de prueba se obtiene a los 3 años, luego de transcurrido el cumplimiento de la reclusión accesoria.')
                 else:
-                    print(f' - Para ingresar al periodo de prueba se requiere un tiempo mínimo de detención de {self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA.años} año(s), {self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA.meses} mes(es) y {self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA.dias} día(s).')
-                print(f' - El requisito temporal para ingresar al periodo de prueba se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO_PERIODO_DE_PRUEBA)}')
+                    self._STRING_SalidasTransitorias.append(f' - Para ingresar al periodo de prueba se requiere un tiempo mínimo de detención de {self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA.años} año(s), {self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA.meses} mes(es) y {self._salidas_transitorias_REQUISITO_TEMPORAL_PERIODO_DE_PRUEBA.dias} día(s).')
+                self._STRING_SalidasTransitorias.append(f' - El requisito temporal para ingresar al periodo de prueba se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO_PERIODO_DE_PRUEBA)}')
 
                 # Indica el requisito hipotético para las salidas transitorias
                 if self._salidas_transitorias_REQUISITO_TEMPORAL.años == 1:
-                    print(' - Como la pena es mayor a 10 años, las salidas transitorias podrían obtenerse luego de 1 año del ingreso al periodo de prueba.')
-                    print(f' - El requisito temporal para acceder a las salidas transitorias se cumpliría el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')
+                    self._STRING_SalidasTransitorias.append(' - Como la pena es mayor a 10 años, las salidas transitorias podrían obtenerse luego de 1 año del ingreso al periodo de prueba.')
+                    self._STRING_SalidasTransitorias.append(f' - El requisito temporal para acceder a las salidas transitorias se cumpliría el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')
                 elif self._salidas_transitorias_REQUISITO_TEMPORAL.meses == 6:
-                    print(' - Como la pena es mayor a 5 años -y no es mayor a 10 años-, las salidas transitorias podrían obtenerse luego de 6 meses del ingreso al periodo de prueba.')
-                    print(f' - El requisito temporal para acceder a las salidas transitorias se cumpliría el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')
+                    self._STRING_SalidasTransitorias.append(' - Como la pena es mayor a 5 años -y no es mayor a 10 años-, las salidas transitorias podrían obtenerse luego de 6 meses del ingreso al periodo de prueba.')
+                    self._STRING_SalidasTransitorias.append(f' - El requisito temporal para acceder a las salidas transitorias se cumpliría el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')
                 else:
-                    print(' - Como la pena no es mayor a 5 años, las salidas transitorias podrían obtenerse desde el ingreso al periodo de prueba.')
+                    self._STRING_SalidasTransitorias.append(' - Como la pena no es mayor a 5 años, las salidas transitorias podrían obtenerse desde el ingreso al periodo de prueba.')
                 
                 # Indica el requisito de calificación "ejemplar"
-                print(f' - Para acceder a las salidas transitorias en esa fecha, la fecha límite para obtener conducta "Ejemplar" es el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR)}')
+                self._STRING_SalidasTransitorias.append(f' - Para acceder a las salidas transitorias en esa fecha, la fecha límite para obtener conducta "Ejemplar" es el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR)}')
                 
                 # Indica el requisito de calificación "bueno"
                 if self._salidas_transitorias_REQUISITO_CALIF_SITUACION == 1:
-                    print(' - Como no se cuenta con la fecha en la que se inició la ejecución de la pena, no es posible calcular fechas en relación al requisito de calificación "bueno" del art. 17.III, ley 24.660.')
+                    self._STRING_SalidasTransitorias.append(' - Como no se cuenta con la fecha en la que se inició la ejecución de la pena, no es posible calcular fechas en relación al requisito de calificación "bueno" del art. 17.III, ley 24.660.')
                 if self._salidas_transitorias_REQUISITO_CALIF_SITUACION == 2:
-                    print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}, para acceder a las salidas transitorias en la fecha indicada, la fecha límite para obtener el requisito de calificación "bueno" es {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_BUENO)}.')
+                    self._STRING_SalidasTransitorias.append(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}, para acceder a las salidas transitorias en la fecha indicada, la fecha límite para obtener el requisito de calificación "bueno" es {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_BUENO)}.')
                 if self._salidas_transitorias_REQUISITO_CALIF_SITUACION == 3:
-                    print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_BUENO)}.')
+                    self._STRING_SalidasTransitorias.append(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_BUENO)}.')
 
                 fecha_mayor = Comparar_fechas_y_devolver_la_mayor(self._salidas_transitorias_COMPUTO, self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR, self._fecha_calificacion_BUENO)                                
-                print(f' - En este contexto, y teniendo en cuenta las fechas de cada requisito, las salidas transitorias podrían obtenerse el día {Datetime_date_enFormatoXX_XX_XXXX(fecha_mayor)}.')
+                self._STRING_SalidasTransitorias.append(f' - En este contexto, y teniendo en cuenta las fechas de cada requisito, las salidas transitorias podrían obtenerse el día {Datetime_date_enFormatoXX_XX_XXXX(fecha_mayor)}.')
             
             else: # Caso en el que se ingresó al periodo de prueba
-                print (f' - Se ingresó al periodo de prueba el día: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_ingreso_a_periodo_de_prueba)}.')
+                self._STRING_SalidasTransitorias.append (f' - Se ingresó al periodo de prueba el día: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_ingreso_a_periodo_de_prueba)}.')
 
                 # Indica el requisito hipotético para las salidas transitorias
                 if self._salidas_transitorias_REQUISITO_TEMPORAL.años == 1:
-                    print(' - Como la pena es mayor a 10 años, las salidas transitorias podrían obtenerse luego de 1 año del ingreso al periodo de prueba.')
-                    print(f' - El requisito temporal para acceder a las salidas transitorias se cumple el día {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')
+                    self._STRING_SalidasTransitorias.append(' - Como la pena es mayor a 10 años, las salidas transitorias podrían obtenerse luego de 1 año del ingreso al periodo de prueba.')
+                    self._STRING_SalidasTransitorias.append(f' - El requisito temporal para acceder a las salidas transitorias se cumple el día {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')
                 elif self._salidas_transitorias_REQUISITO_TEMPORAL.meses == 6:
-                    print(' - Como la pena es mayor a 5 años -y no es mayor a 10 años-, las salidas transitorias podrían obtenerse luego de 6 meses del ingreso al periodo de prueba.')
-                    print(f' - El requisito temporal para acceder a las salidas transitorias se cumple el día {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')
+                    self._STRING_SalidasTransitorias.append(' - Como la pena es mayor a 5 años -y no es mayor a 10 años-, las salidas transitorias podrían obtenerse luego de 6 meses del ingreso al periodo de prueba.')
+                    self._STRING_SalidasTransitorias.append(f' - El requisito temporal para acceder a las salidas transitorias se cumple el día {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO)}')
                 else:
-                    print(' - Como la pena no es mayor a 5 años, las salidas transitorias podrían obtenerse desde el ingreso al periodo de prueba.')
+                    self._STRING_SalidasTransitorias.append(' - Como la pena no es mayor a 5 años, las salidas transitorias podrían obtenerse desde el ingreso al periodo de prueba.')
                 
                 # Indica el requisito de calificación "ejemplar"
-                print(f' - Para acceder a las salidas transitorias en esa fecha, la fecha límite para obtener conducta "Ejemplar" es el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR)}')
+                self._STRING_SalidasTransitorias.append(f' - Para acceder a las salidas transitorias en esa fecha, la fecha límite para obtener conducta "Ejemplar" es el {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR)}')
                 
                 # Indica el requisito de calificación "bueno"
                 if self._salidas_transitorias_REQUISITO_CALIF_SITUACION == 1:
-                    print(' - Como no se cuenta con la fecha en la que se inició la ejecución de la pena, no es posible calcular fechas en relación al requisito de calificación "bueno" del art. 17.III, ley 24.660.')
+                    self._STRING_SalidasTransitorias.append(' - Como no se cuenta con la fecha en la que se inició la ejecución de la pena, no es posible calcular fechas en relación al requisito de calificación "bueno" del art. 17.III, ley 24.660.')
                 if self._salidas_transitorias_REQUISITO_CALIF_SITUACION == 2:
-                    print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}, para acceder a las salidas transitorias en la fecha indicada, la fecha límite para obtener el requisito de calificación "bueno" es {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_BUENO)}.')
+                    self._STRING_SalidasTransitorias.append(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)}, para acceder a las salidas transitorias en la fecha indicada, la fecha límite para obtener el requisito de calificación "bueno" es {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_BUENO)}.')
                 if self._salidas_transitorias_REQUISITO_CALIF_SITUACION == 3:
-                    print(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_BUENO)}.')                   
+                    self._STRING_SalidasTransitorias.append(f' - Teniendo en cuenta que se comenzó a ejecutar la pena el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_inicio_ejecucion)} y que se obtuvo el requisito de calificación "bueno" el día {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_calificacion_BUENO)}, los 2/3 de pena con calificación "bueno" se cumplirán el día {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_REQUISITO_CALIF_BUENO)}.')                   
 
                 fecha_mayor = Comparar_fechas_y_devolver_la_mayor(self._salidas_transitorias_COMPUTO, self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR, self._fecha_calificacion_BUENO)                                
-                print(f' - En este contexto, y teniendo en cuenta las fechas de cada requisito, las salidas transitorias podrían obtenerse el día {Datetime_date_enFormatoXX_XX_XXXX(fecha_mayor)}.')
+                self._STRING_SalidasTransitorias.append(f' - En este contexto, y teniendo en cuenta las fechas de cada requisito, las salidas transitorias podrían obtenerse el día {Datetime_date_enFormatoXX_XX_XXXX(fecha_mayor)}.')
 
         # Imprime advertencias, si corresponde
         if self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_25948.value and self._monto_de_pena.delitosExcluidosLey25948:
-            print('ADVERTENCIA: No aplicaría el instituto de las Salidas Transitorias porque se condenó por alguno de los delitos excluídos, por art. 56 bis, ley 24.660 (según reforma de la ley 25.948).')            
+            self._STRING_SalidasTransitorias.append('ADVERTENCIA: No aplicaría el instituto de las Salidas Transitorias porque se condenó por alguno de los delitos excluídos, por art. 56 bis, ley 24.660 (según reforma de la ley 25.948).')            
         
         if self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_27375.value and self._monto_de_pena.delitosExcluidosLey27375:
-            print('ADVERTENCIA: No aplicaría el instituto de las Salidas Transitorias porque se condenó por alguno de los delitos excluídos, por art. 56 bis -17.III-, ley 24.660 (según reforma de la ley 27.375).')            
+            self._STRING_SalidasTransitorias.append('ADVERTENCIA: No aplicaría el instituto de las Salidas Transitorias porque se condenó por alguno de los delitos excluídos, por art. 56 bis -17.III-, ley 24.660 (según reforma de la ley 27.375).')            
         
         if (self._regimen_normativo._regimen_ST == ST_REGIMENES._Ley_27375.value
             and self._monto_de_pena.perpetua):
-            print('ADVERTENCIA: Las salidas transitorias no estarían legalmente previstas para una pena perpetua (ver art. 17, ley 24.660, según ley 27.375).\nNo obstante, se realiza el cómputo mediante una interpretación amplia del art. 17.I.a de esa ley.')
+            self._STRING_SalidasTransitorias.append('ADVERTENCIA: Las salidas transitorias no estarían legalmente previstas para una pena perpetua (ver art. 17, ley 24.660, según ley 27.375).\nNo obstante, se realiza el cómputo mediante una interpretación amplia del art. 17.I.a de esa ley.')
 
-    def _ImprimirSTRINGLibertadAsistida(self):
+    def _ArmarSTRINGLibertadAsistida(self):
+
+        self._STRING_LibertadAsistida = []
         
         if self._regimen_normativo._regimen_LA == LA_REGIMENES._No_aplica.value:
+            self._STRING_LibertadAsistida = 'NULL'
             return
         
         if self._monto_de_pena.perpetua == True or self._monto_de_pena.reclusionPorTiempoIndeterminado == True:
+            self._STRING_LibertadAsistida = 'NULL'
             return        
         
-        print(Separadores._separadorComun)
-        print('LIBERTAD ASISTIDA')
-        print('-----------------')
+        self._STRING_LibertadAsistida.append(Separadores._separadorComun)
+        self._STRING_LibertadAsistida.append('LIBERTAD ASISTIDA')
+        self._STRING_LibertadAsistida.append('-----------------')
         if self._regimen_normativo._regimen_LA == LA_REGIMENES._Ley_27375.value:            
-            print(f' - La libertad asistida se obtiene 3 meses antes del vencimiento de pena.')
+            self._STRING_LibertadAsistida.append(f' - La libertad asistida se obtiene 3 meses antes del vencimiento de pena.')
         else:
-            print(f' - La libertad asistida se obtiene 6 meses antes del vencimiento de pena.')
-        print(f' - El requisito temporal para acceder a la libertad asistida se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._libertad_asistida_COMPUTO)}')
+            self._STRING_LibertadAsistida.append(f' - La libertad asistida se obtiene 6 meses antes del vencimiento de pena.')
+        self._STRING_LibertadAsistida.append(f' - El requisito temporal para acceder a la libertad asistida se cumple el {Datetime_date_enFormatoXX_XX_XXXX(self._libertad_asistida_COMPUTO)}')
 
         # Imprime advertencias, si correponde
         if self._regimen_normativo._regimen_LA == LA_REGIMENES._Ley_25948.value and self._monto_de_pena.delitosExcluidosLey25948:
-            print('ADVERTENCIA: No aplicaría el instituto de la Libertad Asistida porque se condenó por alguno de los delitos excluídos, por art. 56 bis, ley 24.660 (según reforma de la ley 25.948).')
+            self._STRING_LibertadAsistida.append('ADVERTENCIA: No aplicaría el instituto de la Libertad Asistida porque se condenó por alguno de los delitos excluídos, por art. 56 bis, ley 24.660 (según reforma de la ley 25.948).')
         
         if self._regimen_normativo._regimen_LA == LA_REGIMENES._Ley_27375.value and self._monto_de_pena.delitosExcluidosLey27375:
-            print('ADVERTENCIA: No aplicaría el instituto de la Libertad Asistida porque se condenó por alguno de los delitos excluídos, por art. 56 bis, ley 24.660 (según reforma de la ley 27.375).')
+            self._STRING_LibertadAsistida.append('ADVERTENCIA: No aplicaría el instituto de la Libertad Asistida porque se condenó por alguno de los delitos excluídos, por art. 56 bis, ley 24.660 (según reforma de la ley 27.375).')
 
-    def _ImprimirSTRINGRegimenPreparatorioParaLaLiberacion(self):
+    def _ArmarSTRINGRegimenPreparatorioParaLaLiberacion(self):
+
+        self._STRING_RegimenPreparatorioParaLaLiberacion = []
 
         if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._No_aplica.value:
+            self._STRING_RegimenPreparatorioParaLaLiberacion = 'NULL'
             return
         
         if self._monto_de_pena.perpetua:
+            self._STRING_RegimenPreparatorioParaLaLiberacion = 'NULL'
             return        
         
         if self._regimen_normativo._regimen_PREPLIB == REGPREPLIB_REGIMENES._Ley_27375.value:
-            print(Separadores._separadorComun)
-            print('RÉGIMEN PREPARATORIO PARA LA LIBERTAD')
-            print('-------------------------------------')
-            print(f' - El régimen preparatorio para la libertad comienza el día {Datetime_date_enFormatoXX_XX_XXXX(self._regimen_preparacion_libertad_COMPUTO)}.')
+            self._STRING_RegimenPreparatorioParaLaLiberacion.append(Separadores._separadorComun)
+            self._STRING_RegimenPreparatorioParaLaLiberacion.append('RÉGIMEN PREPARATORIO PARA LA LIBERTAD')
+            self._STRING_RegimenPreparatorioParaLaLiberacion.append('-------------------------------------')
+            self._STRING_RegimenPreparatorioParaLaLiberacion.append(f' - El régimen preparatorio para la libertad comienza el día {Datetime_date_enFormatoXX_XX_XXXX(self._regimen_preparacion_libertad_COMPUTO)}.')
 
-    def _ImprimirSTRINGMultaUnidadesFijasEnPesos(self):
+    def _ArmarSTRINGMultaUnidadesFijasEnPesos(self):
+
+        self._STRING_MultaUnidadesFijasEnPesos = []
+
         if self._regimen_normativo._regimen_UNIDADESFIJAS == 'No aplica':
+            self._STRING_MultaUnidadesFijasEnPesos = 'NULL'
             return
         
         if self._monto_multa_unidades_fijas == 'NULL':
+            self._STRING_MultaUnidadesFijasEnPesos = 'NULL'
             return
         
+        self._STRING_MultaUnidadesFijasEnPesos.append(Separadores._separadorComun)
+        self._STRING_MultaUnidadesFijasEnPesos.append('MULTA')
+        self._STRING_MultaUnidadesFijasEnPesos.append('-----')
+        self._STRING_MultaUnidadesFijasEnPesos.append(f' - Valor de la unidad fija: ${NumeroConSeparadorDeMiles(self._regimen_normativo.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._valorDeLaUnidadFija))}')
+        self._STRING_MultaUnidadesFijasEnPesos.append(f' - Multa en pesos: ${NumeroConSeparadorDeMiles(self._multa_unidadesFijas_en_pesos)}')
+
+    def _ArmarOutput(self, imprimirOutput:bool=False):
+        self._STRING_Output = []
+        self._STRING_Output.extend(self._STRING_General)
+        self._STRING_Output.extend(self._STRING_RegimenNormativo)
+        self._STRING_Output.extend(self._STRING_VencimientoYCaducidadDePena)
+        
+        # Libertad condicional
+        if self._STRING_LibertadCondicional != 'NULL':        
+            self._STRING_Output.extend(self._STRING_LibertadCondicional)
+        
+        # Salidas transitorias
+        if self._STRING_SalidasTransitorias != 'NULL':            
+            self._STRING_Output.extend(self._STRING_SalidasTransitorias)
+        
+        # Libertad asistida
+        if self._STRING_LibertadAsistida != 'NULL':        
+            self._STRING_Output.extend(self._STRING_LibertadAsistida)
+        
+        # Reg. Prep. Lib.
+        if self._STRING_RegimenPreparatorioParaLaLiberacion != 'NULL':            
+            self._STRING_Output.extend(self._STRING_RegimenPreparatorioParaLaLiberacion)
+        
+        # Unidades fijas
+        if self._STRING_MultaUnidadesFijasEnPesos != 'NULL':
+            self._STRING_Output.extend(self._STRING_MultaUnidadesFijasEnPesos)
+        
+        if imprimirOutput == True:
+            self._ImprimirSTRING(self._STRING_Output)
+
+    def _HacerComputo(self, imprimirEnConsola:bool=False):
+        if self._ControlarParametros():
+            return
+        
+        # Determina el régimen normativo a utilizar
+        self._regimen_normativo = RegimenNormativoAplicable(self._fecha_del_hecho)
+
+        # Calcula el cómputo y lo guarda en las variables de datos
+        self._CalcularVencimientoYCaducidadDePena()
+        self._CalcularLibertadCondicional()
+        self._CalcularSalidasTransitorias()                    
+        self._CalcularLibertadAsistida()
+        self._CalcularRegimenPreparacionLibertad()
+        self._CalcularUnidadesFijas()
+        
+        # Arma los string con los resultados
+        self._ArmarSTRINGGeneral()
+        self._ArmarSTRINGRegimenNormativo()        
+        self._ArmarSTRINGVencimientoYCaducidadDePena()
+        self._ArmarSTRINGLibertadCondicional()
+        self._ArmarSTRINGSalidasTransitorias()        
+        self._ArmarSTRINGLibertadAsistida()
+        self._ArmarSTRINGRegimenPreparatorioParaLaLiberacion()
+        self._ArmarSTRINGMultaUnidadesFijasEnPesos()
+
+        # Imprime los resultados
+        self._ArmarOutput(imprimirOutput=imprimirEnConsola)
+        
         print(Separadores._separadorComun)
-        print('MULTA')
-        print('-----')
-        print(f' - Valor de la unidad fija: ${NumeroConSeparadorDeMiles(self._regimen_normativo.UNIDADES_FIJAS(UNIDADESFIJAS_KEYS._valorDeLaUnidadFija))}')
-        print(f' - Multa en pesos: ${NumeroConSeparadorDeMiles(self._multa_unidadesFijas_en_pesos)}')
 
-    def _ImprimirSTRING(self, string:list[str]):
-        for text in string:
-            print(text)
-
-class ComputPenaEjecucionCondicional(Computo):
+class ComputPenaEjecucionCondicional(ComputoBase):
     def __init__(self,
                  fechaDeSentencia:datetime.date='NULL',
                  fechaFirmezaDeSentencia:datetime.date='NULL',
-                 montoDePena:MontoDePena='NULL') -> None:
+                 montoDePena:MontoDePena='NULL',
+                 imprimirComputoEnConsola:bool=False) -> None:
         
         # DEFINE VARIABLES INTERNAS
         self.requisito27CP = TiempoEn_Años_Meses_Dias(_años=4)
@@ -1077,10 +1124,31 @@ class ComputPenaEjecucionCondicional(Computo):
         self._caducidad_de_pena = 'NULL'
         self._vencimiento_plazo_de_control = 'NULL'
 
-        self._CalcularVencimientoYCaducidad()
+        # VARIABLES CON LOS STRING
+        self._STRING_DatosGenerales = 'NULL'
+        self._STRING_VencimientoYCaducidad = 'NULL'
+        self._STRING_Output = 'NULL'        
 
-        self._ImprimirDatosGenerales()
-        self._ImprimirVencimiento_y_Caducidad()
+        self._HacerComputo(imprimirComputoEnConsola=imprimirComputoEnConsola)
+    
+    def _ControlarParametros(self):
+        faltanParametros = False
+        if self._fecha_de_sentencia == 'NULL':
+            faltanParametros = True
+            print(f'self._fecha_de_sentencia == {self._fecha_de_sentencia}')
+            print('class ComputPenaEjecucionCondicional: ERROR. No se ingresó fecha de sentencia.')
+        
+        if self._fecha_firmeza_de_sentencia == 'NULL':
+            faltanParametros = True
+            print(f'self._fecha_firmeza_de_sentencia == {self._fecha_firmeza_de_sentencia}')
+            print('class ComputPenaEjecucionCondicional: ERROR. No se ingresó fecha de firmeza de sentencia.')
+        
+        if self._monto_de_pena == 'NULL':
+            faltanParametros = True
+            print(f'self._monto_de_pena == {self._monto_de_pena}')
+            print('class ComputPenaEjecucionCondicional: ERROR. No se ingresó monto de pena.')
+        
+        return faltanParametros
 
     def _CalcularVencimientoYCaducidad(self):
         
@@ -1088,24 +1156,44 @@ class ComputPenaEjecucionCondicional(Computo):
         self._caducidad_de_pena = self._SumarMontoDePena(self._fecha_de_sentencia, self.requisito51CP_EjecCond)        
         self._vencimiento_plazo_de_control = self._SumarMontoDePena(self._fecha_firmeza_de_sentencia, self._monto_de_pena, _sumarPlazoControl=True)
     
-    def _ImprimirDatosGenerales(self):
-        print(Separadores._separadorComun)
-        print('DATOS INGRESADOS')
-        print('----------------')
-        print(f' - Fecha de sentencia: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_sentencia)}')
-        print(f' - Fecha de firmeza de la sentencia: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_firmeza_de_sentencia)}')
-        print(f' - La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s) de ejecución condicional.')                
-        print(f' - El plazo de control es de {self._monto_de_pena.plazoControl_años} año(s), {self._monto_de_pena.plazoControl_meses} mes(es) y {self._monto_de_pena.plazoControl_dias} día(s).')
+    def _ArmarSTRING_DatosGenerales(self):
+        self._STRING_DatosGenerales = []
+        self._STRING_DatosGenerales.append(Separadores._separadorComun)
+        self._STRING_DatosGenerales.append('DATOS INGRESADOS')
+        self._STRING_DatosGenerales.append('----------------')
+        self._STRING_DatosGenerales.append(f' - Fecha de sentencia: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_sentencia)}')
+        self._STRING_DatosGenerales.append(f' - Fecha dprinte firmeza de la sentencia: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_firmeza_de_sentencia)}')
+        self._STRING_DatosGenerales.append(f' - La pena es de {self._monto_de_pena.años} año(s), {self._monto_de_pena.meses} mes(es) y {self._monto_de_pena.dias} día(s) de ejecución condicional.')                
+        self._STRING_DatosGenerales.append(f' - El plazo de control es de {self._monto_de_pena.plazoControl_años} año(s), {self._monto_de_pena.plazoControl_meses} mes(es) y {self._monto_de_pena.plazoControl_dias} día(s).')
 
-    def _ImprimirVencimiento_y_Caducidad(self):
-        print(Separadores._separadorComun)
-        print('COMPUTO DE PENA')
-        print('---------------')        
-        print(f' - La sentencia se tiene por no pronunciada el día {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
-        print(f' - El plazo de control finaliza el {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_plazo_de_control)}')
-        print(f' - Caducidad: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_pena)}')
+    def _ArmarSTRINGVencimiento_y_Caducidad(self):
+        self._STRING_VencimientoYCaducidad = []
+        self._STRING_VencimientoYCaducidad.append(Separadores._separadorComun)
+        self._STRING_VencimientoYCaducidad.append('COMPUTO DE PENA')
+        self._STRING_VencimientoYCaducidad.append('---------------')        
+        self._STRING_VencimientoYCaducidad.append(f' - La sentencia se tiene por no pronunciada el día {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
+        self._STRING_VencimientoYCaducidad.append(f' - El plazo de control finaliza el {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_plazo_de_control)}')
+        self._STRING_VencimientoYCaducidad.append(f' - Caducidad: {Datetime_date_enFormatoXX_XX_XXXX(self._caducidad_de_pena)}')
 
-class ComputPenaLibertadRevocada(Computo):
+    def _ArmarOutput(self, imprimirOutput:bool=False):
+        self._STRING_Output = []
+        self._STRING_Output.extend(self._STRING_DatosGenerales)
+        self._STRING_Output.extend(self._STRING_VencimientoYCaducidad)
+
+        if imprimirOutput == True:
+            self._ImprimirSTRING(self._STRING_Output)
+
+    def _HacerComputo(self, imprimirComputoEnConsola:bool=False):
+        
+        if self._ControlarParametros() == True:
+            return
+        
+        self._CalcularVencimientoYCaducidad()
+        self._ArmarSTRING_DatosGenerales()
+        self._ArmarSTRINGVencimiento_y_Caducidad()
+        self._ArmarOutput(imprimirOutput=imprimirComputoEnConsola)
+
+class ComputPenaLibertadRevocada(ComputoBase):
     def __init__(self,
                  fechaDelHecho:datetime.date='NULL',
                  fechaEgreso:datetime.date='NULL',
@@ -1114,7 +1202,8 @@ class ComputPenaLibertadRevocada(Computo):
                  fechaSalidasTransitorias:datetime.date='NULL',
                  vencimientoDePena:datetime.date='NULL',
                  libertadEvadida:LIBERTAD_EVADIDA='NULL',
-                 computaTiempoEnLibertad:bool='NULL') -> None:        
+                 computaTiempoEnLibertad:bool='NULL',
+                 imprimirEnConsola:bool=False) -> None:        
 
         # VARIABLES CON EL INPUT
         self._fecha_del_hecho = fechaDelHecho
@@ -1136,12 +1225,12 @@ class ComputPenaLibertadRevocada(Computo):
         self._nuevo_computo_libertad_asistida = 'NULL'
         self._nuevo_computo_regPrepLib = 'NULL'
 
-        if self._ControlarParametros():
-            return
-        
-        self._CalcularNuevoComputo()
-        self._ImprimirDatosGenerales()
-        self._ImprimirNuevoComputo()
+        # VARIABLES CON LOS STRING (OUTPUT)
+        self._STRING_DatosGenerales = []
+        self._STRING_NuevoComputo = []
+        self._STRING_Output = []
+
+        self._HacerComputo(imprimirEnConsola=imprimirEnConsola)
     
     def _ControlarParametros(self):
         faltanParametros = False
@@ -1172,7 +1261,7 @@ class ComputPenaLibertadRevocada(Computo):
         
         return faltanParametros
     
-    def _CalcularNuevoComputo(self):
+    def _CalcularNuevosVencimientos(self):
         
         # Calcula el régimen normativo a aplicar
         self._regimen_normativo = RegimenNormativoAplicable(self._fecha_del_hecho)
@@ -1226,48 +1315,67 @@ class ComputPenaLibertadRevocada(Computo):
                 self._nuevo_computo_regPrepLib = self._nuevo_computo_vencimiento_de_pena
                 self._nuevo_computo_regPrepLib += relativedelta(years=-1)   
     
-    def _ImprimirDatosGenerales(self):
-        print(Separadores._separadorComun)
-        print('DATOS INGRESADOS')
-        print('----------------')        
-        print(f' - Fecha del hecho: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_del_hecho)}')
-        print(f' - Fecha de egreso: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_egreso)}')
-        print(f' - Fecha de la nueva detención: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_nueva_detencion)}')
-        print(f' - Fecha del vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
+    def _ArmarSTRING_DatosGenerales(self):
+        self._STRING_DatosGenerales = []
+        self._STRING_DatosGenerales.append(Separadores._separadorComun)
+        self._STRING_DatosGenerales.append('DATOS INGRESADOS')
+        self._STRING_DatosGenerales.append('----------------')        
+        self._STRING_DatosGenerales.append(f' - Fecha del hecho: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_del_hecho)}')
+        self._STRING_DatosGenerales.append(f' - Fecha de egreso: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_de_egreso)}')
+        self._STRING_DatosGenerales.append(f' - Fecha de la nueva detención: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_nueva_detencion)}')
+        self._STRING_DatosGenerales.append(f' - Fecha del vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(self._vencimiento_de_pena)}')
         
         if self._fecha_libertad_condicional != 'NULL':
-            print(f' - Fecha de la libertad condicional: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_libertad_condicional)}')
+            self._STRING_DatosGenerales.append(f' - Fecha de la libertad condicional: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_libertad_condicional)}')
         if self._fecha_salidas_transitorias != 'NULL':
-            print(f' - Fecha de las salidas transitorias: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_salidas_transitorias)}')
+            self._STRING_DatosGenerales.append(f' - Fecha de las salidas transitorias: {Datetime_date_enFormatoXX_XX_XXXX(self._fecha_salidas_transitorias)}')
         
         if self._computa_tiempo_en_libertad == True:
-            print(' - Se computa el tiempo que se permaneció en libertad, hasta que se revocó la libertad.')
+            self._STRING_DatosGenerales.append(' - Se computa el tiempo que se permaneció en libertad, hasta que se revocó la libertad.')
 
         if self._libertad_evadida == LIBERTAD_EVADIDA._fuga.value:
-            print(' - Motivo de la libertad: Fuga')
+            self._STRING_DatosGenerales.append(' - Motivo de la libertad: Fuga')
         if self._libertad_evadida == LIBERTAD_EVADIDA._salidas_transitorias.value:
-            print(' - Motivo de la libertad: Egreso en salidas transitoras')
+            self._STRING_DatosGenerales.append(' - Motivo de la libertad: Egreso en salidas transitoras')
         if self._libertad_evadida == LIBERTAD_EVADIDA._libertad_condicional.value:
-            print(' - Motivo de la libertad: Egreso en libertad condicional')
+            self._STRING_DatosGenerales.append(' - Motivo de la libertad: Egreso en libertad condicional')
         if self._libertad_evadida == LIBERTAD_EVADIDA._libertad_asistida.value:
-            print(' - Motivo de la libertad: Egreso en libertad asistida')
+            self._STRING_DatosGenerales.append(' - Motivo de la libertad: Egreso en libertad asistida')
 
-    def _ImprimirNuevoComputo(self):        
-        self._regimen_normativo._ArmarSTRING()
-        print(Separadores._separadorComun)
-        print('NUEVO COMPUTO DE PENA')
-        print('---------------------')                
-        print(f' - Tiempo que se permaneció en libertad: {self._tiempo_que_estuvo_en_libertad.años} año(s), {self._tiempo_que_estuvo_en_libertad.meses} mes(es) y {self._tiempo_que_estuvo_en_libertad.dias} día(s).')
-        print(f' - Vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_vencimiento_de_pena)}')
-        print(f' - Caducidad: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_caducidad_de_pena)}')
+    def _ArmarSTRING_NuevoComputo(self):
+        self._STRING_NuevoComputo = []
+        self._STRING_NuevoComputo.extend(self._regimen_normativo._ArmarSTRING())
+        self._STRING_NuevoComputo.append(Separadores._separadorComun)
+        self._STRING_NuevoComputo.append('NUEVO COMPUTO DE PENA')
+        self._STRING_NuevoComputo.append('---------------------')                
+        self._STRING_NuevoComputo.append(f' - Tiempo que se permaneció en libertad: {self._tiempo_que_estuvo_en_libertad.años} año(s), {self._tiempo_que_estuvo_en_libertad.meses} mes(es) y {self._tiempo_que_estuvo_en_libertad.dias} día(s).')
+        self._STRING_NuevoComputo.append(f' - Vencimiento de pena: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_vencimiento_de_pena)}')
+        self._STRING_NuevoComputo.append(f' - Caducidad: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_caducidad_de_pena)}')
         if self._nuevo_computo_salidas_transitorias != 'NULL':
-            print(f' - Salidas transitorias: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_salidas_transitorias)}')
+            self._STRING_NuevoComputo.append(f' - Salidas transitorias: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_salidas_transitorias)}')
         if self._nuevo_computo_libertad_condicional != 'NULL':
-            print(f' - Libertad condicional: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_libertad_condicional)}')
+            self._STRING_NuevoComputo.append(f' - Libertad condicional: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_libertad_condicional)}')
         if self._nuevo_computo_libertad_asistida != 'NULL':
-            print(f' - Libertad asistida: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_libertad_asistida)}')
+            self._STRING_NuevoComputo.append(f' - Libertad asistida: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_libertad_asistida)}')
         if self._nuevo_computo_regPrepLib != 'NULL':
-            print(f' - Régimen preparatorio para la liberación: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_regPrepLib)}')
+            self._STRING_NuevoComputo.append(f' - Régimen preparatorio para la liberación: {Datetime_date_enFormatoXX_XX_XXXX(self._nuevo_computo_regPrepLib)}')
+
+    def _ArmarOutput(self, imprimirOutput:bool=False):
+        self._STRING_Output = []
+        self._STRING_Output.extend(self._STRING_DatosGenerales)
+        self._STRING_Output.extend(self._STRING_NuevoComputo)
+
+        if imprimirOutput == True:
+            self._ImprimirSTRING(self._STRING_Output)
+
+    def _HacerComputo(self, imprimirEnConsola:bool=False):
+        if self._ControlarParametros():
+            return
+        
+        self._CalcularNuevosVencimientos()
+        self._ArmarSTRING_DatosGenerales()
+        self._ArmarSTRING_NuevoComputo()
+        self._ArmarOutput(imprimirOutput=imprimirEnConsola)
 
 def _DEBUG_PENA_TEMPORAL():    
     fechaDelHecho = datetime.date(2018, 5, 26)

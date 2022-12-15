@@ -3,9 +3,18 @@ _text.append('Linea 1')
 _text.append('Linea 2')
 _text.append('Linea 3')
 
-_text = []
-_text.append('Nueva linea 1')
-_text.append('Nueva linea 2')
+_text1 = []
+_text1.append('Nueva linea 1')
+_text1.append('Nueva linea 2')
 
-for text in _text:
-    print(text)
+def imprimir(*loslist):
+    for esteList in loslist:
+        for text in esteList:
+            print(text)
+
+suma = []
+suma.extend(_text)
+suma.extend(_text1)
+
+
+print(suma)

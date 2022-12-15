@@ -1,10 +1,10 @@
 Lo que hice ahora:
- - Reclusión por tiempo indeterminado: Saqué la LA. No se calcula.
- - Reclusión por tiempo indeterminado: Reg. Prep. Lib. queda igual.
- - Imprimir Strings: Comencé a reformar el sistema para que primero arme list con strings, y que por otro lado los imprima.
+ - Output pena temporal o perpetua: Resolví algunos problemas.
+ - Output pena de ejecución condicional: Lo adapté a lo que va a necesitar Flask.
+ - Output nuevo cómputo por libertad revocada: Lo adapté a lo que va a necesitar Flask.
+ - Class ComputPenaEjecucionCondicional: Le agregué función que controla los parámetros.
 
-Con qué seguir: 
- - Reformar el sistema para imprimir el output, para que por un lado arme list de string y que por otro, los imprima
+Con qué seguir:    
  - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación
  - Armar funciones para input s/n
  - Armar funciones para input opciones con número
@@ -13,6 +13,10 @@ Funcionalidad a implementar:
  - 
 
  Hecho:
+ - Output pena temporal o perpetua: Reformé el output para que a futuro sea compatible con Flask.
+ - Reclusión por tiempo indeterminado: Saqué la LA. No se calcula.
+ - Reclusión por tiempo indeterminado: Reg. Prep. Lib. queda igual.
+ - Imprimir Strings: Comencé a reformar el sistema para que primero arme list con strings, y que por otro lado los imprima.
  - Reclusión por tiempo indeterminado: Armé el cálculo de la ST.
  - Reclusión por tiempo indeterminado: Armé el print.
  - ST: Solucioné error en penas menores a 5 años (ley 27.375)
