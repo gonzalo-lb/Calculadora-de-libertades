@@ -1,11 +1,9 @@
 Lo que hice ahora:
- - Output pena temporal o perpetua: Resolví algunos problemas.
- - Output pena de ejecución condicional: Lo adapté a lo que va a necesitar Flask.
- - Output nuevo cómputo por libertad revocada: Lo adapté a lo que va a necesitar Flask.
- - Class ComputPenaEjecucionCondicional: Le agregué función que controla los parámetros.
+ - Salidas transitorias: Resolví error en los casos de ley 27.375 sin fecha de inicio de ejecución. Cuando calculaba el cómputo no restaba las otras detenciones o el estímulo educativo.
+ - class OtraDetencion(): Rearmé el cálculo de las detenciones parciales (ver el detalle en el readme.md)
 
 Con qué seguir:
- - La función que calcula detenciones parciales puede devolver resultados con 31 días. Corregir eso (detención: 5/3/16; libertad: 4/8/16)
+ - La función que calcula detenciones parciales puede devolver resultados con 31 días, o negativos. Corregir eso (detención: 5/3/16; libertad: 4/8/16)
  - Armar funcionalidad para cómputos temporales con la persona ya en libertad.
  - Cuando indique los regímenes de detención, corregir las nomenclaturas para que indique la ley base y la modificación
  - Armar funciones para input s/n
@@ -15,6 +13,10 @@ Funcionalidad a implementar:
  - Cómputos de pena de prisión pero con la persona ya en libertad al momento de realizar el cómputo.
 
  Hecho:
+ - Output pena temporal o perpetua: Resolví algunos problemas.
+ - Output pena de ejecución condicional: Lo adapté a lo que va a necesitar Flask.
+ - Output nuevo cómputo por libertad revocada: Lo adapté a lo que va a necesitar Flask.
+ - Class ComputPenaEjecucionCondicional: Le agregué función que controla los parámetros.
  - Output pena temporal o perpetua: Reformé el output para que a futuro sea compatible con Flask.
  - Reclusión por tiempo indeterminado: Saqué la LA. No se calcula.
  - Reclusión por tiempo indeterminado: Reg. Prep. Lib. queda igual.

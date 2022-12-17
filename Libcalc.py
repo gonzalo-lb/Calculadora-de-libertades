@@ -665,6 +665,12 @@ class ComputoPenaTemporalOPerpetua(ComputoBase):
                     _vencimiento_provisorio = self._RestarOtrasDetenciones(_vencimiento_provisorio, self._otras_detenciones)
                     self._salidas_transitorias_COMPUTO = self._SumarMontoDePena(_vencimiento_provisorio, self._salidas_transitorias_REQUISITO_TEMPORAL_INTEGRAL)
 
+                print(f'DEBUG: Cómputo Salidas transitorias (periodo de prueba) sin restar otras detenciones = {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO_PERIODO_DE_PRUEBA)}')
+                self._salidas_transitorias_COMPUTO = self._RestarOtrasDetenciones(self._salidas_transitorias_COMPUTO, self._otras_detenciones)
+
+                print(f'DEBUG: Cómputo Salidas transitorias (periodo de prueba) sin aplicar estímulo educativo = {Datetime_date_enFormatoXX_XX_XXXX(self._salidas_transitorias_COMPUTO_PERIODO_DE_PRUEBA)}')
+                self._salidas_transitorias_COMPUTO = self._AplicarEstimuloEducativo(self._salidas_transitorias_COMPUTO, self._estimulo_educativo)
+
                 # Calcula cuándo debe obtenerse la conducta ejemplar (resta un año al cómputo)
                 self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR = self._salidas_transitorias_COMPUTO
                 self._salidas_transitorias_REQUISITO_CALIF_EJEMPLAR += relativedelta(years=-1)

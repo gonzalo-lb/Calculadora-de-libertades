@@ -30,3 +30,16 @@ Si falta la fecha del requisito temporal de calificación, no se puede calcular 
 
 ## Cálculos generales que se realizan en todos los casos
 > Siempre que se suma una fecha, al resultado final se le resta un día
+
+## [class OtraDetencion()] Cálculo de tiempo de detención en función de la diferencia entre una fecha de libertad y una de detención. Casos:
+> 1) La detención y la libertad son en el mismo mes y año:<br/>
+En ese caso se aplica la diferencia entre días, y se suma un día. Ejemplos:<br/>
+detención = 1/1/19; libertad = 1/1/19 --> 1 día<br/>
+detención = 1/1/19; libertad = 2/1/19 --> 2 días<br/>
+detención = 1/1/19; libertad = 31/1/19 --> 31 días<br/>
+> 2) La detención y la libertad no son en el mismos mes o año:<br/>
+1.- Primero suma de a un mes hasta igualar o superar el mes/año, y va acumulando ese resultado en otra variable.<br/>
+2.- Luego, suma de a un día hasta igualar esa fecha con la fecha de libertad. Para hacer esta suma tiene en cuenta la fecha calendario (es decir, al utilizar fechas reales, el resultado varía si va de un mes a otro y ese mes tiene 28, 29, 30 o 31 días)<br/>
+En este caso no se suma un día extra, ya que ese día ya se tiene en cuenta cuando se sumó el mes. Ejemplos:<br/>
+detención = 1/2/19; libertad = 1/3/19 --> 1 mes<br/>
+detención = 1/2/19; libertad = 2/3/19 --> 1 mes y un día<br/>

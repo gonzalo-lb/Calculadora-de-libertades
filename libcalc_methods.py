@@ -61,6 +61,45 @@ class MontoDePena(TiempoEn_Años_Meses_Dias):
             return 'La pena es de {} año(s), {} mes(es) y {} día(s).'.format(self.años, self.meses, self.dias)
 
 class OtraDetencion():    
+    
+    # class OtraDetencion():  CLASS VIEJA  
+#     def __init__(self, fecha_de_detencion:datetime.datetime, fecha_de_libertad:datetime.datetime, nombre:str="Sin nombre"):
+#         self._nombre = nombre
+#         self._detencion = fecha_de_detencion
+#         self._libertad = fecha_de_libertad
+#         self._tiempoDeDetencion = MontoDePena()
+#         self._CalcularTiempoDeDetencion()
+    
+#     def _CalcularTiempoDeDetencion(self):
+#         if FechaA_es_Mayor_Que_FechaB(self._detencion, self._libertad):            
+#             raise Exception('ERROR: Se ingresó una fecha de detención posterior a la fecha de libertad.')
+        
+#         fecha_temp = self._detencion
+#         _meses = 0
+#         _años = 0
+#         _dias = 1
+
+#         if self._detencion.day > self._libertad.day:
+#             _meses -= 1
+        
+#         while fecha_temp.month != self._libertad.month:
+#             _meses += 1
+#             fecha_temp += relativedelta(months=1)
+        
+#         while fecha_temp.year != self._libertad.year:
+#             _años += 1
+#             fecha_temp += relativedelta(years=1)
+        
+#         while fecha_temp.day != self._libertad.day:
+#             _dias += 1
+#             fecha_temp += relativedelta(days=1)
+        
+#         self._tiempoDeDetencion.años = _años
+#         self._tiempoDeDetencion.meses = _meses
+#         self._tiempoDeDetencion.dias = _dias
+
+#         print('Este tiempo de detención es de: {}'.format(self._tiempoDeDetencion)) 
+    
     def __init__(self, fecha_de_detencion:datetime.datetime, fecha_de_libertad:datetime.datetime, nombre:str="Sin nombre"):
         self._nombre = nombre
         self._detencion = fecha_de_detencion
@@ -72,31 +111,52 @@ class OtraDetencion():
         if FechaA_es_Mayor_Que_FechaB(self._detencion, self._libertad):            
             raise Exception('ERROR: Se ingresó una fecha de detención posterior a la fecha de libertad.')
         
+        if FechaA_es_Igual_Que_FechaB(self._detencion, self._libertad):
+            self._tiempoDeDetencion.dias = 1
+            print('Este tiempo de detención es de {} año(s), {} mes(es) y {} día(s)'.format(self._tiempoDeDetencion.años, self._tiempoDeDetencion.meses, self._tiempoDeDetencion.dias))
+            return
+        
         fecha_temp = self._detencion
         _meses = 0
         _años = 0
-        _dias = 1
+        _dias = 0
+        se_paso = False
 
-        if self._detencion.day > self._libertad.day:
-            _meses -= 1
-        
-        while fecha_temp.month != self._libertad.month:
-            _meses += 1
+        # Primero suma meses/años y los acumula hasta que se pase de la fecha de libertad, o que sean iguales
+        while se_paso == False:
+            fecha_previa = fecha_temp
             fecha_temp += relativedelta(months=1)
+            if (FechaA_es_Mayor_Que_FechaB(fecha_temp, self._libertad) == False
+            or FechaA_es_Igual_Que_FechaB(fecha_temp, self._libertad) == True):
+                _meses += 1
+                if _meses == 12:
+                    _meses = 0
+                    _años += 1
+            else:
+                se_paso = True
+                fecha_temp = fecha_previa
         
-        while fecha_temp.year != self._libertad.year:
-            _años += 1
-            fecha_temp += relativedelta(years=1)
-        
-        while fecha_temp.day != self._libertad.day:
-            _dias += 1
+        # Luego, hace lo mismo con los días
+        se_paso = False
+        while se_paso == False:
+            fecha_previa = fecha_temp
             fecha_temp += relativedelta(days=1)
+            if (FechaA_es_Mayor_Que_FechaB(fecha_temp, self._libertad) == False
+            or FechaA_es_Igual_Que_FechaB(fecha_temp, self._libertad) == True):
+                _dias += 1                
+            else:
+                se_paso = True
         
         self._tiempoDeDetencion.años = _años
         self._tiempoDeDetencion.meses = _meses
         self._tiempoDeDetencion.dias = _dias
 
-        print('Este tiempo de detención es de: {}'.format(self._tiempoDeDetencion))    
+        # Aplica correcciones
+        if (self._tiempoDeDetencion.años == 0
+        and self._tiempoDeDetencion.meses == 0):
+            self._tiempoDeDetencion.dias += 1
+
+        print('Este tiempo de detención es de {} año(s), {} mes(es) y {} día(s)'.format(self._tiempoDeDetencion.años, self._tiempoDeDetencion.meses, self._tiempoDeDetencion.dias))
 
 class RegimenNormativoAplicable():
     def __init__(self, _fechaDelHecho:datetime.date):
@@ -628,14 +688,18 @@ def MontoDeTiempoA_es_Mayor_que_MontoDeTiempoB(tiempo_a:TiempoEn_Años_Meses_Dia
 def es_multiplo(numero, multiplo):
     return numero % multiplo == 0
 
-def GetConsoleInput_Fecha(mensaje_para_el_usuario='Fecha: ', ENTER_devuelve_NULL=False) -> datetime.date:
+def GetConsoleInput_Fecha(mensaje_para_el_usuario='Fecha: ', ENTER_devuelve_NULL=False, forceInput:str='') -> datetime.date:
     '''Hace ingresar por consola una fecha (formatos XX/XX/XXXX ó X/X/XX) y la devuelve como un datetime.date\n    
     ENTER_devuelve_NULL=True: Si no se ingresa una fecha válida, devuelve "NULL"\n
-    ENTER_devuelve_NULL=False: Si se ingresa una fecha inválida, la vuelve a solicitar'''
+    ENTER_devuelve_NULL=False: Si se ingresa una fecha inválida, la vuelve a solicitar\n
+    forceInput="": Si se ingresa un string, la función no solicita input, y utiliza ese string como si se hubiera ingresado por consola'''
     while True:
         seImprimioError=False
         try:
-            user_input = input(mensaje_para_el_usuario)
+            if forceInput == '':
+                user_input = input(mensaje_para_el_usuario)                
+            else:
+                user_input = forceInput
             if len(user_input) < 6 or len(user_input) > 10:                
                 if ENTER_devuelve_NULL:
                     return 'NULL'
@@ -869,20 +933,7 @@ def GetConsoleInput_OtrosTiemposDeDetencion() -> list[OtraDetencion]:
         return "NULL"
 
 def GetConsoleInput_EstimuloEducativo() -> TiempoEn_Años_Meses_Dias:
-    # estimulo = TiempoEn_Años_Meses_Dias()
-    # try:
-    #     estimulo.años = int(input('Ingresar estímulo educativo (años): '))
-    # except:
-    #     estimulo.años = 0        
-    # try:
-    #     estimulo.meses = int(input('Ingresar estímulo educativo (meses): '))        
-    # except:
-    #     estimulo.meses = 0        
-    # try:
-    #     estimulo.dias = int(input('Ingresar estímulo educativo (días): '))        
-    # except:
-    #     estimulo.dias = 0
-    # return estimulo
+    
     estimulo = TiempoEn_Años_Meses_Dias()
     
     # Ingresar años
@@ -943,5 +994,6 @@ def RestarOtrasDetenciones(fecha_de_requisito_temporal:datetime.date, otras_dete
         return toreturn
 
 if __name__ == '__main__':    
-    x = GetConsoleInput_MontoDePena_temporal()
-    print(x)
+    fechadet = datetime.date(2014, 6, 15)    
+    fechalib = datetime.date(2014, 7, 16)
+    x = OtraDetencion(fechadet, fechalib)
